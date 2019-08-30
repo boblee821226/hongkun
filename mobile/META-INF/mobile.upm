@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="gbk"?>
+<module name="hkjt">
+  <public>
+	<component name="mobileinfoservlet" accessProtected="false" remote="false" singleton="true"  tx="NONE">
+	  <implementation>com.mobile.service.MobileInfoServlet</implementation>
+	</component>
+  </public> 
+</module> 

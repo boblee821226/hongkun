@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="gbk"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<bean id="general" class="nc.pubapp.pade.code.funnode.FunNodePara">
+        <property name="moduleName" value="hkjt" />
+	    <property name="bpfPath" value="test.bpf" />
+	    <property name="funcode" value="HKJ20637"/>
+	    <property name="funNodeName" value="zulin.sjdy"/>
+	    <property name="clientPackName" value="nc.ui.hkjt.zulin.sjdy"/>
+			  		<property name="dbilldDate" value="Dbilldate" />
+			    <property name="metaData" value="zulin\METADATA\hk_zulin_sjdy.bmf" />
+	    <property name="xmlPath" value="zulin\src\client\nc\ui\hkjt\zulin/sjdy\ace\view\Hk_zulin_sjdy_config.xml" />
+	    <property name="metaDataType" value="multiType" />
+	    <property name="funcregispath" value="zulin/designmodel/funcmodel/hk_zulin_sjdy/funcregis/HKJ20637.func" />
+	    <property name="quetempath" value="zulin/designmodel/templet/hk_zulin_sjdy/querytemplet/HKJ20637.qtf" />
+	    <property name="printtempath" value="zulin/designmodel/templet/hk_zulin_sjdy/outtemplet/HKJ20637.otf" />
+	    <property name="systembasepath" value="zulin/designmodel/systemplatebase/hk_zulin_sjdy/HKJ20637/HKJ20637.stb" />
+	    <property name="extendSuffix" value=""/>
+	    <property name="uif2ModelFilePath" value="zulin\designmodel\ace\uif2model\HKJ20637.umf"/>
+	    <property name="busiCompName" value="zulin"/>
+	    <property name="metaDataId" value="c6c07e69-fe53-4d4e-9f4b-dd87eebf3502"/>
+	</bean>
+	
+	<bean id="templet" class="nc.pubapp.pade.code.funnode.Templet">
+	    <property name="tempStyle" value="2" />
+	    <property name="nodeKey" value="" />
+		<property name="templetPath" value="zulin/designmodel/templet/hk_zulin_sjdy/billtemplet/HKJ20637.btf" />
+	</bean>
+
+	<bean id="BAEHpara" class="nc.pubapp.pade.code.funnode.BodyAfterEditHandlerPara">
+		<property name="itemList">
+			<list>
+							</list>
+		</property>
+	</bean>
+
+	<bean id="BBEHpara" class="nc.pubapp.pade.code.funnode.BodyBeforeEditHandlerPara">
+		<property name="itemList">
+			<list>
+							</list>
+		</property>
+	</bean>
+	
+	<bean id="HTBEHpara" class="nc.pubapp.pade.code.funnode.HeadTailBeforeEditHandlerPara">
+	</bean>
+	
+	<bean id="HTAEHpara" class="nc.pubapp.pade.code.funnode.HeadTailAfterEditHandlerPara">
+	</bean>
+	
+	<bean id="SerPropara" class="nc.pubapp.pade.code.funnode.ServiceProxyPara">
+						<property name="queryAllPk">
+			<bean class="nc.pubapp.pade.code.funnode.ServiceProxyItemPara">
+				<property name="fullClassName" value="nc.itf.hkjt.IHk_zulin_sjdyMaintain" />
+				<property name="itmClassName" value=".IHk_zulin_sjdyMaintain" />
+				<property name="methodName" value="queryPKs" />
+			</bean>
+		</property>
+				<property name="queryBillByPk">
+			<bean class="nc.pubapp.pade.code.funnode.ServiceProxyItemPara">
+				<property name="fullClassName" value="nc.itf.hkjt.IHk_zulin_sjdyMaintain" />
+				<property name="itmClassName" value=".IHk_zulin_sjdyMaintain" />
+				<property name="methodName" value="queryBillByPK" />
+			</bean>
+		</property>
+		</bean>
+	
+	<bean id="FilePackNameBean" class="nc.pubapp.pade.code.engine.FilePackNamePara">
+    	<property name="filePackNameList">
+	    	<list>
+				     						       <value>nc.ui.hkjt.zulin.sjdy.handler.OrgChangedHandler.java</value>
+			       <value>nc.ui.hkjt.zulin.sjdy.ace.handler.AceAddHandler.java</value>
+			       <value>nc.ui.hkjt.zulin.sjdy.ace.handler.AceBodyAfterEditHandler.java</value>
+			       <value>nc.ui.hkjt.zulin.sjdy.ace.handler.AceBodyBeforeEditHandler.java</value>
+			       <value>nc.ui.hkjt.zulin.sjdy.ace.handler.AceHeadTailAfterEditHandler.java</value>
+			       <value>nc.ui.hkjt.zulin.sjdy.ace.handler.AceHeadTailBeforeEditHandler.java</value>
+			       <value>nc.ui.hkjt.zulin.sjdy.ace.handler.AceOrgChangedHandler.java</value>
+			       <value>nc.ui.hkjt.zulin.sjdy.ace.serviceproxy.AceHk_zulin_sjdyMaintainProxy.java</value>
+			       <value>nc.ui.hkjt.zulin.sjdy.action.Hk_zulin_sjdyAddAction.java</value>
+			       <value>nc.ui.hkjt.zulin.sjdy.action.Hk_zulin_sjdyDeleteAction.java</value>
+			       <value>nc.ui.hkjt.zulin.sjdy.action.Hk_zulin_sjdyEditAction.java</value>
+			       <value>nc.ui.hkjt.zulin.sjdy.action.CopyActionProcessor.java</value>
+			     			       <value>nc.ui.hkjt.zulin.sjdy.query.Hk_zulin_sjdyQueryConditionInitializer.java</value>
+		     </list>
+	   </property>
+	</bean>
+
+</beans>

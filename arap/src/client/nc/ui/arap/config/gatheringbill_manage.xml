@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+
+<beans>
+	<import resource="classpath:/nc/ui/arap/config/gatheringbill_base.xml" />
+	
+	<!--导入导出action组 -->
+	<bean id="importableEditor" class="nc.ui.arap.importable.GatheringImportablePanel" >
+	<property name="uiEditor" ref="billFormEditor" />
+	</bean>
+	<bean id="importAction" class="nc.ui.arap.importable.action.ArapImportAction"
+		autowire="byName">
+		<property name="model" ref="ManageAppModel" />
+		<property name="importableEditor" ref="importableEditor" />
+	</bean>
+	<bean id="exportAction" class="nc.ui.arap.importable.ArapExportAction"
+		autowire="byName">
+		<property name="importableEditor" ref="importableEditor" />
+		<property name="model" ref="ManageAppModel" />
+		<property name="interceptor" ref="exportActionInterceptor"></property>
+	</bean>
+	<bean id="importexportActionGroup" class="nc.funcnode.ui.action.MenuAction">
+		<property name="code" value="ImportExportMenu" />
+		<property name="name">
+			<bean class="nc.ui.uif2.I18nFB">
+				<property name="resDir" value="2006pub_0"></property>
+				<property name="resId" value="02006pub-0654"></property>
+				<property name="defaultValue" value="导入导出"></property>
+			</bean>
+		</property>
+		<property name="actions">
+			<list>
+				<ref bean="importAction" />
+				<ref bean="currNullAction" />
+				<ref bean="exportAction" />
+			</list>
+		</property>
+	</bean>
+	<bean id="listActions" class="nc.ui.uif2.actions.StandAloneToftPanelActionContainer">
+		<constructor-arg>
+			<ref bean="listView" />
+		</constructor-arg>
+		<property name="actions">
+			<list>
+				<ref bean="addActionGroup" />
+				<ref bean="editAction" />
+				<ref bean="deleteAction" />
+				<ref bean="copyAction" />
+				<ref bean="currNullAction" />
+				<ref bean="queryAction" />
+				<ref bean="refreshAllAction" />
+				<ref bean="currNullAction" />
+				<ref bean="transtype" />
+				<ref bean="billApproveActionGroup_List" />
+				<ref bean="billVerifyActionGroup" />
+				<ref bean="prepayAction" />
+				<ref bean="pauseTransactActionGroup" />
+				<ref bean="madeBillAction" />
+				<ref bean="writeBack" />
+				<ref bean="billAssistantActionGroup_List" />
+				<ref bean="currNullAction" />
+				<ref bean="receiptMenuAction" />
+				<ref bean="currNullAction" />
+				<ref bean="relatedQueryActionGroup" />
+				<ref bean="currNullAction" />
+				<ref bean="importexportActionGroup" />
+				<ref bean="printOperateActionGroup_List" />
+				
+				<!-- HK 2018年10月24日15:30:21 -->
+				<!-- 收款开票 按钮  -->
+				<ref bean="currNullAction" />
+				<ref bean="skKaipiaoActionReal" />
+				<!-- END -->
+				
+				<!-- HK 2018年10月24日16:59:13 -->
+				<!-- 开票明细 按钮  -->
+				<ref bean="currNullAction" />
+				<ref bean="kpQueryActionReal" />
+				<!-- END -->
+				
+			</list>
+		</property>
+	</bean>
+	<bean id="cardActions" class="nc.ui.uif2.actions.StandAloneToftPanelActionContainer">
+		<constructor-arg>
+			<ref bean="billFormEditor" />
+		</constructor-arg>
+		<property name="actions">
+			<list>
+
+				<ref bean="addActionGroup" />
+				<ref bean="editAction" />
+				<ref bean="deleteAction" />
+				<ref bean="copyAction" />
+				<ref bean="currNullAction" />
+				<ref bean="queryAction" />
+				<ref bean="refreshSingAction" />
+				<ref bean="currNullAction" />
+				<ref bean="transtype" />
+				<ref bean="billApproveActionGroup" />
+				<ref bean="billVerifyActionGroup" />
+				<ref bean="prepayAction" />
+				<ref bean="pauseTransactActionGroup" />
+				<ref bean="madeBillAction" />
+				<ref bean="writeBack" />
+				<ref bean="billAssistantActionGroup" />
+				<ref bean="currNullAction" />
+				<ref bean="receiptMenuAction" />
+				<ref bean="currNullAction" />
+				<ref bean="relatedQueryActionGroup" />
+				<ref bean="currNullAction" />
+				<ref bean="importexportActionGroup" />
+				<ref bean="printOperateActionGroup" />
+				
+				<!-- HK 2018年10月22日16:47:11 -->
+				<!-- 收款开票 按钮  -->
+				<ref bean="currNullAction" />
+				<ref bean="skKaipiaoActionReal" />
+				<!-- END -->
+				
+				<!-- HK 2018年10月24日16:59:13 -->
+				<!-- 开票明细 按钮  -->
+				<ref bean="currNullAction" />
+				<ref bean="kpQueryActionReal" />
+				<!-- END -->
+
+			</list>
+		</property>
+		<property name="editActions">
+			<list>
+				<ref bean="saveAction" />
+				<ref bean="tempSaveAction" />
+				<ref bean="currNullAction" />
+				<ref bean="cancelAction" />
+				<ref bean="currNullAction" />
+			    <ref bean="documentManage" />
+			    <ref bean="receiptMenuAction" />
+				<!--<ref bean="relatedQueryActionGroup" />-->
+			</list>
+		</property>
+		<property name="model" ref="ManageAppModel" />
+	</bean>
+	<bean id="multiBesideWidget" class="nc.ui.uif2.components.widget.MultiBesideWidget"
+		init-method="initUI">
+		<property name="besideWidgetInfoMap">
+			<map>
+				<entry>
+					<key>
+						<bean class="nc.ui.uif2.I18nFB">
+							<property name="resDir" value="uif2" />
+							<property name="resId" value="BesideWidget-000001" />
+							<property name="defaultValue" value="辅助信息" />
+						</bean>
+					</key>
+					<list>
+						<ref bean="creditForm" />
+					</list>
+				</entry>
+				<entry>
+					<key>
+						<bean class="nc.ui.uif2.I18nFB">
+							<property name="resDir" value="uif2" />
+							<property name="resId" value="ActionRegistry-000055" />
+							<property name="defaultValue" value="审批" />
+						</bean>
+					</key>
+					<list>
+						<ref bean="besideApproveForm" />
+						<!-- <ref bean="besideHintMessageForm" /> -->
+						<ref bean="besideHistoryForm" />
+					</list>
+				</entry>
+
+			</map>
+		</property>
+		<property name="context" ref="context" />
+		<property name="model" ref="ManageAppModel" />
+	</bean>
+
+	<!-- HK 2018年10月22日09:55:37 -->
+	<!-- 开票登记  按钮 -->
+	<bean id="skKaipiaoActionReal" class="nc.ui.arap.actions.SkKaipiaoAction">
+		<property name="editor" ref="billFormEditor" />
+		<property name="model" ref="ManageAppModel" />
+		<property name="listView" ref="listView" />
+	</bean>
+	<!-- END -->
+	
+	<!-- HK 2018年10月24日16:58:25 -->
+	<!-- 开票明细  按钮 -->
+	<bean id="kpQueryActionReal" class="nc.ui.arap.actions.KpQueryAction">
+		<property name="editor" ref="billFormEditor" />
+		<property name="model" ref="ManageAppModel" />
+		<property name="listView" ref="listView" />
+	</bean>
+	<!-- END -->
+	
+</beans>

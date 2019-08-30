@@ -1,0 +1,2 @@
+DELETE FROM sm_funcregister WHERE cfunid = '0001Z21000000000K6UP';
+DELETE FROM sm_paramregister WHERE pk_param = '0001Z21000000000K6UQ';

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="gbk"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+<bean id="funcregister" class="nc.pubapp.pade.funcmodel.vo.FuncRegister"><property name="bmf_path" value="zulin\METADATA\hk_zulin_znjjm.bmf"/>
+<property name="busiActiveList">
+<list></list>
+</property>
+<property name="cfunid" value="0001ZZ100000000WW6SX"/>
+<property name="class_name" value="nc.ui.pubapp.uif2app.ToftPanelAdaptorEx"/>
+<property name="dr" value="0"/>
+<property name="fun_name" value="滞纳金减免单"/>
+<property name="fun_property" value="0"/>
+<property name="funcRegisterButtonList">
+<list></list>
+</property>
+<property name="funcRegisterParamList">
+<list><bean class="nc.pubapp.pade.funcmodel.vo.FuncRegisterParam"><property name="dr" value="0"/>
+<property name="paramname" value="BeanConfigFilePath"/>
+<property name="paramvalue" value="nc/ui/hkjt/zulin/znjjm/ace/view/Hk_zulin_znjjm_config.xml"/>
+<property name="parentid" value="0001ZZ100000000WW6SX"/>
+<property name="pk_param" value="0001ZZ100000000WW6SY"/>
+<property name="ts" value="2019-05-19 12:44:05"/>
+</bean>
+</list>
+</property>
+<property name="funcode" value="HKJ20640"/>
+<property name="funnode_path" value="zulin\designmodel\ace\client\HKJ20640.fnf"/>
+<property name="funtype" value="0"/>
+<property name="isbuttonpower" value="false"/>
+<property name="isenable" value="true"/>
+<property name="isfunctype" value="false"/>
+<property name="menuModelFilePath" value="zulin/designmodel/funcmodel/hk_zulin_znjjm/menuitemregis/ZL0114.menu"/>
+<property name="metaDataID" value="1b1ea3d8-4c01-4f8b-890f-4202e65e9e98"/>
+<property name="moduleName" value="hkjt"/>
+<property name="orgtypecode" value="SALEORGTYPE000000000"/>
+<property name="own_module" value="HKJ2"/>
+<property name="pageList">
+<list></list>
+</property>
+<property name="parent_id" value="0001ZZ100000000184QK"/>
+<property name="pk_group" value="~"/>
+<property name="ts" value="2019-05-19 12:44:05"/>
+<property name="uif2model_path" value="zulin\designmodel\ace\uif2model\HKJ20640.umf"/>
+</bean>
+
+</beans>

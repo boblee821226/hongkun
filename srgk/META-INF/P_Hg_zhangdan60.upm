@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding='gb2312'?>
+<module name="hkjt">
+  <public>
+	<component remote="true" singleton="true"  tx="CMT">
+	  <interface>nc.itf.hkjt.IHg_zhangdanMaintain</interface>
+	  <implementation>nc.impl.hkjt.Hg_zhangdanMaintainImpl</implementation>
+	</component>
+	<component remote="true" singleton="true"  tx="CMT">
+	  <interface>nc.itf.hkjt.IHg_zhangdanDataCompute</interface>
+	  <implementation>nc.impl.hkjt.Hg_zhangdanDataCompImpl</implementation>
+	</component>
+  </public> 
+</module> 

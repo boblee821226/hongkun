@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+
+<beans>
+	<!-- 合同基本子表 复制粘帖时清除的字段 -->
+	<bean id="pasteClearItem_ct_sale_b" class="java.util.ArrayList">
+		<constructor-arg>
+			<list>
+				<value>nordnum</value>
+				<value>nordsum</value>
+				<value>pk_ct_sale_b</value>
+				<value>noritotalgpmny</value>
+				<value>ntotalgpmny</value>
+				<value>pk_origctb</value>
+				<value>pk_ecmct</value>	
+				<value>pk_ecmct_b</value>	
+				<value>vecmctbillcode</value>	
+				<value>ts</value>
+			</list>
+		</constructor-arg>
+	</bean>
+	<!-- 合同条款复制粘帖时清除的字段 -->	
+	<bean id="pasteClearItem_ct_sale_term" class="java.util.ArrayList">
+		<constructor-arg>
+			<list>
+				<value>pk_ct_sale_term</value>
+				<value>ts</value>
+			</list>
+		</constructor-arg>
+	</bean>
+	
+	<!-- 合同费用复制粘帖时清除的字段 -->	
+	<bean id="pasteClearItem_ct_sale_exp" class="java.util.ArrayList">
+		<constructor-arg>
+			<list>
+				<value>pk_ct_sale_exp</value>
+				<value>ts</value>
+			</list>
+		</constructor-arg>
+	</bean>
+	<!-- 合同大事记复制粘帖时清除的字段 -->	
+	<bean id="pasteClearItem_ct_sale_memora" class="java.util.ArrayList">
+		<constructor-arg>
+			<list>
+				<value>pk_ct_sale_memora</value>
+				<value>ts</value>
+			</list>
+		</constructor-arg>
+	</bean>
+	
+	<!-- 合同收款协议 -->	
+	<bean id="pasteClearItem_ct_sale_payterm" class="java.util.ArrayList">
+		<constructor-arg>
+			<list>
+				<value>pk_ct_sale_payterm</value>
+				<value>ts</value>
+			</list>
+		</constructor-arg>
+	</bean>
+	
+</beans>

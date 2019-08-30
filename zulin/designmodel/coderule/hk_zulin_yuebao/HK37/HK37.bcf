@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="gbk"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+<bean id="needBCR" class="nc.pubapp.pade.billcode.vo.NeedBCR"><property name="code" value="HK37"/>
+<property name="codelenth" value="40"/>
+<property name="codescope" value="global"/>
+<property name="codestyle" value="after"/>
+<property name="metaid" value="5f8f6955-8927-4279-ac6f-d0ac3fa56840"/>
+<property name="name" value="HK37"/>
+<property name="orgtype" value="GLOBLE00000000000000"/>
+<property name="pk_nbcr" value="0001ZZ100000000MSLAN"/>
+</bean>
+
+</beans>

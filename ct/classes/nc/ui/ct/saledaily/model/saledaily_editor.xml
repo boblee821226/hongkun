@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+
+<beans default-lazy-init="true">
+	<!-- 编辑事件 --> 
+	    <bean id="appEventHandlerMediator" class="nc.ui.pubapp.uif2app.model.AppEventHandlerMediator">
+		<property name="model" ref="ManageAppModel" />
+		<property name="handlerMap">
+			<map>
+				<!-- 表头行切换事件 -->
+				<entry key="nc.ui.pubapp.uif2app.event.list.ListHeadRowChangedEvent">
+					<list>
+						<ref bean="headrowchghandler" />
+					</list>
+				</entry>
+				<!-- 主组织(销售组织)编辑事件 -->
+				<entry key="nc.ui.pubapp.uif2app.event.OrgChangedEvent">
+					<list>
+						<ref bean="mainorgchghandler" />
+					</list>
+				</entry>
+				
+				<!-- 表头(尾)编辑前事件 -->
+				<entry key="nc.ui.pubapp.uif2app.event.card.CardHeadTailBeforeEditEvent">
+					<list>
+						<ref bean="before_headtail_edithandler" />
+					</list>
+				</entry>
+				<!-- 表头(尾)编辑后事件 -->
+				<entry key="nc.ui.pubapp.uif2app.event.card.CardHeadTailAfterEditEvent">
+					<list>
+						<ref bean="after_headtail_edithandler" />
+					</list>
+				</entry>
+				<!-- 表体编辑前事件 -->
+				<entry key="nc.ui.pubapp.uif2app.event.card.CardBodyBeforeEditEvent">
+					<list>
+						<ref bean="before_body_edithandler" />
+					</list>
+				</entry>
+				<!-- 表体编辑后事件 -->
+				<entry key="nc.ui.pubapp.uif2app.event.card.CardBodyAfterEditEvent">
+					<list>
+						<ref bean="after_body_edithandler" />
+						<ref bean="relationCalculate"/> 
+					</list>
+				</entry>
+				
+			</map>
+					
+		</property>
+	</bean>
+	
+	<!-- 表头行切换后处理 -->
+	<bean id="headrowchghandler" class="nc.ui.ct.editor.rowchange.HeadRowChangeHandler">
+		<property name="tableCode" value = "pk_ct_sale_b"></property>
+	</bean>
+	
+	<!-- 主组织(销售组织)编辑后处理 -->
+	<bean id="mainorgchghandler" class="nc.ui.ct.saledaily.editor.org.SaleOrgChangedEventHandler">
+		<property name="cardForm" ref="billFormEditor" />
+	</bean>
+	
+	<!-- 表头(尾)编辑前事件处理器 -->
+	<bean id="before_headtail_edithandler" class="nc.ui.ct.saledaily.editor.before.SaleHeadTailBeforeEventHandler">
+	</bean>
+	
+	<!-- 表头(尾)编辑后事件处理器 -->
+	<bean id="after_headtail_edithandler" class="nc.ui.ct.saledaily.editor.after.SaleHeadTailAfterEventHandler">
+	</bean>
+	
+	<!-- 表体编辑前事件处理器 -->
+	<bean id="before_body_edithandler" class="nc.ui.ct.saledaily.editor.before.SaleBodyBeforeEventHandler">
+	</bean>
+	
+	<!-- 表体编辑后事件处理器 -->
+	<bean id="after_body_edithandler" class="nc.ui.ct.saledaily.editor.after.SaleBodyAfterEventHandler">
+	</bean>
+	
+	<!-- 单价金额关系换算 -->
+	<bean id="relationCalculate" class="nc.ui.ct.util.RelationCalculate"/>
+	
+</beans>
+

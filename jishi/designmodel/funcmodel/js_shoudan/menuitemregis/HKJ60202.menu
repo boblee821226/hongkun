@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="gbk"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+<bean id="menuItem" class="nc.pubapp.pade.funcmodel.vo.MenuItem"><property name="dr" value="0"/>
+<property name="funModelFilePath" value="jishi/designmodel/funcmodel/js_shoudan/funcregis/HKJ60202.menu"/>
+<property name="funcode" value="HKJ60202"/>
+<property name="ismenutype" value="false"/>
+<property name="menuitemcode" value="HKJ21002"/>
+<property name="menuitemname" value="手单流水"/>
+<property name="pk_menuitem" value="0001ZZ100000000062D7"/>
+<property name="resid" value="DHKJ21002"/>
+<property name="ts" value="2016-05-12 16:41:53"/>
+</bean>
+
+</beans>

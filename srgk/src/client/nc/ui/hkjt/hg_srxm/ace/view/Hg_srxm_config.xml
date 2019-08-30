@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="gbk"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<!-- 环境变量 -->
+	<bean id="context" class="nc.vo.uif2.LoginContext" />
+
+	<!-- 应用服务类，负责进行模型操作的处理 -->
+	<bean id="modelService"
+		class="nc.ui.hkjt.hg_srxm.ace.maintain.AceHg_srxmService" />
+		
+	<!-- 数据模型管理器，主要负责各种方式的模型初始化     -->
+	<bean id="modelDataManager" class="nc.ui.hkjt.hg_srxm.ace.maintain.AceHg_srxmDataManager">
+		<property name="model" ref="appModel" />
+		<property name="service" ref="modelService" />
+	</bean>		
+
+	<!-- 对象转换器工厂，由此获取操作对象的特征信息 -->
+	<!-- 对于有元数据的VO，可以使用下面的配置 -->
+	<bean id="boadatorfactory" class="nc.vo.bd.meta.BDObjectAdpaterFactory" />
+
+	<!-- 模板容器，负责对模板的统一装载 -->
+	<bean id="templateContainer" class="nc.ui.uif2.editor.TemplateContainer"
+		init-method="load">
+		<property name="context" ref="context" />
+	</bean>
+
+		
+	<!-- 层次结构构造策略 -->
+	<bean id="treeCreateStrategy" class="nc.vo.bd.meta.BDObjectTreeCreateStrategy">
+		<property name="factory" ref="boadatorfactory" />
+						<property name="rootName" value="收入项目" />
+	</bean>
+
+	<!-- 层次应用模型 -->
+	<bean id="appModel" class="nc.ui.pubapp.uif2app.model.HierachicalDataAppModel">
+		<property name="service" ref="modelService" />
+		<property name="treeCreateStrategy" ref="treeCreateStrategy" />
+		<property name="businessObjectAdapterFactory" ref="boadatorfactory" />
+		<property name="context" ref="context" />
+	</bean>
+
+	<!--树控件 -->
+	<bean id="bdobjectFilter" class="nc.ui.pub.beans.tree.BDObjectFilterByText" />
+	<bean id="treePanel" class="nc.ui.uif2.components.TreePanel"
+		init-method="init">
+		<property name="model" ref="appModel" />
+		<property name="searchMode" value="filter" />
+		<property name="filterByText"><ref bean="bdobjectFilter" /></property>
+	</bean>
+
+	<!-- 列表控件的取值策略 -->
+	<bean id="componentValueManager" class="nc.ui.uif2.editor.value.BillCardPanelHeadVOValueAdapter">
+		<property name="headVOName"
+			value="nc.vo.hkjt.srgk.huiguan.srxm.SrxmHVO" />
+	</bean>
+
+	<!--卡控件 -->
+	<bean id="billFormEditor" class="nc.ui.pubapp.uif2app.view.BillForm"
+		init-method="initUI">
+		<property name="model" ref="appModel" />
+		<property name="templateContainer" ref="templateContainer" />
+		<property name="componentValueManager" ref="componentValueManager" />
+	</bean>
+	
+	<!-- 事件监听-->
+	<bean id="appEventHandlerMediator" class="nc.ui.pubapp.uif2app.model.AppEventHandlerMediator">
+		<property name="model" ref="appModel" />
+		<property name="handlerGroup">
+			<list>	
+				<!-- 新增事件 -->
+				<bean class="nc.ui.pubapp.uif2app.event.EventHandlerGroup">
+					<property name="event" value="nc.ui.pubapp.uif2app.event.billform.AddEvent"/>
+					<property name="handler">
+						<bean class="nc.ui.hkjt.hg_srxm.ace.handler.AceAddHandler"/>
+					</property>
+				</bean>	
+						<!-- 表头表尾字段编辑前事件 -->
+				<bean class="nc.ui.pubapp.uif2app.event.EventHandlerGroup">
+					<property name="event"
+						value="nc.ui.pubapp.uif2app.event.card.CardHeadTailBeforeEditEvent" />
+					<property name="handler">
+						<bean class="nc.ui.hkjt.hg_srxm.ace.handler.CardHeadTailBeforeEditHandler"/>
+					</property>
+				</bean>
+			</list>
+		</property>		
+	</bean>	
+
+	<bean id="top_panel" class="nc.ui.bd.pub.BDOrgPanel" init-method="initUI">
+		<property name="model" ref="appModel" />
+		<property name="dataManager" ref="modelDataManager" />
+		<property name="refNodeName" value="业务单元" />
+		<property name="labelName">
+			<bean class="nc.ui.uif2.I18nFB">
+			  	<property name="resDir" value="org"/>
+				<property name="resId" value="0org0010"/>
+				<property name="defaultValue" value="业务单元"/>
+			</bean>
+		</property>
+	</bean>
+	<bean id="baseinfopane" class="nc.ui.uif2.tangramlayout.node.VSNode">
+		<property name="up">
+			<bean class="nc.ui.uif2.tangramlayout.node.CNode">
+				<property name="component"><ref bean="top_panel"/></property>
+			</bean>
+		</property>
+		<property name="down">
+			<bean class="nc.ui.uif2.tangramlayout.node.HSNode">
+				<property name="left">
+					<bean class="nc.ui.uif2.tangramlayout.node.CNode">
+						<property name="component"><ref bean="treePanel"/></property>
+					</bean>
+				</property>
+				<property name="right">
+					<bean class="nc.ui.uif2.tangramlayout.node.CNode">
+						<property name="component"><ref bean="billFormEditor"/></property>
+					</bean>
+				</property>
+				<property name="dividerLocation"><value>0.2</value></property>
+			</bean>
+		</property>
+		<property name="dividerLocation"><value>30f</value></property>
+		<property name="name">
+			<bean class="nc.ui.uif2.I18nFB">
+			  	<property name="resDir" value="org"></property>
+				<property name="resId" value="UC001-0000106"></property>
+				<property name="defaultValue" value="卡片"></property>
+			</bean>
+		</property>
+		<property name="showMode"><value>NoDivider</value></property>
+	</bean>
+	
+
+	<!-- 界面布局总装-->
+	<bean id="container" class="nc.ui.uif2.TangramContainer"
+		init-method="initUI">
+		<property name="tangramLayoutRoot">
+			    <bean class="nc.ui.uif2.tangramlayout.node.TBNode">
+	       <property name="showMode" value="CardLayout"></property>
+	       <property name="name" value="versionqry"></property>
+	       <property name="tabs">
+	         <list>
+	           <ref bean="baseinfopane"/>
+	          
+	         </list>
+	       </property>
+	     </bean>
+		</property>
+		<property name="actions">
+			<list>
+				<ref bean="addAction" />
+				<ref bean="editAction" />
+				<ref bean="deleteAction" />
+				<ref bean="separatorAction" />
+
+				<ref bean="refreshAction" />
+				<ref bean="separatorAction" />
+				<!--ref bean="fenpeiAction" /-->
+			</list>
+		</property>
+		<property name="editActions">
+			<list>
+				<ref bean="saveAction" />
+				<ref bean="cancelAction" />
+			</list>
+		</property>
+		<property name="model" ref="appModel" />
+	</bean>
+
+	<!-- 节点关闭校验 -->
+	<bean id="ClosingListener" class="nc.ui.pubapp.common.validateservice.ClosingCheck">
+		<property name="model" ref="appModel" />
+		<property name="saveAction" ref="saveAction" />
+	</bean>
+	
+	<!-- 分隔按钮 -->
+	<bean id="separatorAction" class="nc.funcnode.ui.action.SeparatorAction" />
+
+	<bean id="addAction" class="nc.ui.pubapp.uif2app.actions.AddAction">
+		<property name="model" ref="appModel" />
+	</bean>
+
+	<bean id="editAction" class="nc.ui.pubapp.uif2app.actions.EditAction">
+		<property name="model" ref="appModel" />
+	</bean>
+
+	<bean id="deleteAction" class="nc.ui.hkjt.hg_srxm.ace.action.DeleteAction">
+		<property name="model" ref="appModel" />
+	</bean>
+
+	<bean id="refreshAction" class="nc.ui.pubapp.uif2app.actions.RefreshAction">
+		<property name="model" ref="appModel" />
+		<property name="dataManager" ref="modelDataManager" />
+	</bean>
+
+	<bean id="saveAction" class="nc.ui.pubapp.uif2app.actions.SaveAction">
+		<property name="model" ref="appModel" />
+		<property name="editor" ref="billFormEditor" />
+	</bean>
+
+	<bean id="cancelAction" class="nc.ui.uif2.actions.CancelAction">
+		<property name="model" ref="appModel" />
+	</bean>
+	<!--分配按钮-->
+	<bean id="fenpeiAction" class="nc.ui.hkjt.hg_srxm.ace.action.FenPeiAction">
+		<property name="model" ref="appModel" />
+		<property name="dataManager" ref="modelDataManager" />
+	</bean>
+</beans>

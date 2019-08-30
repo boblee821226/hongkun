@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding='gb2312'?>
+<module name="hkjt">
+  <public>
+	<component remote="true" singleton="true"  tx="CMT">
+	  <interface>nc.itf.hkjt.IHk_zulin_yuebaoMaintain</interface>
+	  <implementation>nc.impl.hkjt.Hk_zulin_yuebaoMaintainImpl</implementation>
+	</component>
+	
+	<component remote="true" singleton="true"  tx="CMT">
+	  <interface>nc.itf.hkjt.report.HkjtReportITF</interface>
+	  <implementation>nc.impl.hkjt.report.HkjtReportImpl</implementation>
+	</component>
+
+  </public> 
+</module> 

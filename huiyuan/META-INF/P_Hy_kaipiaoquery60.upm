@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding='gb2312'?>
+<module name="hkjt">
+  <public>
+	<component remote="true" singleton="true"  tx="CMT">
+	  <interface>nc.itf.hkjt.IHy_kaipiaoqueryMaintain</interface>
+	  <implementation>nc.impl.hkjt.Hy_kaipiaoqueryMaintainImpl</implementation>
+	</component>
+
+  </public> 
+</module> 

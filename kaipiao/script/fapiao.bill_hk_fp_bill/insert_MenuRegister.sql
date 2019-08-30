@@ -1,0 +1,1 @@
+INSERT INTO sm_menuitemreg (ts, nodeorder, pk_menu, menuitemname, iconpath, resid, pk_menuitem, ismenutype, menudes, funcode, menuitemcode, dr ) VALUES ('2016-08-22 19:34:29', null, '1004ZZ10000000000FFL', '账单开票', null, 'DHKJ20633', '0001Z21000000000K6UR', 'N', null, 'HKJ20633', 'HKJ20633', 0 );

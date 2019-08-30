@@ -1,0 +1,1 @@
+INSERT INTO sm_menuitemreg (ts, nodeorder, menuitemname, pk_menu, iconpath, resid, pk_menuitem, ismenutype, menudes, funcode, menuitemcode, dr ) VALUES ('2018-09-20 18:46:29', null, '租赁月报', '1001N5100000000PGXNG', null, 'DHKJ20635', '0001ZZ100000000MSKWB', 'N', null, 'HKJ20635', 'HKJ20635', 0 );

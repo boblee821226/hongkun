@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding='gb2312'?>
+<module name="hkjt">
+  <public>
+	<component remote="true" singleton="true"  tx="CMT">
+	  <interface>nc.itf.hkjt.IJs_shoudanMaintain</interface>
+	  <implementation>nc.impl.hkjt.Js_shoudanMaintainImpl</implementation>
+	</component>
+
+  </public> 
+</module> 

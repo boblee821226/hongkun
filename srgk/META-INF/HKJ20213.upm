@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="gbk"?>
+<module name="hkjt">
+	<public>
+		    <!-- 接口 -->
+		    <component priority="0" singleton="true" remote="true" tx="CMT" supportAlias="true">
+	      <interface>nc.itf.hkjt.IHg_jzfsMaintain</interface>
+	      <implementation>nc.impl.hkjt.Hg_jzfsMaintainImpl</implementation>
+	    </component>
+	    
+	</public>
+</module>

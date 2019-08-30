@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding='gb2312'?>
+<module name="hkjt">
+  <public>
+	<component remote="true" singleton="true"  tx="CMT">
+	  <interface>nc.itf.hkjt.IHk_zulin_sdflrMaintain</interface>
+	  <implementation>nc.impl.hkjt.Hk_zulin_sdflrMaintainImpl</implementation>
+	</component>
+
+  </public> 
+</module> 
