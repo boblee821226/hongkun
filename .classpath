@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" output="api/classes" path="api/src/public"/>
+	<classpathentry kind="src" output="api/classes" path="api/src/private"/>
+	<classpathentry kind="src" output="cmp/classes" path="cmp/src/public"/>
+	<classpathentry kind="src" output="cmp/classes" path="cmp/src/client"/>
+	<classpathentry kind="src" output="cmp/classes" path="cmp/src/private"/>
+	<classpathentry kind="src" output="cmp/classes" path="cmp/src/test"/>
+	<classpathentry kind="src" output="cmp/classes" path="cmp/resources"/>
+	<classpathentry kind="src" output="zulin/classes" path="zulin/src/public"/>
+	<classpathentry kind="src" output="zulin/classes" path="zulin/src/client"/>
+	<classpathentry kind="src" output="zulin/classes" path="zulin/src/private"/>
+	<classpathentry kind="src" output="zulin/classes" path="zulin/src/test"/>
+	<classpathentry kind="src" output="zulin/classes" path="zulin/resources"/>
+	<classpathentry kind="src" output="arap/classes" path="arap/src/public"/>
+	<classpathentry kind="src" output="arap/classes" path="arap/src/client"/>
+	<classpathentry kind="src" output="arap/classes" path="arap/src/private"/>
+	<classpathentry kind="src" output="arap/classes" path="arap/src/test"/>
+	<classpathentry kind="src" output="arap/classes" path="arap/resources"/>
+	<classpathentry kind="src" output="ct/classes" path="ct/src/public"/>
+	<classpathentry kind="src" output="ct/classes" path="ct/src/client"/>
+	<classpathentry kind="src" output="ct/classes" path="ct/src/private"/>
+	<classpathentry kind="src" output="ct/classes" path="ct/src/test"/>
+	<classpathentry kind="src" output="ct/classes" path="ct/resources"/>
+	<classpathentry kind="src" output="kaipiao/classes" path="kaipiao/src/public"/>
+	<classpathentry kind="src" output="kaipiao/classes" path="kaipiao/src/client"/>
+	<classpathentry kind="src" output="kaipiao/classes" path="kaipiao/src/private"/>
+	<classpathentry kind="src" output="gl/classes" path="gl/src/private"/>
+	<classpathentry kind="src" output="mobile/classes" path="mobile/src/public"/>
+	<classpathentry kind="src" output="mobile/classes" path="mobile/src/client"/>
+	<classpathentry kind="src" output="mobile/classes" path="mobile/src/private"/>
+	<classpathentry kind="src" output="jishi/classes" path="jishi/src/public"/>
+	<classpathentry kind="src" output="jishi/classes" path="jishi/src/client"/>
+	<classpathentry kind="src" output="jishi/classes" path="jishi/src/private"/>
+	<classpathentry kind="src" output="nengyuan/classes" path="nengyuan/src/public"/>
+	<classpathentry kind="src" output="nengyuan/classes" path="nengyuan/src/client"/>
+	<classpathentry kind="src" output="nengyuan/classes" path="nengyuan/src/private"/>
+	<classpathentry kind="src" output="huiyuan/classes" path="huiyuan/src/public"/>
+	<classpathentry kind="src" output="huiyuan/classes" path="huiyuan/src/client"/>
+	<classpathentry kind="src" output="huiyuan/classes" path="huiyuan/src/private"/>
+	<classpathentry kind="src" output="srgk/classes" path="srgk/src/public"/>
+	<classpathentry kind="src" output="srgk/classes" path="srgk/src/client"/>
+	<classpathentry kind="src" output="srgk/classes" path="srgk/src/private"/>
+	<classpathentry kind="src" output="srgk/classes" path="srgk/src/test"/>
+	<classpathentry kind="src" output="srgk/classes" path="srgk/resources"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/Runtime"/>
+	<classpathentry kind="con" path="com.yonyou.studio.udt.core.container/Ant_Library"/>
+	<classpathentry kind="con" path="com.yonyou.studio.udt.core.container/Product_Common_Library"/>
+	<classpathentry kind="con" path="com.yonyou.studio.udt.core.container/Middleware_Library"/>
+	<classpathentry kind="con" path="com.yonyou.studio.udt.core.container/Framework_Library"/>
+	<classpathentry kind="con" path="com.yonyou.studio.udt.core.container/Module_Public_Library"/>
+	<classpathentry kind="con" path="com.yonyou.studio.udt.core.container/Module_Client_Library"/>
+	<classpathentry kind="con" path="com.yonyou.studio.udt.core.container/Module_Private_Library">
+		<accessrules>
+			<accessrule kind="accessible" pattern="**"/>
+		</accessrules>
+	</classpathentry>
+	<classpathentry kind="con" path="com.yonyou.studio.udt.core.container/Module_Lang_Library"/>
+	<classpathentry kind="con" path="com.yonyou.studio.udt.core.container/Generated_EJB"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
