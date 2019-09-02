@@ -2,11 +2,14 @@ package nc.itf.hkjt.report;
 
 import java.util.HashMap;
 
-import nc.pub.pu.m21.mail.SendMailInfo_dqy;
 import nc.pub.smart.context.SmartContext;
 import nc.pub.smart.data.DataSet;
+import nc.vo.pu.m25.entity.InvoiceVO;
 import nc.vo.pub.BusinessException;
 
+/**
+ * 报表接口、以及其它乱七八糟的接口 都在此实现。
+ */
 public interface HkjtReportITF {
 
 	/**
@@ -26,4 +29,10 @@ public interface HkjtReportITF {
 	public Object sendMail(Object data,Object other)
 	throws BusinessException;
 	
+	/**
+	 * 根据发票VO，判断是否应该生成 出库调整单
+	 * 发票金额 与 入库金额 不一致，并且，期间有出库的情况下，需要生成调整单。
+	 */
+	public Object genCktzdByPoInvoice(InvoiceVO[] poInvoiceVOs, Object ohter) 
+	throws BusinessException;
 }

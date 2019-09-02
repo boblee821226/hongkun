@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
+	<classpathentry kind="src" output="pu/classes" path="pu/src/public"/>
+	<classpathentry kind="src" output="pu/classes" path="pu/src/client"/>
+	<classpathentry kind="src" output="pu/classes" path="pu/src/private"/>
 	<classpathentry kind="src" output="api/classes" path="api/src/public"/>
 	<classpathentry kind="src" output="api/classes" path="api/src/private"/>
 	<classpathentry kind="src" output="cmp/classes" path="cmp/src/client"/>

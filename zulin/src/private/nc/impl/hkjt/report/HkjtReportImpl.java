@@ -9,6 +9,7 @@ import nc.bs.dao.BaseDAO;
 import nc.bs.framework.common.NCLocator;
 import nc.bs.pub.mail.MailTool;
 import nc.itf.hkjt.report.HkjtReportITF;
+import nc.itf.ia.mia.IIAMaintain;
 import nc.jdbc.framework.processor.ArrayListProcessor;
 import nc.pub.smart.context.SmartContext;
 import nc.pub.smart.data.DataSet;
@@ -16,8 +17,16 @@ import nc.pubitf.pp.m29.IAccountQuery;
 import nc.vo.cmp.settlement.SettlementAggVO;
 import nc.vo.cmp.settlement.SettlementBodyVO;
 import nc.vo.cmp.settlement.SettlementHeadVO;
+import nc.vo.ia.mia.entity.IABillVO;
+import nc.vo.ia.mia.entity.IAHeadVO;
+import nc.vo.ia.mia.entity.IAItemVO;
 import nc.vo.pp.m29.account.entity.AccountVO;
+import nc.vo.pu.m25.entity.InvoiceHeaderVO;
+import nc.vo.pu.m25.entity.InvoiceItemVO;
+import nc.vo.pu.m25.entity.InvoiceVO;
 import nc.vo.pub.BusinessException;
+import nc.vo.pub.lang.UFBoolean;
+import nc.vo.pub.lang.UFDate;
 import nc.vo.pub.lang.UFDouble;
 
 public class HkjtReportImpl implements HkjtReportITF {
@@ -284,5 +293,343 @@ public class HkjtReportImpl implements HkjtReportITF {
 		return resultMsg;
 		
 	}
-	
+
+	@Override
+	public Object genCktzdByPoInvoice(InvoiceVO[] poInvoiceVOs, Object ohter)
+			throws BusinessException {
+		
+		try {
+			
+			BaseDAO dao = new BaseDAO();
+			IIAMaintain IAitf = (IIAMaintain)NCLocator.getInstance().lookup(IIAMaintain.class.getName());
+			
+			for(InvoiceVO billVO : poInvoiceVOs) {
+				
+				InvoiceHeaderVO hVO  = billVO.getParentVO();
+				InvoiceItemVO[] bVOs = billVO.getChildrenVO();
+				
+//				String pk_org = hVO.getPk_org();
+				String pk_group = hVO.getPk_group();
+				String yyyymm = "2019-05";
+				
+				/**
+				 * 1、根据发票 查询 采购结算单、以及下游入库单的信息。
+				 */
+				// 结算信息的MAP  key:发票bid  value:入库code\入库数量\入库金额\账簿\结算id\入库日期\成本域\会计期间计算日期\结算bid\结算单号\结算行号
+				HashMap<String,ArrayList<Object[]>> MAP_JS = new HashMap<String,ArrayList<Object[]>>();	
+				{
+					StringBuffer querySQL_1 = 
+					new StringBuffer("select ")
+							.append(" js.PK_SETTLEBILL")		// 0、结算id
+							.append(",jsb.PK_SETTLEBILL_B ")	// 1、结算bid
+							.append(",jsb.PK_INVOICE ")			// 2、发票id
+							.append(",jsb.PK_INVOICE_B ")		// 3、发票bid
+							.append(",rk.cbillid ")				// 4、调整入库id
+							.append(",rkb.cbill_bid ")			// 5、调整入库bid
+							.append(",rk.VBILLCODE ")			// 6、调整入库code
+							.append(",rkb.nnum ")				// 7、调整入库数量
+							.append(",rkb.nmny ")				// 8、调整入库金额
+							.append(",rk.pk_book ")				// 9、账簿
+							.append(",rk.dbilldate ")			//10、调整入库日期
+							.append(",rk.pk_org ")				//11、成本域
+							.append(",rkb.daccountdate ")		//12、调整入库会计期间计算日期 
+							.append(",js.vbillcode ")			//13、结算单号
+							.append(",jsb.crowno ")				//14、结算行号	
+																//15、采购入库的期间
+							// 结算单
+							.append(" from po_settlebill js ")	
+							.append(" inner join po_settlebill_b jsb on js.pk_settlebill = jsb.pk_settlebill ")
+							// 入库单
+							.append(" inner join IA_I2BILL_B rkb on rkb.csrcbid = jsb.pk_settlebill_b ")
+							.append(" inner join IA_I2BILL rk on rkb.cbillid = rk.cbillid ")
+							// where
+							.append(" where js.dr=0 and jsb.dr=0 and rkb.dr=0 and rk.dr=0 ")
+							.append(" and jsb.PK_INVOICE = '"+hVO.getPk_invoice()+"' ")	// 发票id
+					;
+					ArrayList list = (ArrayList)dao.executeQuery(querySQL_1.toString(), new ArrayListProcessor());
+					for(Object obj : list) {
+						Object[] value = (Object[])obj;
+						String pk_js 	= PuPubVO.getString_TrimZeroLenAsNull(value[0]);
+						String pk_js_b 	= PuPubVO.getString_TrimZeroLenAsNull(value[1]);
+						String pk_fp 	= PuPubVO.getString_TrimZeroLenAsNull(value[2]);
+						String pk_fp_b 	= PuPubVO.getString_TrimZeroLenAsNull(value[3]);
+						String pk_rk 	= PuPubVO.getString_TrimZeroLenAsNull(value[4]);
+						String pk_rk_b 	= PuPubVO.getString_TrimZeroLenAsNull(value[5]);
+						String rkCode 	= PuPubVO.getString_TrimZeroLenAsNull(value[6]);
+						UFDouble rkNum 	= PuPubVO.getUFDouble_NullAsZero(value[7]);
+						UFDouble rkMny 	= PuPubVO.getUFDouble_NullAsZero(value[8]);
+						String pk_book 	= PuPubVO.getString_TrimZeroLenAsNull(value[9]);
+						UFDate rkDate	= PuPubVO.getUFDate(value[10]);		// 调整入库-日期
+						String pk_org 	= PuPubVO.getString_TrimZeroLenAsNull(value[11]);	// 成本域
+						UFDate rkkjDate = PuPubVO.getUFDate(value[12]);		// 调整入库-会计期间计算日期 
+						String jsCode 	= PuPubVO.getString_TrimZeroLenAsNull(value[13]);	// 结算单号
+						String jsRowno 	= PuPubVO.getString_TrimZeroLenAsNull(value[14]);	// 结算行号
+						
+						Object[] value_item = 
+							new Object[]{
+								rkCode,		// 0、调整入库单号
+								rkNum,		// 1、调整入库num
+								rkMny,		// 2、调整入库mny
+								pk_book,	// 3、账簿
+								pk_js,		// 4、结算id
+								rkDate,		// 5、调整入库 单据日期
+								pk_org,		// 6、成本域
+								rkkjDate,	// 7、调整入库 会计日期
+								pk_js_b,	// 8、结算bid
+								jsCode,		// 9、结算单号
+								jsRowno,	//10、结算行号
+							};
+						
+						String MAP_key = pk_fp_b;	// Map的key = 发票bid
+						if(MAP_JS.containsKey(MAP_key)) {
+							MAP_JS.get(MAP_key).add(
+								value_item
+							);
+						}
+						else {
+							ArrayList<Object[]> MAP_value = new ArrayList<Object[]>();
+							MAP_value.add(
+								value_item
+							);
+							MAP_JS.put(MAP_key, MAP_value);
+						}
+					}
+				}
+				
+				/**
+				 * 2、根据表体进行循环
+				 */
+				for(InvoiceItemVO bVO : bVOs) {
+					String pk_fp_b = bVO.getPk_invoice_b();
+					ArrayList<Object[]> MAP_value = MAP_JS.get(pk_fp_b);
+					if(MAP_value!=null && MAP_value.size()==2) {
+						
+						UFDouble xx_mny = // 调整的总金额
+							  PuPubVO.getUFDouble_NullAsZero(MAP_value.get(0)[2])
+						.add( PuPubVO.getUFDouble_NullAsZero(MAP_value.get(1)[2]) );
+						
+						UFDouble xx_num = // 调整的总数量
+							PuPubVO.getUFDouble_NullAsZero(MAP_value.get(0)[1]).abs();	// 取绝对值
+						
+						if(
+							PuPubVO.getUFDouble_ZeroAsNull(xx_mny)!=null
+						&&	PuPubVO.getUFDouble_ZeroAsNull(xx_num)!=null
+						) {
+							// 只有 存在金额差，才需要往下进行。
+							UFDouble xx_price = xx_mny.div(xx_num);	// 需要调整的单价
+							String pk_book 	  = PuPubVO.getString_TrimZeroLenAsNull(MAP_value.get(0)[3]);	// 账簿
+							String pk_js      = PuPubVO.getString_TrimZeroLenAsNull(MAP_value.get(0)[4]);	// 结算id
+							UFDate rkDate	  = PuPubVO.getUFDate(MAP_value.get(0)[5]);	// 调整入库日期
+							String pk_org     = PuPubVO.getString_TrimZeroLenAsNull(MAP_value.get(0)[6]);	// 成本域
+							UFDate rkkjDate	  = PuPubVO.getUFDate(MAP_value.get(0)[7]);	// 调整入库会计计算日期
+							String pk_js_b    = PuPubVO.getString_TrimZeroLenAsNull(MAP_value.get(0)[8]);	// 成本域
+							String jsCode     = PuPubVO.getString_TrimZeroLenAsNull(MAP_value.get(0)[9]);	// 成本域
+							String jsRowno    = PuPubVO.getString_TrimZeroLenAsNull(MAP_value.get(0)[10]);	// 成本域
+							String pk_inv  	  = bVO.getPk_material();		// 物料v
+							String pk_inv_src = bVO.getPk_srcmaterial();	// 物料src
+							String pk_cgrk 	  = bVO.getCsourceid();			// 发票对应的采购入库id
+							/**
+							 ****** 3、查询 存货明细账
+							 */
+							/**
+							 * 3.1 期初
+							 */
+							StringBuffer querySQL_3_1 = 
+							new StringBuffer("select ")
+									.append(" ia_monthnab.nabnum ")
+									.append(",ia_monthnab.nabmny ")
+									.append(" from ia_monthnab ")
+									.append(" inner join ia_calcrange on ia_monthnab.ccalcrangeid = ia_calcrange.ccalcrangeid ")
+									.append(" where ia_monthnab.dr = 0 ")
+									.append(" and ia_monthnab.caccountperiod = '2019-04' ")
+									.append(" and ia_monthnab.pk_org = '"+pk_org+"' ")
+									.append(" and ia_monthnab.pk_book = '"+pk_book+"' ")
+									.append(" and ia_monthnab.cinventoryid = '"+pk_inv+"' ")
+									.append(" and ia_monthnab.pk_group = '"+pk_group+"' ")
+							;
+							ArrayList list_3_1 = (ArrayList)dao.executeQuery(querySQL_3_1.toString(), new ArrayListProcessor());
+							UFDouble QC_num = UFDouble.ZERO_DBL;	// 期初数量
+							UFDouble QC_mny = UFDouble.ZERO_DBL;	// 期初金额
+							if(list_3_1!=null&&list_3_1.size()>0) {
+								Object[] value = (Object[])list_3_1.get(0);
+								QC_num = PuPubVO.getUFDouble_NullAsZero(value[0]);
+								QC_mny = PuPubVO.getUFDouble_NullAsZero(value[1]);
+							}
+							/**
+							 * 3.2 本期发生
+							 */
+							StringBuffer querySQL_3_2 = 
+							new StringBuffer("select ")
+									.append(" ia_detailledger.csrcid ")			// 0、来源id（如果是结算单生成的入库，则来源id为结算id）
+									.append(",ia_detailledger.vbillcode ")		// 1、单号
+									.append(",ia_detailledger.cbilltypecode ")	// 2、类型
+									.append(",ia_detailledger.fdispatchflag ")	// 3、0-入库  1-出库
+									.append(",ia_detailledger.nnum ")			// 4、数量
+									.append(",case when fpricemodeflag = 5 then nplanedprice else nprice end nprice ")	// 5、单价
+									.append(",ia_detailledger.nmny ")			// 6、金额
+									.append(",ia_detailledger.cdeptid ")		// 7、部门id
+									.append(",ia_detailledger.cdeptvid ")		// 8、部门vid
+									.append(",ia_detailledger.cstockorgid ")	// 9、库存组织id
+									.append(",ia_detailledger.cstockorgvid ")	//10、库存组织vid
+									.append(",ia_detailledger.cstordocid ")		//11、仓库id
+									.append(" from ia_detailledger ")
+									.append(" inner join ia_calcrange on ia_detailledger.ccalcrangeid = ia_calcrange.ccalcrangeid ")
+									.append(" where ")
+									.append(" ia_detailledger.dr = 0 ")
+									.append(" and ia_detailledger.caccountperiod >= '"+yyyymm+"' and ia_detailledger.caccountperiod <= '"+yyyymm+"' ")
+									.append(" and ia_detailledger.pk_org = '"+pk_org+"' ")
+									.append(" and ia_detailledger.pk_book = '"+pk_book+"' ")
+									.append(" and ia_detailledger.cinventoryid = '"+pk_inv+"' ")
+									.append(" and ia_detailledger.pk_group = '"+pk_group+"' ")
+									.append(" and ia_detailledger.fintransitflag in ( - 1, 0 ) ")
+									.append(" and ia_detailledger.cbilltypecode not in ( 'IG' ) ")
+									.append(" order by ")
+									.append(" ia_detailledger.cinventoryid, ia_calcrange.vbatchcode, ia_calcrange.ccalcrangeid, ia_detailledger.caccountperiod ")
+									.append(",case when ia_detailledger.iauditsequence = - 1 then 2147483647 else ia_detailledger.iauditsequence end ")
+									.append(",ia_detailledger.dbizdate, ia_detailledger.dbilldate, ia_detailledger.creationtime ")
+							;
+							ArrayList list_3_2 = (ArrayList)dao.executeQuery(querySQL_3_2.toString(), new ArrayListProcessor());
+							UFDouble qc_nnum = UFDouble.ZERO_DBL;	// 发票采购入库单之前 的 数量为期初数量。
+							Integer index_cgrk = list_3_2.size();	// 发票采购入库单 的 所在行。之后的出库 才需要处理。到 调整的入库单为止。
+							Integer index_tzrk = -1;				// 发票调整入库单 的所在行，之前的才处理，之后不做处理。
+							// 针对 存货明细账 的本期发生  来循环处理
+							for(int i=0 ; list_3_2!=null&&i<list_3_2.size() ; i++) {
+								
+								Object[] value = (Object[])list_3_2.get(i);
+								String cbillid 		 = PuPubVO.getString_TrimZeroLenAsNull(value[0]);
+								String vbillcode 	 = PuPubVO.getString_TrimZeroLenAsNull(value[1]);
+								String cbilltypecode = PuPubVO.getString_TrimZeroLenAsNull(value[2]);
+								Integer fdispatchflag= PuPubVO.getInteger_NullAs(value[3],0);
+								UFDouble ch_nnum 	 = PuPubVO.getUFDouble_ZeroAsNull(value[4]);
+								UFDouble ch_nprice 	 = PuPubVO.getUFDouble_ZeroAsNull(value[5]);
+								UFDouble ch_nmny 	 = PuPubVO.getUFDouble_ZeroAsNull(value[6]);
+								String cdeptid 		 = PuPubVO.getString_TrimZeroLenAsNull(value[7]);
+								String cdeptvid 	 = PuPubVO.getString_TrimZeroLenAsNull(value[8]);
+								String cstockorgid 	 = PuPubVO.getString_TrimZeroLenAsNull(value[9]);
+								String cstockorgvid  = PuPubVO.getString_TrimZeroLenAsNull(value[10]);
+								String cstordocid	 = PuPubVO.getString_TrimZeroLenAsNull(value[11]);
+								
+								/**
+								 * a、如果定位到 发票对应的采购入库单。
+								 *    则开始处理
+								 */
+								if( pk_cgrk.equals(cbillid) ) {
+									index_cgrk = i;
+									continue;
+								}
+								/**
+								 * b、如果定位到 发票对应的调整入库单。
+								 * 	     则停止处理
+								 */
+								else if( pk_js.equals(cbillid) ) {
+									index_tzrk = i;
+									break;
+								}
+								/**
+								 * c、入库之前的为期初（数量、金额）
+								 */
+								else {
+									if( fdispatchflag==0 ) {		// 入库
+										QC_num = QC_num.add(ch_nnum);
+										QC_mny = QC_num.add(ch_nmny);
+									}else if(  fdispatchflag==1  ) {// 出库
+										QC_num = QC_num.sub(ch_nnum);
+										QC_mny = QC_num.sub(ch_nmny);
+									}
+								}
+								
+								if( fdispatchflag==1 && ch_nnum!=null) {
+									// 出库 并且 数量不为空  则需要处理。
+									if(i>index_cgrk) {
+										// 并且 当前索引大于 index_cgrk  才进行处理
+										{
+											
+											UFDouble tz_mny = null;	// 本次要调整的金额， 不为空，才生单。
+											
+											// 如果期初数量 大于0  则先抵扣期初
+											if( QC_num.compareTo(UFDouble.ZERO_DBL)>=0 ) {
+												UFDouble temp_xx_num = QC_num.sub(ch_nnum);	// 差额
+												if(temp_xx_num.compareTo(UFDouble.ZERO_DBL)>=0) {
+													// 如果差额 大于0，说明 期初大于 本次要处理的出库，不做处理。
+													// 将差额 赋值给 期初 即可。
+													QC_num = temp_xx_num;
+												}
+												else {
+													// 如果差额 小于0，说明 期初不够了， 要从 采购入库里取，并且需要生成 调整单了。
+													UFDouble do_nnum = temp_xx_num.abs();	// 需要处理的数量
+													UFDouble temp_xxxx_num = xx_num.sub(do_nnum);
+													if(temp_xx_num.compareTo(UFDouble.ZERO_DBL)>0) {
+														// 如果差额大于零， 说明不是最后一次，则用 调差单价*处理数量 来计算 调整金额。
+														tz_mny = xx_price.multiply(ch_nnum).setScale(2, UFDouble.ROUND_HALF_UP);
+														xx_mny = xx_mny.sub(tz_mny);	// 扣减 调整总额。
+													}
+													else if (temp_xx_num.compareTo(UFDouble.ZERO_DBL)<=0) {
+														// 如果差额小于等于零，说明是最后一次，直接将剩余金额 拿过来。
+														tz_mny = xx_mny;
+														xx_mny = null;	// 调整完毕，将 调整总额 置空。
+													}
+												}
+											}
+											
+											if( tz_mny==null ) continue;	// 如果本次调整金额 为空，则跳过。
+											
+											// 封装 出库调整单的数据
+											IABillVO iaBillVO = new IABillVO();
+											// 表头
+											IAHeadVO iaHVO = new IAHeadVO();
+											iaHVO.setBconvertflag(UFBoolean.FALSE);
+											iaHVO.setBsystemflag(UFBoolean.FALSE);
+											iaHVO.setCaccountperiod(yyyymm);
+											iaHVO.setCdeptid(cdeptid);			// 找出库单的部门
+											iaHVO.setCdeptvid(cdeptvid);		// 找出库单的部门v
+											iaHVO.setCstockorgid(cstockorgid);	// 找出库单的库存组织
+											iaHVO.setCstockorgvid(cstockorgvid);// 找出库单的库存组织v
+											iaHVO.setCstordocid(cstordocid);	// 找出库单的仓库
+											iaHVO.setDbilldate(rkDate);	// 与调整入库单的一致
+											iaHVO.setDr(0);
+											iaHVO.setFintransitflag(-1);
+											iaHVO.setPk_book(pk_book);
+											iaHVO.setPk_group(pk_group);
+											iaHVO.setPk_org(pk_org);
+											iaHVO.setVnote("调整【"+vbillcode+"】的成本");
+											// 表体
+											IAItemVO iaBVO = new IAItemVO();
+											iaBVO.setBreworkflag(UFBoolean.FALSE);
+											iaBVO.setCaccountperiod(yyyymm);
+											iaBVO.setCcurrencyid("1002Z0100000000001K1");	// 币种（可以固定）
+											iaBVO.setCinventoryid(pk_inv_src);	// 物料src
+											iaBVO.setCinventoryvid(pk_inv);		// 物料v
+											iaBVO.setCrowno("10");
+											iaBVO.setDaccountdate(rkkjDate);	// 会计期间计算日期 与 调整入库 的一致
+											iaBVO.setDbilldate(rkDate);
+											iaBVO.setDbizdate(rkDate);
+											iaBVO.setDr(0);
+											iaBVO.setNmny(tz_mny);	// 需要计算 = 调整单价*出库数量
+											iaBVO.setPk_book(pk_book);
+											iaBVO.setPk_group(pk_group);
+											iaBVO.setPk_org(pk_org);
+											iaBVO.setAttributeValue("pseudocolumn", 0);
+											// 来源信息
+											iaBVO.setVsrctype("27");		// 来源单据类型  = 结算单
+											iaBVO.setVsrcrowno(jsRowno);	// 来源行号
+											iaBVO.setVsrccode(jsCode);		// 来源单号
+											iaBVO.setCsrcid(pk_js);			// 来源id
+											iaBVO.setCsrcbid(pk_js_b);		// 来源bid
+											// 组合保存
+											iaBillVO.setParentVO(iaHVO);
+											iaBillVO.setChildrenVO(new IAItemVO[]{iaBVO});
+											IABillVO[] result = IAitf.insertIA(new IABillVO[]{iaBillVO});
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		} catch(Exception ex) {
+			throw new BusinessException(ex);
+		}
+		return null;
+	}
 }
