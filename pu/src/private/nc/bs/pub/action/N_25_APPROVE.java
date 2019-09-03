@@ -44,11 +44,11 @@ public class N_25_APPROVE extends AbstractCompiler2 {
       nc.vo.pu.m25.entity.InvoiceVO[] vos =
         (nc.vo.pu.m25.entity.InvoiceVO[]) this.getVos();
       
-//      nc.vo.pu.m25.env.InvoiceUIToBSEnv[] envs =
-//        nc.vo.pu.m25.pub.InvoiceEnvExtractUtil.getEnvs(vo);
-//      retValue =
-//        NCLocator.getInstance().lookup(IInvoiceApprove.class)
-//        .approve(vos, this, envs);
+      nc.vo.pu.m25.env.InvoiceUIToBSEnv[] envs =
+        nc.vo.pu.m25.pub.InvoiceEnvExtractUtil.getEnvs(vo);
+      retValue =
+        NCLocator.getInstance().lookup(IInvoiceApprove.class)
+        .approve(vos, this, envs);
       
       /**
        * HK  2019年8月30日20点09分
