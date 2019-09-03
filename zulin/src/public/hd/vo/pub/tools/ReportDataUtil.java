@@ -78,4 +78,27 @@ public class ReportDataUtil {
     field.setFldname(key);
     return field;
   }
+  
+  /**
+   * 根据 传入的期间，取增加的几个期间（正数为 增加期间、负数为 减少期间）
+   */
+  public static String getYyyymmAddMm(String yyyymm,Integer addMm) {
+	  
+	  String[] temp = yyyymm.split("-");
+	  Integer yyyy = PuPubVO.getInteger_NullAs(temp[0], 0);
+	  Integer mm   = PuPubVO.getInteger_NullAs(temp[1], 0);
+	  
+	  mm += addMm;
+	  
+	  if (mm<=0) {
+		  yyyy--;
+		  mm += 12;
+	  } else if (mm>12) {
+		  yyyy++;
+		  mm -= 12;
+	  }
+	  
+	  return ""+yyyy+"-"+(mm<10?"0":"")+mm;
+  }
+  
 }

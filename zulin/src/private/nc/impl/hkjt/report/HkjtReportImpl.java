@@ -1,6 +1,7 @@
 package nc.impl.hkjt.report;
 
 import hd.vo.pub.tools.PuPubVO;
+import hd.vo.pub.tools.ReportDataUtil;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -310,12 +311,12 @@ public class HkjtReportImpl implements HkjtReportITF {
 				
 //				String pk_org = hVO.getPk_org();
 				String pk_group = hVO.getPk_group();
-				String yyyymm = "2019-05";
+//				String yyyymm = "2019-05";
 				
 				/**
 				 * 1、根据发票 查询 采购结算单、以及下游入库单的信息。
 				 */
-				// 结算信息的MAP  key:发票bid  value:入库code\入库数量\入库金额\账簿\结算id\入库日期\成本域\会计期间计算日期\结算bid\结算单号\结算行号
+				// 结算信息的MAP  key:发票bid  value:入库code\入库数量\入库金额\账簿\结算id\入库日期\成本域\会计期间计算日期\结算bid\结算单号\结算行号\采购入库的期间
 				HashMap<String,ArrayList<Object[]>> MAP_JS = new HashMap<String,ArrayList<Object[]>>();	
 				{
 					StringBuffer querySQL_1 = 
@@ -335,7 +336,7 @@ public class HkjtReportImpl implements HkjtReportITF {
 							.append(",rkb.daccountdate ")		//12、调整入库会计期间计算日期 
 							.append(",js.vbillcode ")			//13、结算单号
 							.append(",jsb.crowno ")				//14、结算行号	
-																//15、采购入库的期间
+							.append(",rk.caccountperiod ")		//15、采购入库的期间
 							// 结算单
 							.append(" from po_settlebill js ")	
 							.append(" inner join po_settlebill_b jsb on js.pk_settlebill = jsb.pk_settlebill ")
@@ -364,6 +365,7 @@ public class HkjtReportImpl implements HkjtReportITF {
 						UFDate rkkjDate = PuPubVO.getUFDate(value[12]);		// 调整入库-会计期间计算日期 
 						String jsCode 	= PuPubVO.getString_TrimZeroLenAsNull(value[13]);	// 结算单号
 						String jsRowno 	= PuPubVO.getString_TrimZeroLenAsNull(value[14]);	// 结算行号
+						String yyyymm 	= PuPubVO.getString_TrimZeroLenAsNull(value[15]);	// 期间（以生成的调整入库为准）
 						
 						Object[] value_item = 
 							new Object[]{
@@ -378,6 +380,7 @@ public class HkjtReportImpl implements HkjtReportITF {
 								pk_js_b,	// 8、结算bid
 								jsCode,		// 9、结算单号
 								jsRowno,	//10、结算行号
+								yyyymm,		//11、期间
 							};
 						
 						String MAP_key = pk_fp_b;	// Map的key = 发票bid
@@ -419,15 +422,16 @@ public class HkjtReportImpl implements HkjtReportITF {
 							UFDouble xx_price = xx_mny.div(xx_num);	// 需要调整的单价
 							String pk_book 	  = PuPubVO.getString_TrimZeroLenAsNull(MAP_value.get(0)[3]);	// 账簿
 							String pk_js      = PuPubVO.getString_TrimZeroLenAsNull(MAP_value.get(0)[4]);	// 结算id
-							UFDate rkDate	  = PuPubVO.getUFDate(MAP_value.get(0)[5]);	// 调整入库日期
+							UFDate rkDate	  = PuPubVO.getUFDate(MAP_value.get(0)[5]);						// 调整入库日期
 							String pk_org     = PuPubVO.getString_TrimZeroLenAsNull(MAP_value.get(0)[6]);	// 成本域
-							UFDate rkkjDate	  = PuPubVO.getUFDate(MAP_value.get(0)[7]);	// 调整入库会计计算日期
+							UFDate rkkjDate	  = PuPubVO.getUFDate(MAP_value.get(0)[7]);						// 调整入库会计计算日期
 							String pk_js_b    = PuPubVO.getString_TrimZeroLenAsNull(MAP_value.get(0)[8]);	// 成本域
 							String jsCode     = PuPubVO.getString_TrimZeroLenAsNull(MAP_value.get(0)[9]);	// 成本域
 							String jsRowno    = PuPubVO.getString_TrimZeroLenAsNull(MAP_value.get(0)[10]);	// 成本域
-							String pk_inv  	  = bVO.getPk_material();		// 物料v
-							String pk_inv_src = bVO.getPk_srcmaterial();	// 物料src
-							String pk_cgrk 	  = bVO.getCsourceid();			// 发票对应的采购入库id
+							String yyyymm     = PuPubVO.getString_TrimZeroLenAsNull(MAP_value.get(0)[11]);	// 期间
+							String pk_inv  	  = bVO.getPk_material();				// 物料v
+							String pk_inv_src = bVO.getPk_srcmaterial();			// 物料src
+							String pk_cgrk 	  = bVO.getCsourceid();					// 发票对应的采购入库id
 							/**
 							 ****** 3、查询 存货明细账
 							 */
@@ -441,7 +445,7 @@ public class HkjtReportImpl implements HkjtReportITF {
 									.append(" from ia_monthnab ")
 									.append(" inner join ia_calcrange on ia_monthnab.ccalcrangeid = ia_calcrange.ccalcrangeid ")
 									.append(" where ia_monthnab.dr = 0 ")
-									.append(" and ia_monthnab.caccountperiod = '2019-04' ")
+									.append(" and ia_monthnab.caccountperiod = '"+ReportDataUtil.getYyyymmAddMm(yyyymm,-1)+"' ")
 									.append(" and ia_monthnab.pk_org = '"+pk_org+"' ")
 									.append(" and ia_monthnab.pk_book = '"+pk_book+"' ")
 									.append(" and ia_monthnab.cinventoryid = '"+pk_inv+"' ")
