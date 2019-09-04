@@ -89,7 +89,7 @@
 		<property name="bodyLineActions">
 			<list>
 				<ref bean="addLineAction" /><!-- HK 2019Äê5ÔÂ19ÈÕ16:04:17 -->
-				<bean class="nc.ui.pubapp.uif2app.actions.BodyInsertLineAction" />
+				<!--bean class="nc.ui.pubapp.uif2app.actions.BodyInsertLineAction" /-->
 				<bean class="nc.ui.pubapp.uif2app.actions.BodyDelLineAction" />
 			</list>
 		</property>

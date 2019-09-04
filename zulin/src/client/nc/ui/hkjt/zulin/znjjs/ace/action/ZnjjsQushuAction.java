@@ -116,6 +116,7 @@ public class ZnjjsQushuAction extends NCAction {
 					.append(",ctb.noritotalgpmny ")	// 8实缴金额
 					.append(",ctb.pk_ct_sale_b ")	// 9合同子表pk
 					.append(",ctb.pk_ct_sale ")		//10合同主表pk
+					.append(",ct.vdef19 ")			//11租金确认截至日
 					.append(" from ct_sale ct ")
 					.append(" inner join ct_sale_b ctb on ct.pk_ct_sale = ctb.pk_ct_sale ")
 					.append(" left join bd_defdoc srxm on ctb.vbdef1  = srxm.pk_defdoc ")
@@ -136,7 +137,7 @@ public class ZnjjsQushuAction extends NCAction {
 		if(list!=null && list.size()>0)
 		{
 			UFDouble yq_mny_total = UFDouble.ZERO_DBL;	// 表头-滞纳金合计
-			
+			int addRowIndex = -1;
 			for(int row=0;row<list.size();row++)
 			{
 				Object[] obj = (Object[])list.get(row);
@@ -152,32 +153,48 @@ public class ZnjjsQushuAction extends NCAction {
 				UFDouble   sj_mny = PuPubVO.getUFDouble_ValueAsValue(obj[8]);
 				String 		ht_id = PuPubVO.getString_TrimZeroLenAsNull(obj[9]);
 				String     ht_bid = PuPubVO.getString_TrimZeroLenAsNull(obj[10]);
+				UFDate	  zjqrjzr = PuPubVO.getUFDate(obj[11]);	// 租金确认截至日期
 				UFDouble   jf_mny = yj_mny.sub(sj_mny);	// 应缴费金额 = 应缴房租 - 实缴房租
 				
-				UFDouble  yq_bl = new UFDouble(5);	// 比例(千分之‰)
-				Integer  yq_num = dbilldate.getDaysAfter(jf_date) + 1;	// 逾期天数
+				UFDate jisuanDate = dbilldate;	// 计算日期（如果租金确认截至日期，小于 当前日期， 那计算日期应该等于租金确认截至日期）
+				String vbmemo = null;			// 行备注（如果按租金确认截至日期来计算的，体现到行备注上）
+				if(zjqrjzr!=null && zjqrjzr.compareTo(dbilldate)<0) {
+					jisuanDate = zjqrjzr;
+					vbmemo = "租金确认截至日期"+zjqrjzr.toString().substring(0, 10);
+				}
+				
+				Integer yq_num = jisuanDate.getDaysAfter(jf_date) + 1;	// 逾期天数
+				
+				if(yq_num<=0) {	// 逾期天数 <=0 , 不做处理
+					continue;
+				}
+					
+				UFDouble  yq_bl = new UFDouble(5);				// 比例(千分之‰)
 				UFDouble yq_mny = jf_mny.multiply(yq_bl).multiply(yq_num).div(1000.00)
 						.setScale(2, UFDouble.ROUND_HALF_UP);	// 滞纳金=应缴费金额 * 5‰ * 逾期天数
 				
 				yq_mny_total = yq_mny_total.add(yq_mny);
 				
 				this.getAddLineAction().doAction();
+				addRowIndex++;
 				
-				this.getEditor().getBillCardPanel().getBillModel().setValueAt(pk_cust,row,"pk_cust");
-				this.getEditor().getBillCardPanel().getBillModel().setValueAt(pk_area,row,"pk_area");
-				this.getEditor().getBillCardPanel().getBillModel().setValueAt(pk_room,row,"pk_room");
-				this.getEditor().getBillCardPanel().getBillModel().setValueAt(ht_code,row,"ht_code");
-				this.getEditor().getBillCardPanel().getBillModel().setValueAt(ht_rowno,row,"ht_rowno");
-				this.getEditor().getBillCardPanel().getBillModel().setValueAt(pk_sfxm,row,"pk_sfxm");
-				this.getEditor().getBillCardPanel().getBillModel().setValueAt(jf_date,row,"jf_date");
-				this.getEditor().getBillCardPanel().getBillModel().setValueAt(jf_mny,row,"jf_mny");
+				this.getEditor().getBillCardPanel().getBillModel().setValueAt(pk_cust, addRowIndex, "pk_cust");
+				this.getEditor().getBillCardPanel().getBillModel().setValueAt(pk_area, addRowIndex, "pk_area");
+				this.getEditor().getBillCardPanel().getBillModel().setValueAt(pk_room, addRowIndex, "pk_room");
+				this.getEditor().getBillCardPanel().getBillModel().setValueAt(ht_code, addRowIndex, "ht_code");
+				this.getEditor().getBillCardPanel().getBillModel().setValueAt(ht_rowno, addRowIndex, "ht_rowno");
+				this.getEditor().getBillCardPanel().getBillModel().setValueAt(pk_sfxm, addRowIndex, "pk_sfxm");
+				this.getEditor().getBillCardPanel().getBillModel().setValueAt(jf_date, addRowIndex, "jf_date");
+				this.getEditor().getBillCardPanel().getBillModel().setValueAt(jf_mny, addRowIndex, "jf_mny");
 				
-				this.getEditor().getBillCardPanel().getBillModel().setValueAt(yq_bl,row,"yq_bl");
-				this.getEditor().getBillCardPanel().getBillModel().setValueAt(yq_num,row,"yq_num");
-				this.getEditor().getBillCardPanel().getBillModel().setValueAt(yq_mny,row,"yq_mny");
+				this.getEditor().getBillCardPanel().getBillModel().setValueAt(yq_bl, addRowIndex, "yq_bl");
+				this.getEditor().getBillCardPanel().getBillModel().setValueAt(yq_num, addRowIndex, "yq_num");
+				this.getEditor().getBillCardPanel().getBillModel().setValueAt(yq_mny, addRowIndex, "yq_mny");
 				
-				this.getEditor().getBillCardPanel().getBillModel().setValueAt(ht_id,row,"ht_id");
-				this.getEditor().getBillCardPanel().getBillModel().setValueAt(ht_bid,row,"ht_bid");
+				this.getEditor().getBillCardPanel().getBillModel().setValueAt(ht_id, addRowIndex, "ht_id");
+				this.getEditor().getBillCardPanel().getBillModel().setValueAt(ht_bid, addRowIndex, "ht_bid");
+				
+				this.getEditor().getBillCardPanel().getBillModel().setValueAt(vbmemo, addRowIndex, "vbmemo");	// 行备注
 				
 			}
 			
