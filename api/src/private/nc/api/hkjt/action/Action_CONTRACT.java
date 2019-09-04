@@ -9,6 +9,7 @@ import nc.api.hkjt.itf.ApiPubInfo;
 import nc.api.hkjt.vo.ContractBVO;
 import nc.api.hkjt.vo.ContractVO;
 import nc.api.hkjt.vo.LoginVO;
+import nc.api.hkjt.vo.QueryParamVO;
 import nc.bs.dao.BaseDAO;
 import nc.jdbc.framework.processor.ArrayListProcessor;
 import nc.vo.pub.BusinessException;
@@ -46,6 +47,12 @@ public class Action_CONTRACT {
 			,Object other
 	) throws BusinessException
 	{
+		
+		QueryParamVO queryVO = (QueryParamVO)data;
+		String ts = null;	// 时间戳
+		if(queryVO!=null) {
+			ts = PuPubVO.getString_TrimZeroLenAsNull(queryVO.getTs());
+		}
 		
 		StringBuffer querySQL = 
 			new StringBuffer("select ")
@@ -87,6 +94,8 @@ public class Action_CONTRACT {
 					.append(",zhongjie.name ")		// 26、是否中介渠道
 					.append(",ht.vdef9 ")			// 27、佣金倍数
 					.append(",ht.pk_ct_sale ")		// 28、合同pk
+					.append(",ht.dr ")			// 29、删除标志
+					.append(",ht.ts ")			// 30、时间戳
 					.append(" from ct_sale ht ")
 					.append(" left join org_orgs org on ht.pk_org = org.pk_org ")
 					.append(" left join bd_customer cust on ht.pk_customer = cust.pk_customer ")
@@ -95,10 +104,13 @@ public class Action_CONTRACT {
 					.append(" left join bd_psndoc psn on ht.personnelid = psn.pk_psndoc ")	// 人员
 					.append(" left join bd_defdoc quyu on ht.vdef15 = quyu.pk_defdoc ")		// 区域
 					.append(" left join bd_defdoc zhongjie on ht.vdef11 = zhongjie.pk_defdoc ")		// 是否中介渠道
-					.append(" where ht.dr=0  ")
-					.append(" and ht.blatest = 'Y' ")
+					.append(" where ")
+					.append(" ht.blatest = 'Y' ")	// 永远取 最新版，不管是不是删除的。（需要测试一下，删除后 会不会改为N）
 					.append(" and ht.fstatusflag in (1,6) ")
 //					.append(" and ht.vbillcode = '201806239001' ")	// 测试
+					.append( ts==null 
+							? " and ht.dr = 0 " 			// 如果不传ts，则返回 所有存在的数据。
+							: " and ht.ts >= '"+ts+"' " )	// 如果传了ts，则返回该ts之后的数据，包括删除的。
 					.append(" order by org.code,cust.code,ht.vbillcode ")
 		;
 		
@@ -162,7 +174,12 @@ public class Action_CONTRACT {
 				
 				String pk_ct = PuPubVO.getString_TrimZeroLenAsNull(value[28]);
 				
-				querySQL_pk_ct += ",'"+pk_ct+"'";
+				vo.setDr(PuPubVO.getInteger_NullAs(value[29], 0));			// 删除标志
+				vo.setTs(PuPubVO.getString_TrimZeroLenAsNull(value[30]));	// 时间戳
+				
+				if(vo.getDr()==0) {	// 只有 dr=0 的才需要 查询合同表体。 删除状态的 无需查询表体。
+					querySQL_pk_ct += ",'"+pk_ct+"'";
+				}
 				
 				result_MAP.put(pk_ct, vo);
 				
