@@ -504,9 +504,9 @@ public class HkjtReportImpl implements HkjtReportITF {
 								String vbillcode 	 = PuPubVO.getString_TrimZeroLenAsNull(value[1]);
 								String cbilltypecode = PuPubVO.getString_TrimZeroLenAsNull(value[2]);
 								Integer fdispatchflag= PuPubVO.getInteger_NullAs(value[3],0);
-								UFDouble ch_nnum 	 = PuPubVO.getUFDouble_ZeroAsNull(value[4]);
-								UFDouble ch_nprice 	 = PuPubVO.getUFDouble_ZeroAsNull(value[5]);
-								UFDouble ch_nmny 	 = PuPubVO.getUFDouble_ZeroAsNull(value[6]);
+								UFDouble ch_nnum 	 = PuPubVO.getUFDouble_NullAsZero(value[4]);
+								UFDouble ch_nprice 	 = PuPubVO.getUFDouble_NullAsZero(value[5]);
+								UFDouble ch_nmny 	 = PuPubVO.getUFDouble_NullAsZero(value[6]);
 								String cdeptid 		 = PuPubVO.getString_TrimZeroLenAsNull(value[7]);
 								String cdeptvid 	 = PuPubVO.getString_TrimZeroLenAsNull(value[8]);
 								String cstockorgid 	 = PuPubVO.getString_TrimZeroLenAsNull(value[9]);
