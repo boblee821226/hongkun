@@ -7,6 +7,7 @@ import java.util.HashMap;
 import uap.xbrl.adapter.log.Logger;
 
 import nc.api.hkjt.vo.LoginVO;
+import nc.api.hkjt.vo.QueryParamVO;
 import nc.pub.pushlet.util.Rand;
 import nc.vo.pub.BusinessException;
 import nc.vo.pub.lang.UFBoolean;
@@ -47,6 +48,8 @@ public class ApiPubInfo {
 	
 	/**
 	 * 对照表
+	 * key：类型+动作
+	 * value：data参数的vo类型
 	 */
 	public static HashMap<String,Class> MAPPER = new HashMap<String,Class>();
 	
@@ -83,35 +86,35 @@ public class ApiPubInfo {
 		);
 		MAPPER.put(	// 客户、查询
 			BILLTYPE_CUSTOMER+"_"+ACTION_QUY, 
-			LoginVO.class
+			QueryParamVO.class
 		);
 		MAPPER.put(	// 客户、修改
 			BILLTYPE_CUSTOMER+"_"+ACTION_MOD, 
-			LoginVO.class
+			QueryParamVO.class
 		);
 		MAPPER.put(	// 房间、查询
 			BILLTYPE_ROOM+"_"+ACTION_QUY, 
-			LoginVO.class
+			QueryParamVO.class
 		);
 		MAPPER.put(	// 员工、查询
 			BILLTYPE_MANAGER+"_"+ACTION_QUY, 
-			LoginVO.class
+			QueryParamVO.class
 		);
 		MAPPER.put(	// 合同、查询
 			BILLTYPE_CONTRACT+"_"+ACTION_QUY, 
-			LoginVO.class
+			QueryParamVO.class
 		);
 		MAPPER.put(	// 缴费通知、查询
 			BILLTYPE_PAYABLE+"_"+ACTION_QUY, 
-			LoginVO.class
+			QueryParamVO.class
 		);
 		MAPPER.put(	// 缴费记录、查询
 			BILLTYPE_PAY+"_"+ACTION_QUY, 
-			LoginVO.class
+			QueryParamVO.class
 		);
 		MAPPER.put(	// 缴费记录、新增
 			BILLTYPE_PAY+"_"+ACTION_ADD, 
-			LoginVO.class
+			QueryParamVO.class
 		);
 		/***END***/
 	}

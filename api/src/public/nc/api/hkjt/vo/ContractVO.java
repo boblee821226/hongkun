@@ -44,6 +44,9 @@ public class ContractVO implements Serializable{
 	private Double commission;		// 佣金倍数
 	private ArrayList<ContractBVO> bVOs = new ArrayList<ContractBVO>();		// 合同子数据
 	
+	private Integer dr;		// 删除标志
+	private String ts;		// 时间戳
+	
 	public String getOrgCode() {
 		return orgCode;
 	}
@@ -217,5 +220,17 @@ public class ContractVO implements Serializable{
 	}
 	public void setbVOs(ArrayList<ContractBVO> bVOs) {
 		this.bVOs = bVOs;
+	}
+	public Integer getDr() {
+		return dr;
+	}
+	public void setDr(Integer dr) {
+		this.dr = dr;
+	}
+	public String getTs() {
+		return ts;
+	}
+	public void setTs(String ts) {
+		this.ts = ts;
 	}
 }
