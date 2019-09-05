@@ -114,13 +114,13 @@ public class AceHg_sgshujuBeforeSaveAction extends ReWriteBaseAction{
 				
 				String jzfsA 	= bvo.getTz_km_jzfs_1();		// 结账方式A
 				String srxmA 	= bvo.getTz_km_srxm_1();		// 收入项目A
-				UFDouble dataA 	= PuPubVO.getUFDouble_ZeroAsNull(bvo.getTz_km_data_1());		// 数据A
+				UFDouble dataA 	= PuPubVO.getUFDouble_ValueAsValue(bvo.getTz_km_data_1());		// 数据A
 				String typeA 	= bvo.getTz_km_srxm_type1();	// 类型A
 //				String infoA 	= PuPubVO.getString_TrimZeroLenAsNull( bvo.getTz_km_info_1() );	// 明细A
 				
 				String jzfsB 	= bvo.getTz_km_jzfs_2();		// 结账方式B
 				String srxmB 	= bvo.getTz_km_srxm_2();		// 收入项目B
-				UFDouble dataB 	= PuPubVO.getUFDouble_ZeroAsNull(bvo.getTz_km_data_2());		// 数据B
+				UFDouble dataB 	= PuPubVO.getUFDouble_ValueAsValue(bvo.getTz_km_data_2());		// 数据B
 				String typeB 	= bvo.getTz_km_srxm_type2();	// 类型B
 //				String infoB 	= PuPubVO.getString_TrimZeroLenAsNull( bvo.getTz_km_info_2() );	// 明细B
 				
