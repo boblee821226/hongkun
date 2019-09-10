@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+<!--  extends  nc/ui/ia/bill/base/maintain/conf/BaseBillCommonSet.xml  -->
+<beans>
+
+	<!-- 应用服务类，负责进行模型操作的处理 -->
+	<bean id="manageModelService" class="nc.ui.ia.mi7.maintain.model.I7ModelService" />
+
+	<!-- 列表控件 -->
+	<bean id="listView" class="nc.ui.ia.bill.out.maintain.view.OutListView"
+		init-method="initUI">
+		<property name="model" ref="manageAppModel" />
+		<property name="multiSelectionMode" value="0" />
+		<property name="templateContainer" ref="templateContainer" />
+		<!-- 列表自定义项处理 -->
+		<property name="userdefitemListPreparator" ref="userdefitemListPreparatorForIA" />
+		<property name="paginationBar" ref="paginationBar"/>
+	</bean>
+
+	<!--卡片控件 -->
+	<bean id="billForm" class="nc.ui.ia.bill.out.maintain.view.OutBillForm"
+		init-method="initUI">
+		<property name="model" ref="manageAppModel" />
+		<property name="templateContainer" ref="templateContainer" />
+		<property name="autoAddLine" value="true" />
+		<!-- 是否进行模板非空校验 -->
+		<property name="templateNotNullValidate" value="true" />
+		<!-- 空行过滤器，卡片界面根据此过滤器删除表体空行 -->
+		<property name="blankChildrenFilter" ref="blankChildrenFilter" />
+		<!-- 卡片自定义项处理 -->
+		<property name="userdefitemPreparator" ref="userdefitemPreparatorForIA" />
+		<property name="bodyLineActions">
+			<list>
+				<ref bean="bodyAddLineAction" />
+				<ref bean="bodyInsertLineAction" />
+				<ref bean="bodyDelLineAction" />
+				<ref bean="bodyCopyLineAction" />
+				<ref bean="bodyPasteLineAction" />
+				<ref bean="bodyPasteToTailAction" />
+			  <ref bean="bodyseparatorAction" />
+				<ref bean="bodyReSortAction" />
+				<ref bean="bodyseparatorAction" />
+        <ref bean="defaultBodyZoomAction" />
+			</list>
+		</property>
+	</bean>
+
+	<!-- 构造方法中传入的界面显示时，配置的Action才可见 -->
+	<bean id="actionsOfList" class="nc.ui.uif2.actions.StandAloneToftPanelActionContainer">
+		<constructor-arg ref="listView" />
+		<!-- 可以配置非编辑状态下和编辑状态下分别可见的Action，没有此需求时可以配置得一样 -->
+		<property name="actions">
+			<list>
+				<ref bean="addAction" />
+				<ref bean="editAction" />
+				<ref bean="deleteAction" />
+				<ref bean="copyAction" />
+				<ref bean="separatorAction" />
+				<ref bean="queryAction" />
+				<ref bean="refreshAction" />
+				<ref bean="separatorAction" />
+				<ref bean="linkQueryGroup" />
+				<ref bean="separatorAction" />
+				<ref bean="printGroup" />
+				<!--wll add 2016-06-16 新增“生成转固单”-->
+				<ref bean="separatorAction" />
+				<ref bean="totransassetAction" />
+			</list>
+		</property>
+		<property name="model" ref="manageAppModel" />
+	</bean>
+
+	<!-- 构造方法中传入的界面显示时，配置的Action才可见 -->
+	<bean id="actionsOfCard" class="nc.ui.uif2.actions.StandAloneToftPanelActionContainer">
+		<constructor-arg ref="billForm" />
+		<!-- 可以配置非编辑状态下和编辑状态下分别可见的Action，没有此需求时可以配置得一样 -->
+		<property name="actions">
+			<list>
+				<ref bean="addAction" />
+				<ref bean="editAction" />
+				<ref bean="deleteAction" />
+				<ref bean="copyAction" />
+				<ref bean="separatorAction" />
+
+				<ref bean="queryAction" />
+				<ref bean="refreshCardAction" />
+				<ref bean="separatorAction" />
+
+				<ref bean="linkQueryGroup" />
+				<ref bean="separatorAction" />
+
+				<ref bean="printGroup" />
+				<!--wll add 2016-06-16 新增“生成转固单”-->
+				<ref bean="separatorAction" />
+				<ref bean="totransassetAction" />
+			</list>
+		</property>
+		<property name="editActions">
+			<list>
+				<ref bean="saveAction" />
+				<ref bean="separatorAction" />
+				<ref bean="cancelAction" />
+			</list>
+		</property>
+		<property name="model" ref="manageAppModel" />
+	</bean>
+
+	<bean id="billtype" class="java.lang.String">
+		<constructor-arg value="I7" />
+	</bean>
+
+	<!-- 自定义项处理 -->
+	<bean id="headpath" class="java.lang.String">
+		<constructor-arg value="ia.ia_i4bill" />
+	</bean>
+	<bean id="itempath" class="java.lang.String">
+		<constructor-arg value="ia.ia_i4bill_b" />
+	</bean>
+
+	<!-- 菜单按钮动作处理器声明 -->
+	<bean id="editAction" class="nc.ui.ia.mi7.maintain.action.I7EditAction">
+		<property name="model" ref="manageAppModel" />
+		<property name="billForm" ref="billForm" />
+		<property name="interceptor" ref="billFormShowUpComponentInterceptor" />
+	</bean>
+
+	<bean id="saveAction" class="nc.ui.ia.mi7.maintain.action.I7SaveAction">
+		<property name="model" ref="manageAppModel" />
+		<property name="editor" ref="billForm" />
+		<property name="service" ref="manageModelService" />
+		<property name="validationService" ref="validator" />
+	</bean>
+	<!--wll add 2016-06-16 “生成转固单”-->
+	<bean id="totransassetAction" class="nc.ui.ia.mi7.maintain.action.I7ToHJAction">
+		<property name="model" ref="manageAppModel" />
+		<property name="editor" ref="billForm" />
+		<property name="service" ref="manageModelService" />
+	</bean>
+	<!-- 编辑事件处理器声明 -->
+	<bean id="headBeforeEditor" class="nc.ui.ia.mi7.maintain.editor.I7HeadBeforeEditHandler" />
+	<bean id="headAfterEditor" class="nc.ui.ia.mi7.maintain.editor.I7HeadAfterEditHandler" />
+	<bean id="bodyBeforeEditor" class="nc.ui.ia.mi7.maintain.editor.I7BodyBeforeEditHandler" />
+	<bean id="bodyAfterEditor" class="nc.ui.ia.mi7.maintain.editor.I7BodyAfterEditHandler" />
+	<bean id="orgChangeEditor" class="nc.ui.ia.mi7.maintain.editor.I7OrgEditHandler">
+		<constructor-arg ref="billForm" />
+	</bean>
+	<bean id="billVO" class="java.lang.String">
+		<constructor-arg value="nc.vo.ia.mi7.entity.I7BillVO" />
+	</bean>
+
+	<bean id="queryAction" class="nc.ui.pubapp.uif2app.query2.action.DefaultQueryAction">
+		<property name="model" ref="manageAppModel" />
+		<property name="dataManager" ref="modelDataManager" />
+		<property name="qryCondDLGInitializer" ref="qryCondDLGInitializer"></property>
+		<property name="showUpComponent" ref="listView" />
+		<property name="templateContainer" ref="queryTemplateContainer"></property>
+	</bean>
+
+	<bean id="qryCondDLGInitializer" class="nc.ui.ia.mi7.maintain.view.I7QryCondDLGInitializer">
+		<property name="queryParams">
+			<list>
+				<bean class="nc.ui.uif2.editor.UserdefQueryParam">
+					<property name="mdfullname" ref="headpath" />
+					<property name="prefix" value="vdef" />
+				</bean>
+				<bean class="nc.ui.uif2.editor.UserdefQueryParam">
+					<property name="mdfullname" ref="itempath" />
+					<property name="prefix" value="vbdef" />
+				</bean>
+			</list>
+		</property>
+	</bean>
+  
+  <!-- 卡片加载事件 -->
+  <bean id="scmCardLoadhandler" class="nc.ui.scmpub.listener.ScmCardItemsFillableHandler">
+    <property name="enabledItems">
+      <map>
+        <entry>
+          <key>
+            <value></value>
+          </key>
+          <list>
+              <value>bincometaxflag</value>
+              <value>nincometaxrate</value>
+              <value>nexpaybacktax</value>
+              <value>cprofitcenterid</value>
+              <value>cprofitcentervid</value>
+              <value>cprojectid</value>
+              <value>vbdef1</value>
+              <value>vbdef2</value>
+              <value>vbdef3</value>
+              <value>vbdef4</value>
+              <value>vbdef5</value>
+              <value>vbdef6</value>
+              <value>vbdef7</value>
+              <value>vbdef8</value>
+              <value>vbdef9</value>
+              <value>vbdef10</value>
+              <value>vbdef11</value>
+              <value>vbdef12</value>
+              <value>vbdef13</value>
+              <value>vbdef14</value>
+              <value>vbdef15</value>
+              <value>vbdef16</value>
+              <value>vbdef17</value>
+              <value>vbdef18</value>
+              <value>vbdef19</value>
+              <value>vbdef20</value>
+          </list>
+        </entry>
+      </map>
+    </property>
+    
+  </bean>
+     <bean id="paginationQueryService" class="nc.ui.ia.mi7.maintain.model.I7PageService">
+   </bean>
+</beans>
