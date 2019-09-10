@@ -49,7 +49,7 @@ public class N_4I_SIGN extends AbstractCompiler2 {
 						.sign(new nc.vo.ic.m4i.entity.GeneralOutVO[] { outVOs[i] })[0];
 			}
 			// 库存其他出库单推转固单
-			creatHJFrom4i(retunVos);
+//			creatHJFrom4i(retunVos);	// 2019年9月10日10点12分 将 推 转固的功能 去掉
 
 			return retunVos;
 		} catch (Exception ex) {
