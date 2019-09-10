@@ -64,8 +64,9 @@
 				<ref bean="separatorAction" />
 				<ref bean="printGroup" />
 				<!--wll add 2016-06-16 新增“生成转固单”-->
-				<ref bean="separatorAction" />
-				<ref bean="totransassetAction" />
+				<!-- 2019年9月10日10点28分 去掉生成转固单 -->
+				<!-- ref bean="separatorAction" />
+				<ref bean="totransassetAction" /-->
 			</list>
 		</property>
 		<property name="model" ref="manageAppModel" />
@@ -92,8 +93,9 @@
 
 				<ref bean="printGroup" />
 				<!--wll add 2016-06-16 新增“生成转固单”-->
-				<ref bean="separatorAction" />
-				<ref bean="totransassetAction" />
+				<!-- 2019年9月10日10点28分 去掉生成转固单 -->
+				<!-- ref bean="separatorAction" />
+				<ref bean="totransassetAction" /-->
 			</list>
 		</property>
 		<property name="editActions">
@@ -132,11 +134,12 @@
 		<property name="validationService" ref="validator" />
 	</bean>
 	<!--wll add 2016-06-16 “生成转固单”-->
-	<bean id="totransassetAction" class="nc.ui.ia.mi7.maintain.action.I7ToHJAction">
+	<!-- 2019年9月10日10点28分 去掉生成转固单 -->
+	<!-- bean id="totransassetAction" class="nc.ui.ia.mi7.maintain.action.I7ToHJAction">
 		<property name="model" ref="manageAppModel" />
 		<property name="editor" ref="billForm" />
 		<property name="service" ref="manageModelService" />
-	</bean>
+	</bean-->
 	<!-- 编辑事件处理器声明 -->
 	<bean id="headBeforeEditor" class="nc.ui.ia.mi7.maintain.editor.I7HeadBeforeEditHandler" />
 	<bean id="headAfterEditor" class="nc.ui.ia.mi7.maintain.editor.I7HeadAfterEditHandler" />
