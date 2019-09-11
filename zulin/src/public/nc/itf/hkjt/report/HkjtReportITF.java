@@ -35,4 +35,10 @@ public interface HkjtReportITF {
 	 */
 	public Object genCktzdByPoInvoice(InvoiceVO[] poInvoiceVOs, Object ohter) 
 	throws BusinessException;
+	/**
+	 * 根据发票VO，判断是否应该生成 原币原值调整单
+	 * 结算单 金额不一致，并且物料为 固定资产属性，才需要处理。
+	 */
+	public Object genYbyztzByPoInvoice(InvoiceVO[] poInvoiceVOs, Object ohter) 
+			throws BusinessException;
 }
