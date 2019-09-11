@@ -55,7 +55,18 @@ public class N_25_APPROVE extends AbstractCompiler2 {
        * 生成  出库调整单
        */
       HkjtReportITF itf = (HkjtReportITF)NCLocator.getInstance().lookup(HkjtReportITF.class.getName());
-      Object result = itf.genCktzdByPoInvoice(vos, null);
+      {
+    	  Object result = itf.genCktzdByPoInvoice(vos, null);
+      }
+      /***END***/
+      
+      /**
+       * HK 2019年9月6日10点54分
+       * 生成 固定资产的原币原值调整单
+       */
+      {
+    	  Object result = itf.genYbyztzByPoInvoice(vos, null);
+      }
       /***END***/
       
       return retValue;
