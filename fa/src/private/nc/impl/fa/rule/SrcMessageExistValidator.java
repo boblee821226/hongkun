@@ -47,6 +47,11 @@ public class SrcMessageExistValidator extends  BaseValidator {
 	private void srcMessageIsDeleted(List<String> pk_bill_srcList) {
 		if (CollectionUtils.isNotEmpty(pk_bill_srcList)) {
 			String bill_type_src = pk_bill_srcList.get(pk_bill_srcList.size() - 1); // 取出最后一个，作为"项目成本转固单"的特殊处理条件
+			
+			if ("27".equals(bill_type_src)) {
+				return; // HK 2019年9月11日19点02分  如果是 采购结算单 则跳过判断
+			}
+			
 			if (BillTypeOther.proadapt.equals(bill_type_src)) {
 				return; // 产出物价值调整单消息由上游项目进行控制，不在am_messagenote和sm_msg_content表中
 			}
@@ -102,7 +107,10 @@ public class SrcMessageExistValidator extends  BaseValidator {
 		}
 		/** added by wangweiak 2015-01-09 如果来源单据类型为"项目成本转固单"，特殊处理消息
 		 * （资产内部使用的是 am_messagenote表，和别的领域使用的是消息平台的sm_msg_content表*/
-		if (BillTypeOther.cbs_project.equals(bill_type_src) || BillTypeOther.proadapt.equals(bill_type_src)) {
+		if (BillTypeOther.cbs_project.equals(bill_type_src) 
+		 || BillTypeOther.proadapt.equals(bill_type_src)
+		 || "27".equals(bill_type_src)	// HK 2019年9月11日18点43分  配置上游单据为 采购结算单
+		) {
 			pk_bill_srcList.add(bill_type_src);
 		}
 		return pk_bill_srcList;
