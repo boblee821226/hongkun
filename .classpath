@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
+	<classpathentry kind="src" output="fa/classes" path="fa/src/private"/>
+	<classpathentry kind="src" output="ia/classes" path="ia/src/client"/>
 	<classpathentry kind="src" output="ic/classes" path="ic/src/private"/>
 	<classpathentry kind="src" output="pu/classes" path="pu/src/private"/>
 	<classpathentry kind="src" output="api/classes" path="api/src/public"/>
