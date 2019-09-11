@@ -9,15 +9,22 @@ import java.util.HashMap;
 import nc.bs.dao.BaseDAO;
 import nc.bs.framework.common.NCLocator;
 import nc.bs.pub.mail.MailTool;
+import nc.itf.fa.prv.IAlter;
 import nc.itf.hkjt.report.HkjtReportITF;
 import nc.itf.ia.mia.IIAMaintain;
+import nc.jdbc.framework.generator.SequenceGenerator;
 import nc.jdbc.framework.processor.ArrayListProcessor;
+import nc.pub.billcode.itf.IBillcodeManage;
 import nc.pub.smart.context.SmartContext;
 import nc.pub.smart.data.DataSet;
 import nc.pubitf.pp.m29.IAccountQuery;
+import nc.vo.am.common.TransportBillVO;
 import nc.vo.cmp.settlement.SettlementAggVO;
 import nc.vo.cmp.settlement.SettlementBodyVO;
 import nc.vo.cmp.settlement.SettlementHeadVO;
+import nc.vo.fa.alter.AlterBodyVO;
+import nc.vo.fa.alter.AlterHeadVO;
+import nc.vo.fa.alter.AlterVO;
 import nc.vo.ia.mia.entity.IABillVO;
 import nc.vo.ia.mia.entity.IAHeadVO;
 import nc.vo.ia.mia.entity.IAItemVO;
@@ -28,6 +35,7 @@ import nc.vo.pu.m25.entity.InvoiceVO;
 import nc.vo.pub.BusinessException;
 import nc.vo.pub.lang.UFBoolean;
 import nc.vo.pub.lang.UFDate;
+import nc.vo.pub.lang.UFDateTime;
 import nc.vo.pub.lang.UFDouble;
 
 public class HkjtReportImpl implements HkjtReportITF {
@@ -309,9 +317,7 @@ public class HkjtReportImpl implements HkjtReportITF {
 				InvoiceHeaderVO hVO  = billVO.getParentVO();
 				InvoiceItemVO[] bVOs = billVO.getChildrenVO();
 				
-//				String pk_org = hVO.getPk_org();
 				String pk_group = hVO.getPk_group();
-//				String yyyymm = "2019-05";
 				
 				/**
 				 * 1、根据发票 查询 采购结算单、以及下游入库单的信息。
@@ -348,6 +354,9 @@ public class HkjtReportImpl implements HkjtReportITF {
 							.append(" and jsb.PK_INVOICE = '"+hVO.getPk_invoice()+"' ")	// 发票id
 					;
 					ArrayList list = (ArrayList)dao.executeQuery(querySQL_1.toString(), new ArrayListProcessor());
+					
+					if(list==null || list.size()<=0) continue;	// 如果查询不到 需要处理的数据，就跳过
+					
 					for(Object obj : list) {
 						Object[] value = (Object[])obj;
 						String pk_js 	= PuPubVO.getString_TrimZeroLenAsNull(value[0]);
@@ -657,6 +666,253 @@ public class HkjtReportImpl implements HkjtReportITF {
 				}
 			}
 		} catch(Exception ex) {
+			throw new BusinessException(ex);
+		}
+		return null;
+	}
+
+	@Override
+	public Object genYbyztzByPoInvoice(InvoiceVO[] poInvoiceVOs, Object ohter)
+			throws BusinessException {
+		
+		try {
+			// 操作数据库
+			BaseDAO dao = new BaseDAO();
+			// 单号生成器
+			IBillcodeManage codeManage = (IBillcodeManage)NCLocator.getInstance().lookup(IBillcodeManage.class.getName());
+			// pk生成器
+			SequenceGenerator pkGen = new SequenceGenerator();	
+			
+			for(InvoiceVO fpBillVO : poInvoiceVOs) {// 一张结算单 生成一张 原币原值调整单
+				
+				String billCode = null;	// 单据号，保存前 取号，如果 失败 需要退号。
+				String billType = null;	
+				String pk_group = null;
+				String pk_org 	= null;
+				
+				try {
+					
+					InvoiceHeaderVO fpHVO  = fpBillVO.getParentVO();
+					
+					// 根据发票 找下游结算单，并且 只取 固定资产的物料。
+					StringBuffer querySQL = 
+					new StringBuffer("select ")
+							.append(" jsb.nclashestmoney ")		// 0、冲暂估金额
+							.append(",jsb.nmoney ")				// 1、结算金额
+							.append(",jsb.nsettlenum ")			// 2、结算数量
+							.append(",js.PK_SETTLEBILL ")		// 3、结算单id
+							.append(",jsb.PK_SETTLEBILL_B ")	// 4、结算单bid
+							.append(",js.dbilldate ")			// 5、结算日期
+							.append(",card.pk_card ")			// 6、卡片id
+							.append(",cardhis.card_num ")			// 7、卡片数量
+							.append(",cardhis.originvalue ")		// 8、卡片原币原值
+							.append(",cardhis.localoriginvalue ")	// 9、卡片本币原值
+							.append(" from po_settlebill js ")
+							.append(" inner join po_settlebill_b jsb on js.pk_settlebill = jsb.pk_settlebill ")
+							.append(" inner join ic_purchasein_b cgrkb on jsb.pk_purchasein_b = cgrkb.cgeneralbid ")
+							.append(" inner join fa_transasset_b zgb on  cgrkb.cgeneralbid = zgb.pk_bill_b_src ")
+							.append(" inner join fa_card card on zgb.pk_transasset_b = card.pk_bill_b_src ")
+							.append(" inner join fa_cardhistory cardhis on (card.pk_card = cardhis.pk_card and cardhis.laststate_flag='Y') ")
+							.append(" where js.dr = 0 and jsb.dr = 0 ")
+							.append(" and jsb.PK_INVOICE = '"+fpHVO.getPk_invoice()+"' ")	// 根据 采购发票pk 查询
+							.append(" and nvl(jsb.nclashestmoney,0) <> nvl(jsb.nmoney,0) ")	// 只取 冲销金额 与 结算金额 不相等的
+					;
+					ArrayList list = (ArrayList)dao.executeQuery(querySQL.toString(), new ArrayListProcessor());
+					
+					if(list==null||list.size()<=0) continue;
+					
+					// 结算信息的MAP  
+					// key:结算单 bid
+					// value:
+					HashMap<String,ArrayList<Object[]>> MAP_JS = new HashMap<String,ArrayList<Object[]>>();
+					// 结算调整的数据
+					// key:结算单 bid
+					// value:调整金额、涉及到的数量
+					HashMap<String,UFDouble[]> MAP_jstz = new HashMap<String,UFDouble[]>();
+					for(Object obj : list) {
+						Object[] value = (Object[])obj;
+						UFDouble cxMny	= PuPubVO.getUFDouble_NullAsZero(value[0]);
+						UFDouble jsMny	= PuPubVO.getUFDouble_NullAsZero(value[1]);
+						UFDouble jsNum	= PuPubVO.getUFDouble_NullAsZero(value[2]);
+						String jsdId	= PuPubVO.getString_TrimZeroLenAsNull(value[3]);
+						String jsdBid	= PuPubVO.getString_TrimZeroLenAsNull(value[4]);
+						UFDate jsDate	= PuPubVO.getUFDate(value[5]);
+						String cardPk	= PuPubVO.getString_TrimZeroLenAsNull(value[6]);
+						UFDouble cardNum	= PuPubVO.getUFDouble_NullAsZero(value[7]);
+						UFDouble cardYbyz	= PuPubVO.getUFDouble_NullAsZero(value[8]);
+						UFDouble cardBbyz	= PuPubVO.getUFDouble_NullAsZero(value[9]);
+						
+						Object[] value_item_JS = 
+							new Object[]{
+								jsdId,		// 0、结算单id
+								jsdBid,		// 1、结算单bid
+								jsDate,		// 2、结算日期
+								cardPk,		// 3、卡片id
+								cardNum,	// 4、卡片数量
+								cardYbyz,	// 5、卡片原币
+								cardBbyz,	// 6、卡片本币
+							};
+						
+						String MAP_key = jsdBid;
+						
+						if(MAP_JS.containsKey(MAP_key)) {
+							MAP_JS.get(MAP_key).add( value_item_JS );
+						}else {
+							ArrayList<Object[]> MAP_value = new ArrayList<Object[]>();
+							MAP_value.add( value_item_JS );
+							MAP_JS.put(MAP_key, MAP_value);
+						}
+						
+						UFDouble[] MAP_value_jstz = 
+							new UFDouble[]{
+								jsMny.sub(cxMny),	// 调整金额 = 结算-冲销
+								jsNum,				// 涉及到的数量
+						};
+						
+						if(!MAP_jstz.containsKey(MAP_key)) {
+							MAP_jstz.put(MAP_key, MAP_value_jstz);
+						}
+					}
+					
+					if(MAP_JS.size()<=0) continue;
+					
+					pk_group  = fpHVO.getPk_group();
+					pk_org    = fpHVO.getPk_org();
+					String pk_org_v  = fpHVO.getPk_org_v();
+					String billMaker = fpHVO.getApprover();		// 发票审核人 为 调整单的创建人。
+					String currPk 	= "1002Z0100000000001K1";	// 币种
+					String remark	= "采购结算调整原值";				// 备注
+					billType = "HG";							// 原币原值调整单-单据类型
+					String transiType = "HG-01";				// 原币原值调整单-交易类型
+					String transiPk = "0001N510000000001IXK";	// 原币原值调整单-交易类型pk
+					String pkAlter 	= pkGen.generate();			// 变动单pk （需要先生成pk）
+					billCode = codeManage.getPreBillCode_RequiresNew(billType, pk_group, pk_org);	// 保存前 预取单号
+					String srcBillType 	= "27";	// 来源-单据类型
+					String srcBillId = null;	// 来源-单据id
+					UFDate busiDate = null;		// 业务日期=结算单日期
+					
+					ArrayList<String> showAlterKeyList = new ArrayList<String>();
+					showAlterKeyList.add("originvalue");
+					
+					ArrayList<AlterBodyVO> tzBVOs_list = new ArrayList<AlterBodyVO>();	// 表体数据list
+					
+					String[] MAP_keys = new String[MAP_JS.size()];
+					MAP_keys = MAP_JS.keySet().toArray(MAP_keys);
+					for(String key : MAP_keys) {
+						
+						ArrayList<Object[]> jsArray = MAP_JS.get(key);
+						UFDouble[] jstzData = MAP_jstz.get(key);
+						
+						UFDouble jstzMny   = jstzData[0];			// 调整金额
+						UFDouble jstzNum   = jstzData[1];			// 调整数量
+						UFDouble jstzPrice = jstzMny.div(jstzNum);	// 调整单价
+						
+						if(jsArray==null||jsArray.size()<=0) continue;
+						
+						for(int i=0;i<jsArray.size();i++) {
+							Object[] value = jsArray.get(i);
+							String jsdId	= PuPubVO.getString_TrimZeroLenAsNull(value[0]);// 结算id
+							String jsdBid	= PuPubVO.getString_TrimZeroLenAsNull(value[1]);// 结算bid
+							UFDate jsDate	= PuPubVO.getUFDate(value[2]);					// 结算日期
+							String cardPk	= PuPubVO.getString_TrimZeroLenAsNull(value[3]);// 卡片pk
+							UFDouble cardNum	= PuPubVO.getUFDouble_NullAsZero(value[4]);	// 卡片数量
+							UFDouble cardYbyz	= PuPubVO.getUFDouble_NullAsZero(value[5]);	// 原币
+							UFDouble cardBbyz	= PuPubVO.getUFDouble_NullAsZero(value[6]);	// 本币
+							
+							if(srcBillId==null) {
+								srcBillId = jsdId;
+								busiDate = jsDate;
+							}
+							
+							UFDouble alterMny = null;	// 本次调整金额
+							
+							if( PuPubVO.getUFDouble_ZeroAsNull(jstzMny)!=null ) {
+								if(cardNum.compareTo(jstzNum)>=0) {
+									// 如果 卡片数量 大于等于 调整数量，则将 调整金额 全部归为  本次调整金额
+									alterMny = jstzMny;
+									jstzMny = UFDouble.ZERO_DBL;	// 调整完毕 将 调整金额置为0
+									jstzNum = UFDouble.ZERO_DBL;	// 调整完毕 将 调整数量置为0
+								} else {
+									// 如果 卡片数量 小于 调整数量，则 按调整单价 * 卡片数量  去调
+									alterMny = jstzPrice.multiply(cardNum).setScale(2, UFDouble.ROUND_HALF_UP);
+									jstzMny = jstzMny.sub(alterMny);	// 调整完毕 将 调整金额 减去 本次调整金额
+									jstzNum = jstzNum.sub(cardNum);		// 调整完毕 将 调整数量 减去 本次卡片数量
+								}
+							}
+							
+							if(alterMny==null) continue;	// 如果本次调整金额 为 空，则跳过
+							
+							AlterBodyVO tzBVO = new AlterBodyVO();
+							tzBVOs_list.add(tzBVO);
+							tzBVO.setPk_alter(pkAlter);		// 变动单id
+							tzBVO.setPk_card(cardPk);		// 卡片
+							tzBVO.setPk_currency(currPk);	// 币种
+							tzBVO.setRemark(remark);		// 备注
+							tzBVO.setStatus(2);				// vo状态
+							
+							// 原币原值
+							tzBVO.setAttributeValue("originvalue_before", cardYbyz);				// 调整前
+							tzBVO.setAttributeValue("originvalue_alter", alterMny);					// 本次调整
+							tzBVO.setAttributeValue("originvalue_after", cardYbyz.add(alterMny));	// 调整后 = 调整前 + 本次调整
+							// 本币原值
+							tzBVO.setAttributeValue("localoriginvalue_before", cardBbyz);	
+							tzBVO.setAttributeValue("localoriginvalue_alter", alterMny);	
+							tzBVO.setAttributeValue("localoriginvalue_after", cardBbyz.add(alterMny));
+							
+							//// 来源信息设置
+							tzBVO.setPk_bill_src(jsdId);		// 来源-表头id = 结算单id
+							tzBVO.setPk_bill_b_src(jsdBid);		// 来源-表体id = 结算单bid
+						}
+					}
+					
+					if(tzBVOs_list.size()<=0) continue;
+					
+					AlterBodyVO[] tzBVOs = new AlterBodyVO[tzBVOs_list.size()];
+					tzBVOs = tzBVOs_list.toArray(tzBVOs);
+					
+					AlterHeadVO tzHVO = new AlterHeadVO();
+					tzHVO.setPk_alter(pkAlter);				// 变动单pk
+					tzHVO.setBill_code(billCode);			// 单据号
+					tzHVO.setBusiness_date(busiDate);		// 业务日期
+					tzHVO.setPk_group(pk_group);			// 集团
+					tzHVO.setPk_org(pk_org);				// 组织
+					tzHVO.setPk_org_v(pk_org_v);			// 组织V
+					tzHVO.setBill_status(0);				// 单据状态-自由态
+					tzHVO.setBillmaker(billMaker);			// 制单人
+					tzHVO.setBillmaketime(new UFDateTime());// 制单时间-当前时间
+					tzHVO.setDr(0);					// 删除标志
+					tzHVO.setDirty(false);			// 是否删除
+					tzHVO.setBill_type(billType);		// 单据类型
+					tzHVO.setTransi_type(transiType);	// 交易类型
+					tzHVO.setPk_transitype(transiPk);	// 交易类型pk
+					tzHVO.setRemark(remark);		// 备注
+					tzHVO.setStatus(1);				// vo状态
+					//// 来源信息设置
+					tzHVO.setPk_bill_src(srcBillId);			// 来源-单据id
+					tzHVO.setBill_type_src(srcBillType);		// 来源-单据类型
+					tzHVO.setTransi_type_src(srcBillType);		// 来源-交易类型
+					tzHVO.setPk_transitype_src(srcBillType);	// 来源-交易类型pk
+					
+					AlterVO tzBillVO = new AlterVO();
+					tzBillVO.setParentVO(tzHVO);
+					tzBillVO.setChildrenVO(tzBVOs);
+					
+					TransportBillVO result = 
+							NCLocator.getInstance().lookup(IAlter.class)
+							.insert(null, tzBillVO, showAlterKeyList);
+					
+					return result;
+				}
+				catch(Exception ex) {
+					ex.printStackTrace();
+					if(billCode!=null) {
+						codeManage.rollbackPreBillCode(billType, pk_group, pk_org, billCode);
+					}
+					throw new Exception(ex);
+				}
+			}
+		} 
+		catch(Exception ex) {
 			throw new BusinessException(ex);
 		}
 		return null;
