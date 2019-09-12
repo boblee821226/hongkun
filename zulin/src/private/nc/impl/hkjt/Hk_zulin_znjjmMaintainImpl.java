@@ -1,9 +1,9 @@
 package nc.impl.hkjt;
 
 import nc.impl.pub.ace.AceHk_zulin_znjjmPubServiceImpl;
+import nc.itf.hkjt.IHk_zulin_znjjmMaintain;
 import nc.ui.querytemplate.querytree.IQueryScheme;
 import nc.vo.hkjt.zulin.znjjm.ZnjjmBillVO;
-import nc.itf.hkjt.IHk_zulin_znjjmMaintain;
 import nc.vo.pub.BusinessException;
 
 public class Hk_zulin_znjjmMaintainImpl extends AceHk_zulin_znjjmPubServiceImpl
@@ -17,7 +17,7 @@ public class Hk_zulin_znjjmMaintainImpl extends AceHk_zulin_znjjmPubServiceImpl
 
 	@Override
 	public ZnjjmBillVO[] insert(ZnjjmBillVO[] clientFullVOs,
-			ZnjjmBillVO[] originBills) throws BusinessException {
+			ZnjjmBillVO[] originBills) throws BusinessException {	
 		return super.pubinsertBills(clientFullVOs, originBills);
 	}
 
