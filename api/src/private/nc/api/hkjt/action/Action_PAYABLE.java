@@ -68,7 +68,6 @@ public class Action_PAYABLE {
 					.append(" where ys.dr = 0 and ysb.dr = 0 ")
 					.append(" and ys.pk_tradetypeid in ('1001N5100000006402AK','1001N51000000063ZZH4') ")// 水电费应收单、缴费通知单
 					.append(" and ys.effectstatus = 10 ")
-					.append(" order by org.code,cust.code,ys.billno ")
 				.append(" union all ")
 					// 取 滞纳金计算单
 					.append(" select ")
@@ -89,13 +88,13 @@ public class Action_PAYABLE {
 					.append(" inner join ( select js.pk_org,max(js.dbilldate) dbilldate from hk_zulin_znjjs js where dr=0 group by js.pk_org ")
 					.append("  ) js_new on (js.pk_org=js_new.pk_org and js.dbilldate=js_new.dbilldate) ")
 					.append(" inner join hk_zulin_znjjs_b jsb on (js.pk_hk_zulin_znjjs = jsb.pk_hk_zulin_znjjs) ")
-					.append(" left join ar_recitem ysb on (jsb.pk_hk_zulin_znjjs_b = ysb.def29 and ysb.dr=0) ")
+//					.append(" left join ar_recitem ysb on (jsb.pk_hk_zulin_znjjs_b = ysb.def29 and ysb.dr=0) ")
 					.append(" left join bd_defdoc room on (jsb.pk_room = room.pk_defdoc) ")
 					.append(" left join org_salesorg org on (js.pk_org = org.pk_salesorg) ")
 					.append(" left join bd_customer cust on (jsb.pk_cust = cust.pk_customer) ")
 					.append(" left join ct_sale ct on (jsb.ht_id = ct.pk_ct_sale) ")
 					.append(" where js.dr=0 and jsb.dr=0 ")
-					.append(" and ysb.pk_recitem is null ")
+//					.append(" and ysb.pk_recitem is null ")
 		;
 		
 		BaseDAO dao = new BaseDAO();
