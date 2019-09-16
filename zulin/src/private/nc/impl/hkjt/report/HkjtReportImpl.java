@@ -714,6 +714,7 @@ public class HkjtReportImpl implements HkjtReportITF {
 							.append(" inner join fa_card card on zgb.pk_transasset_b = card.pk_bill_b_src ")
 							.append(" inner join fa_cardhistory cardhis on (card.pk_card = cardhis.pk_card and cardhis.laststate_flag='Y') ")
 							.append(" where js.dr = 0 and jsb.dr = 0 ")
+							.append(" and jsb.dr = 0 and cgrkb.dr = 0 and zgb.dr = 0 and card.dr = 0 and cardhis.dr = 0 ")
 							.append(" and jsb.PK_INVOICE = '"+fpHVO.getPk_invoice()+"' ")	// 根据 采购发票pk 查询
 							.append(" and nvl(jsb.nclashestmoney,0) <> nvl(jsb.nmoney,0) ")	// 只取 冲销金额 与 结算金额 不相等的
 					;
