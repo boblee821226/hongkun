@@ -671,6 +671,10 @@ public class HkjtReportImpl implements HkjtReportITF {
 		return null;
 	}
 
+	/**
+	 * 分摊的算法：每张卡片的调整金额 = 卡片上的资产数量 * 结算单价 - 卡片上的调整前的原币原值
+	 * 如果 本卡片的 数量 等于是 最后， 则 直接分摊剩余金额
+	 */
 	@Override
 	public Object genYbyztzByPoInvoice(InvoiceVO[] poInvoiceVOs, Object ohter)
 			throws BusinessException {
@@ -707,6 +711,7 @@ public class HkjtReportImpl implements HkjtReportITF {
 							.append(",cardhis.card_num ")			// 7、卡片数量
 							.append(",cardhis.originvalue ")		// 8、卡片原币原值
 							.append(",cardhis.localoriginvalue ")	// 9、卡片本币原值
+							.append(",jsb.nprice ")					// 10、结算单价
 							.append(" from po_settlebill js ")
 							.append(" inner join po_settlebill_b jsb on js.pk_settlebill = jsb.pk_settlebill ")
 							.append(" inner join ic_purchasein_b cgrkb on jsb.pk_purchasein_b = cgrkb.cgeneralbid ")
@@ -742,6 +747,7 @@ public class HkjtReportImpl implements HkjtReportITF {
 						UFDouble cardNum	= PuPubVO.getUFDouble_NullAsZero(value[7]);
 						UFDouble cardYbyz	= PuPubVO.getUFDouble_NullAsZero(value[8]);
 						UFDouble cardBbyz	= PuPubVO.getUFDouble_NullAsZero(value[9]);
+						UFDouble jsPrice	= PuPubVO.getUFDouble_NullAsZero(value[10]);	// 结算单价
 						
 						Object[] value_item_JS = 
 							new Object[]{
@@ -768,6 +774,7 @@ public class HkjtReportImpl implements HkjtReportITF {
 							new UFDouble[]{
 								jsMny.sub(cxMny),	// 调整金额 = 结算-冲销
 								jsNum,				// 涉及到的数量
+								jsPrice,			// 结算单价
 						};
 						
 						if(!MAP_jstz.containsKey(MAP_key)) {
@@ -807,6 +814,7 @@ public class HkjtReportImpl implements HkjtReportITF {
 						UFDouble jstzMny   = jstzData[0];			// 调整金额
 						UFDouble jstzNum   = jstzData[1];			// 调整数量
 						UFDouble jstzPrice = jstzMny.div(jstzNum);	// 调整单价
+						UFDouble jsPrice   = jstzData[2];			// 结算单价
 						
 						if(jsArray==null||jsArray.size()<=0) continue;
 						
@@ -835,7 +843,11 @@ public class HkjtReportImpl implements HkjtReportITF {
 									jstzNum = UFDouble.ZERO_DBL;	// 调整完毕 将 调整数量置为0
 								} else {
 									// 如果 卡片数量 小于 调整数量，则 按调整单价 * 卡片数量  去调
-									alterMny = jstzPrice.multiply(cardNum).setScale(2, UFDouble.ROUND_HALF_UP);
+									// 20190919 改为 【每张卡片的调整金额 = 卡片上的资产数量 * 结算单价 - 卡片上的调整前的原币原值】
+//									alterMny = jstzPrice.multiply(cardNum).setScale(2, UFDouble.ROUND_HALF_UP);
+									alterMny = jsPrice.multiply(cardNum)
+												.setScale(2, UFDouble.ROUND_HALF_UP)
+												.sub(cardYbyz);
 									jstzMny = jstzMny.sub(alterMny);	// 调整完毕 将 调整金额 减去 本次调整金额
 									jstzNum = jstzNum.sub(cardNum);		// 调整完毕 将 调整数量 减去 本次卡片数量
 								}
