@@ -1,16 +1,16 @@
 package nc.ui.hkjt.zulin.sjdy.ace.action;
 
+import hd.vo.pub.tools.PuPubVO;
+
 import java.util.ArrayList;
 
 import nc.bs.framework.common.NCLocator;
 import nc.itf.uap.IUAPQueryBS;
 import nc.jdbc.framework.processor.ArrayListProcessor;
-import nc.jdbc.framework.processor.BeanListProcessor;
 import nc.ui.pub.beans.MessageDialog;
 import nc.vo.pub.lang.UFBoolean;
 import nc.vo.pub.lang.UFDate;
 import nc.vo.pub.lang.UFDouble;
-import hd.vo.pub.tools.PuPubVO;
 
 public class BodyAddLineAction extends
 		nc.ui.pubapp.uif2app.actions.BodyAddLineAction {
@@ -143,6 +143,7 @@ public class BodyAddLineAction extends
 						.append(",ysb.def5 ")				// 9、本期用量
 						.append(",ysb.local_money_de ")		//10、金额
 						.append(",ysb.pk_recitem ")			//11、应收bid
+						.append(",substr(ysb.busidate,1,10) ")	//12、表体-应缴费日期
 						.append(" from ar_recbill ys ")
 						.append(" inner join ar_recitem ysb on ys.pk_recbill = ysb.pk_recbill ")
 						.append(" left join bd_defdoc room on ysb.def8 = room.pk_defdoc ")
@@ -165,6 +166,8 @@ public class BodyAddLineAction extends
 				if(list!=null&&list.size()>0)
 				{
 					UFDouble total_je = UFDouble.ZERO_DBL;	// 合计金额
+					String yjfrq_str = null;
+					boolean isSameYjfrq = true;
 					
 					for(int i=0;i<list.size();i++)
 					{
@@ -182,14 +185,28 @@ public class BodyAddLineAction extends
 						getCardPanel().getBillModel().setValueAt(obj[9], i, "vbdef07");		// 9、本期用量
 						getCardPanel().getBillModel().setValueAt(obj[10],i, "skje");		// 10、金额
 						getCardPanel().getBillModel().setValueAt(obj[11],i, "vbdef01");		// 11、应收bid
-						
+						String yjfrq = PuPubVO.getString_TrimZeroLenAsNull(obj[12]);	// 12、应缴费日期
+						getCardPanel().getBillModel().setValueAt(yjfrq,i, "vbdef19");	// 备注 = 应缴费日期
+						// 04160100000096
 						total_je = total_je.add(
 								PuPubVO.getUFDouble_NullAsZero(obj[10])
 						);
+						if(isSameYjfrq) {	// 只有标志为相同，才进行处理
+							if(yjfrq_str == null) {	// 如果为空，则先赋值
+								yjfrq_str = yjfrq;
+							} else {	// 如果不为空，则进行判断
+								if(!yjfrq_str.equals(yjfrq)) {	// 如果不一致，则将标志设置为false
+									isSameYjfrq = false;
+								}
+							}
+						}
 						
 					}
 					
 					getCardPanel().getHeadItem("vdef03").setValue(total_je);	// 表头-合计金额
+					if(isSameYjfrq && yjfrq_str!=null) {
+						getCardPanel().getHeadItem("vdef19").setValue(new UFDate(yjfrq_str));	// 表头-合计金额
+					}
 					
 				}
 			}
