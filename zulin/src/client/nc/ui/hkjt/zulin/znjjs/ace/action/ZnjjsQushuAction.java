@@ -139,7 +139,7 @@ public class ZnjjsQushuAction extends NCAction {
 						.append(" and (nvl(ctb.norigtaxmny,0)-nvl(ctb.noritotalgpmny,0))<>0 ")
 						.append(" and srxm.name not like '%押金%' ")
 						.append(" and srxm.name not like '%调整%' ")
-	//					.append(" and ct.vbillcode = '201811068053' ")	// 测试
+//						.append(" and ct.vbillcode = '20181212A008' ")	// 测试
 			;
 			
 			ArrayList list = (ArrayList)iUAPQueryBS.executeQuery(querySQL.toString(), new ArrayListProcessor());
@@ -203,16 +203,120 @@ public class ZnjjsQushuAction extends NCAction {
 					
 					this.getEditor().getBillCardPanel().getBillModel().setValueAt(vbmemo, addRowIndex, "vbmemo");	// 行备注
 					
-					MAP_HT_INFO.put(ht_bid, null);
+					MAP_HT_INFO.put(ht_bid, null);	// 添加到缓存里 供 第三步 使用
 				}
 			}
 		}
 		
 		/**
-		 * 2、从上期的 计算单上 取数
+		 * 2、取 已收款，但是 逾期收款的 数据， 并且是 之前没有取过的。（确保只取一次，不要重复取）
 		 */
 		{
 			StringBuffer querySQL_2 = 
+			new StringBuffer("select ")
+					.append(" ct.pk_customer ")
+					.append(",ct.vdef15 ")
+					.append(",ct.vdef16 ")
+					.append(",ct.vbillcode ")
+					.append(",ctb.crowno ")
+					.append(",skb.def1 ")
+					.append(",substr(skb.def3,1,10) ")
+					.append(",skb.money_cr ")
+					.append(",0 ")
+					.append(",ctb.pk_ct_sale_b ")
+					.append(",ctb.pk_ct_sale ")
+					.append(",substr(skb.busidate,1,10) ")
+					.append(",sk.billno ")
+					.append(",skb.pk_gatherbill ")
+					.append(" from ar_gatherbill sk ")
+					.append(" inner join ar_gatheritem skb on sk.pk_gatherbill = skb.pk_gatherbill ")
+					.append(" inner join ct_sale_b ctb on skb.src_itemid = ctb.pk_ct_sale_b ")
+					.append(" inner join ct_sale ct on ctb.pk_ct_sale = ct.pk_ct_sale ")
+					.append(" left join bd_defdoc srxm on skb.def1 = srxm.pk_defdoc ")
+					.append(" left join hk_zulin_znjjs_b jsb on skb.pk_gatherbill = jsb.vbdef04 ")
+					.append(" where sk.dr = 0 and skb.dr = 0 ")
+					.append(" and skb.src_tradetype = 'Z3-01' ")
+					.append(" and srxm.name not like '%押金%' ")
+					.append(" and srxm.name not like '%调整%' ")
+					.append(" and ct.pk_org = '"+pk_org+"' ")
+					.append(" and jsb.pk_hk_zulin_znjjs_b is null ")
+//					.append(" and sk.billno = 'D22019092400008794' ")	// 测试
+			;
+			ArrayList list_2 = (ArrayList)iUAPQueryBS.executeQuery(querySQL_2.toString(), new ArrayListProcessor());
+			
+			if(list_2!=null && list_2.size()>0)
+			{
+				for(int row=0;row<list_2.size();row++)
+				{
+					Object[] obj = (Object[])list_2.get(row);
+					String	  pk_cust = PuPubVO.getString_TrimZeroLenAsNull(obj[0]);
+					String 	  pk_area = PuPubVO.getString_TrimZeroLenAsNull(obj[1]);
+					String 	  pk_room = PuPubVO.getString_TrimZeroLenAsNull(obj[2]);
+					String 	  ht_code = PuPubVO.getString_TrimZeroLenAsNull(obj[3]);
+					String 	 ht_rowno = PuPubVO.getString_TrimZeroLenAsNull(obj[4]);
+					String 	  pk_sfxm = PuPubVO.getString_TrimZeroLenAsNull(obj[5]);
+					UFDate    jf_date = PuPubVO.getUFDate(obj[6]);
+					UFDouble   yj_mny = PuPubVO.getUFDouble_ValueAsValue(obj[7]);
+					UFDouble   sj_mny = PuPubVO.getUFDouble_ValueAsValue(obj[8]);
+					String 		ht_id = PuPubVO.getString_TrimZeroLenAsNull(obj[9]);
+					String     ht_bid = PuPubVO.getString_TrimZeroLenAsNull(obj[10]);
+					UFDate	  zjqrjzr = PuPubVO.getUFDate(obj[11]);	// 租金确认截至日期
+					UFDouble   jf_mny = yj_mny.sub(sj_mny);	// 应缴费金额 = 应缴房租 - 实缴房租
+					String     skCode = PuPubVO.getString_TrimZeroLenAsNull(obj[12]);	// 收款单号
+					String     skBid = PuPubVO.getString_TrimZeroLenAsNull(obj[13]);	// 收款单bid
+					
+					UFDate jisuanDate = dbilldate;	// 计算日期（如果租金确认截至日期，小于 当前日期， 那计算日期应该等于租金确认截至日期）
+					String vbmemo = null;			// 行备注（如果按租金确认截至日期来计算的，体现到行备注上）
+					if(zjqrjzr!=null && zjqrjzr.compareTo(dbilldate)<0) {
+						jisuanDate = zjqrjzr;
+						vbmemo = "收款日期"+zjqrjzr.toString().substring(0, 10);
+					}
+					
+					Integer yq_num = jisuanDate.getDaysAfter(jf_date);	// 逾期天数
+					
+					if(yq_num<=0) {	// 逾期天数 <=0 , 不做处理
+						continue;
+					}
+						
+					UFDouble  yq_bl = new UFDouble(5);				// 比例(千分之‰)
+					UFDouble yq_mny = jf_mny.multiply(yq_bl).multiply(yq_num).div(1000.00)
+							.setScale(2, UFDouble.ROUND_HALF_UP);	// 滞纳金=应缴费金额 * 5‰ * 逾期天数
+					
+					yq_mny_total = yq_mny_total.add(yq_mny);
+					
+					this.getAddLineAction().doAction();
+					addRowIndex++;
+					
+					this.getEditor().getBillCardPanel().getBillModel().setValueAt(pk_cust, addRowIndex, "pk_cust");
+					this.getEditor().getBillCardPanel().getBillModel().setValueAt(pk_area, addRowIndex, "pk_area");
+					this.getEditor().getBillCardPanel().getBillModel().setValueAt(pk_room, addRowIndex, "pk_room");
+					this.getEditor().getBillCardPanel().getBillModel().setValueAt(ht_code, addRowIndex, "ht_code");
+					this.getEditor().getBillCardPanel().getBillModel().setValueAt(ht_rowno, addRowIndex, "ht_rowno");
+					this.getEditor().getBillCardPanel().getBillModel().setValueAt(pk_sfxm, addRowIndex, "pk_sfxm");
+					this.getEditor().getBillCardPanel().getBillModel().setValueAt(jf_date, addRowIndex, "jf_date");
+					this.getEditor().getBillCardPanel().getBillModel().setValueAt(jf_mny, addRowIndex, "jf_mny");
+					
+					this.getEditor().getBillCardPanel().getBillModel().setValueAt(yq_bl, addRowIndex, "yq_bl");
+					this.getEditor().getBillCardPanel().getBillModel().setValueAt(yq_num, addRowIndex, "yq_num");
+					this.getEditor().getBillCardPanel().getBillModel().setValueAt(yq_mny, addRowIndex, "yq_mny");
+					
+					this.getEditor().getBillCardPanel().getBillModel().setValueAt(ht_id, addRowIndex, "ht_id");
+					this.getEditor().getBillCardPanel().getBillModel().setValueAt(ht_bid, addRowIndex, "ht_bid");
+					
+					this.getEditor().getBillCardPanel().getBillModel().setValueAt(vbmemo, addRowIndex, "vbmemo");	// 行备注
+					
+					this.getEditor().getBillCardPanel().getBillModel().setValueAt(skCode, addRowIndex, "vbdef03");	// 收款单号
+					this.getEditor().getBillCardPanel().getBillModel().setValueAt(skBid, addRowIndex, "vbdef04");	// 收款单bid
+					
+				}
+			}
+		}
+		
+		/**
+		 * 3、从上期的 计算单上 取数
+		 */
+		{
+			StringBuffer querySQL_3 = 
 			new StringBuffer("select ")
 					.append(" jsb.pk_cust ")	// 0
 					.append(",jsb.pk_area ")	// 1
@@ -221,13 +325,15 @@ public class ZnjjsQushuAction extends NCAction {
 					.append(",jsb.ht_rowno ")	// 4
 					.append(",jsb.pk_sfxm ")	// 5
 					.append(",jsb.jf_date ")	// 6
-					.append(",jsb.jf_mny - to_number(nvl( replace(jsb.vbdef01,'~',''),'0' )) ")		// 7
+					.append(",jsb.jf_mny - to_number(nvl( replace(jsb.vbdef01,'~',''),'0' )) ")		// 7  滞纳金-减免金额
 					.append(",jsb.yq_bl ")		// 8
 					.append(",jsb.yq_num ")		// 9
 					.append(",jsb.yq_mny ")		//10
 					.append(",jsb.ht_id ")		//11
 					.append(",jsb.ht_bid ")		//12
 					.append(",jsb.vbmemo ")		//13
+					.append(",jsb.vbdef03 ")	//14 收款单号
+					.append(",jsb.vbdef04 ")	//15 收款单bid
 					.append(" from hk_zulin_znjjs js ")
 					.append(" inner join ( ")
 					.append("	select js.pk_org,max(js.dbilldate) dbilldate ")
@@ -243,16 +349,17 @@ public class ZnjjsQushuAction extends NCAction {
 					.append(" and ysb.pk_recitem is null ")	// 只取 未生成应收单的，生成应收单，就意味着 滞纳金模块 处理完毕
 			;
 			
-			ArrayList list_2 = (ArrayList)iUAPQueryBS.executeQuery(querySQL_2.toString(), new ArrayListProcessor());
+			ArrayList list_3 = (ArrayList)iUAPQueryBS.executeQuery(querySQL_3.toString(), new ArrayListProcessor());
 			
-			if(list_2!=null && list_2.size()>0)
+			if(list_3!=null && list_3.size()>0)
 			{
-				for(int i=0;i<list_2.size();i++)
+				for(int i=0;i<list_3.size();i++)
 				{
-					Object[] obj = (Object[])list_2.get(i);
+					Object[] obj = (Object[])list_3.get(i);
 					String ht_bid = PuPubVO.getString_TrimZeroLenAsNull(obj[12]);
-					if(!MAP_HT_INFO.containsKey(ht_bid)) {
-						
+					String  skBid = PuPubVO.getString_TrimZeroLenAsNull(obj[15]);	// 收款单bid
+					// 如果有 收款单bid不为空，或者 不再本期的第一步里，则添加
+					if(skBid!=null || !MAP_HT_INFO.containsKey(ht_bid)) {
 						String pk_cust 	= PuPubVO.getString_TrimZeroLenAsNull(obj[0]);
 						String pk_area 	= PuPubVO.getString_TrimZeroLenAsNull(obj[1]);
 						String pk_room 	= PuPubVO.getString_TrimZeroLenAsNull(obj[2]);
@@ -266,10 +373,14 @@ public class ZnjjsQushuAction extends NCAction {
 						UFDouble yq_mny = PuPubVO.getUFDouble_ValueAsValue(obj[10]);
 						String ht_id 	= PuPubVO.getString_TrimZeroLenAsNull(obj[11]);
 						String vbmemo 	= PuPubVO.getString_TrimZeroLenAsNull(obj[13]);
-						if(vbmemo==null){
-							vbmemo = "";
+						String   skCode = PuPubVO.getString_TrimZeroLenAsNull(obj[14]);	// 收款单号
+						
+						if(skBid==null) {	// 只有不是 逾期收款单的，才进行 备注的处理
+							if(vbmemo==null){
+								vbmemo = "";
+							}
+							vbmemo += "【截至到"+dbilldateStr+"，房租已交清，只欠滞纳金】";
 						}
-						vbmemo += "【截至到"+dbilldateStr+"，房租已交清，只欠滞纳金】";
 						
 						yq_mny_total = yq_mny_total.add(yq_mny);
 						
@@ -294,7 +405,9 @@ public class ZnjjsQushuAction extends NCAction {
 						
 						this.getEditor().getBillCardPanel().getBillModel().setValueAt(vbmemo, addRowIndex, "vbmemo");
 					
-						MAP_HT_INFO.put(ht_bid, null);
+						this.getEditor().getBillCardPanel().getBillModel().setValueAt(skCode, addRowIndex, "vbdef03");	// 收款单号
+						this.getEditor().getBillCardPanel().getBillModel().setValueAt(skBid, addRowIndex, "vbdef04");	// 收款单bid
+						
 					}
 				}
 			}
