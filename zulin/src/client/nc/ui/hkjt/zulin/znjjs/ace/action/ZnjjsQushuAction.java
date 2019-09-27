@@ -170,7 +170,7 @@ public class ZnjjsQushuAction extends NCAction {
 						vbmemo = "租金确认截至日期"+zjqrjzr.toString().substring(0, 10);
 					}
 					
-					Integer yq_num = jisuanDate.getDaysAfter(jf_date) + 1;	// 逾期天数
+					Integer yq_num = jisuanDate.getDaysAfter(jf_date);	// 逾期天数 (19年9月27日，确定为不加一)
 					
 					if(yq_num<=0) {	// 逾期天数 <=0 , 不做处理
 						continue;
@@ -233,7 +233,7 @@ public class ZnjjsQushuAction extends NCAction {
 					.append(" inner join ct_sale_b ctb on skb.src_itemid = ctb.pk_ct_sale_b ")
 					.append(" inner join ct_sale ct on ctb.pk_ct_sale = ct.pk_ct_sale ")
 					.append(" left join bd_defdoc srxm on skb.def1 = srxm.pk_defdoc ")
-					.append(" left join hk_zulin_znjjs_b jsb on skb.pk_gatherbill = jsb.vbdef04 ")
+					.append(" left join hk_zulin_znjjs_b jsb on (skb.pk_gatherbill = jsb.vbdef04 and jsb.dr = 0) ")
 					.append(" where sk.dr = 0 and skb.dr = 0 ")
 					.append(" and skb.src_tradetype = 'Z3-01' ")
 					.append(" and srxm.name not like '%押金%' ")
