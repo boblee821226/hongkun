@@ -224,7 +224,13 @@ public class ErmMatterAppBillQueryImpl implements IErmMatterAppBillQuery, IErmMa
 			fixedCon += " orig_amount > isnull(( SELECT sum(p.exe_amount+p.pre_amount) FROM er_mtapp_billpf p WHERE p.pk_mtapp_detail=er_mtapp_detail.pk_mtapp_detail GROUP BY p.pk_mtapp_detail ),0 ) ";
 		} else if (djlxbm.startsWith(BXConstans.BX_PREFIX)) {
 			// 报销单拉单条件：总额>报销的执行数+报销的预占数 （Total > bxExe + bxPre）
-			fixedCon += " orig_amount > isnull(( SELECT sum(p.exe_amount+p.pre_amount) FROM er_mtapp_billpf p WHERE p.pk_mtapp_detail=er_mtapp_detail.pk_mtapp_detail and p.pk_djdl='bx' GROUP BY p.pk_mtapp_detail ),0 ) ";
+			/**
+			 * HK 2019年9月27日14点51分
+			 * 去掉 申请金额 大于 执行金额 的限制，只考虑 是否关闭
+			 */
+//			fixedCon += " orig_amount > isnull(( SELECT sum(p.exe_amount+p.pre_amount) FROM er_mtapp_billpf p WHERE p.pk_mtapp_detail=er_mtapp_detail.pk_mtapp_detail and p.pk_djdl='bx' GROUP BY p.pk_mtapp_detail ),0 ) ";
+			fixedCon += " (1=1) ";
+			/***END***/
 		}
 		fixedCon += " and pk_tradetype in (select pk_tradetype from er_mtapp_cbill where src_tradetype = '";
 		fixedCon += djlxbm;
@@ -436,7 +442,13 @@ public class ErmMatterAppBillQueryImpl implements IErmMatterAppBillQuery, IErmMa
 			fixedCon += " orig_amount > isnull(( SELECT sum(p.exe_amount+p.pre_amount) FROM er_mtapp_billpf p WHERE p.pk_mtapp_detail=er_mtapp_detail.pk_mtapp_detail GROUP BY p.pk_mtapp_detail ),0 ) ";
 		} else if (djlxbm.startsWith(BXConstans.BX_PREFIX)) {
 			// 报销单拉单条件：总额>报销的执行数+报销的预占数 （Total > bxExe + bxPre）
-			fixedCon += " orig_amount > isnull(( SELECT sum(p.exe_amount+p.pre_amount) FROM er_mtapp_billpf p WHERE p.pk_mtapp_detail=er_mtapp_detail.pk_mtapp_detail and p.pk_djdl='bx' GROUP BY p.pk_mtapp_detail ),0 ) ";
+			/**
+			 * HK 2019年9月27日14点51分
+			 * 去掉 申请金额 大于 执行金额 的限制，只考虑 是否关闭
+			 */
+//			fixedCon += " orig_amount > isnull(( SELECT sum(p.exe_amount+p.pre_amount) FROM er_mtapp_billpf p WHERE p.pk_mtapp_detail=er_mtapp_detail.pk_mtapp_detail and p.pk_djdl='bx' GROUP BY p.pk_mtapp_detail ),0 ) ";
+			fixedCon += " (1=1) ";
+			/***END***/
 		}
 
 		if (!StringUtil.isEmpty(pk_psndoc)) {

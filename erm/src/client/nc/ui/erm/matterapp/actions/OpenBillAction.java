@@ -130,7 +130,13 @@ public class OpenBillAction extends NCAction {
 
 		if (effecStatus.equals(ErmMatterAppConst.EFFECTSTATUS_VALID)
 				&& closeStatus.equals(ErmMatterAppConst.CLOSESTATUS_Y)
-				&& !INCSystemUserConst.NC_USER_PK.equals(matterAppVO.getCloseman())) {
+				/**
+				 * HK 2019年9月27日15点57分
+				 * 去掉 当前操作员 必须是 关闭人的 限制。 解决了，系统自动关闭，无法开启的问题。
+				 */
+//				&& !INCSystemUserConst.NC_USER_PK.equals(matterAppVO.getCloseman())
+				/***END***/
+		) {
 			return true;
 		}
 
