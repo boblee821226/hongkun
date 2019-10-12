@@ -129,9 +129,12 @@ public class ZnjjsQushuAction extends NCAction {
 						.append(",ctb.pk_ct_sale_b ")	// 9合同子表pk
 						.append(",ctb.pk_ct_sale ")		//10合同主表pk
 						.append(",ct.vdef19 ")			//11租金确认截至日
+						.append(",substr(ctb.vbdef4,1,10) ")	//12结束日期
+						.append(",jffs.name ")	//13缴费方式
 						.append(" from ct_sale ct ")
 						.append(" inner join ct_sale_b ctb on ct.pk_ct_sale = ctb.pk_ct_sale ")
-						.append(" left join bd_defdoc srxm on ctb.vbdef1  = srxm.pk_defdoc ")
+						.append(" left join bd_defdoc srxm on ctb.vbdef1 = srxm.pk_defdoc ")	// 收入项目
+						.append(" left join bd_defdoc jffs on ctb.vbdef7 = jffs.pk_defdoc ")	// 缴费方式
 						.append(" where ct.dr = 0 and ctb.dr = 0 ")
 						.append(" and ct.blatest = 'Y' ")
 						.append(" and ct.pk_org = '"+pk_org+"' ")
@@ -155,19 +158,26 @@ public class ZnjjsQushuAction extends NCAction {
 					String 	  ht_code = PuPubVO.getString_TrimZeroLenAsNull(obj[3]);
 					String 	 ht_rowno = PuPubVO.getString_TrimZeroLenAsNull(obj[4]);
 					String 	  pk_sfxm = PuPubVO.getString_TrimZeroLenAsNull(obj[5]);
-					UFDate    jf_date = PuPubVO.getUFDate(obj[6]);
+					UFDate    jf_date = PuPubVO.getUFDate(obj[6]);	// 默认为 合同行-开始日期 如果缴费方式=后付，则赋值为 合同行-结束日期
 					UFDouble   yj_mny = PuPubVO.getUFDouble_ValueAsValue(obj[7]);
 					UFDouble   sj_mny = PuPubVO.getUFDouble_ValueAsValue(obj[8]);
 					String 		ht_id = PuPubVO.getString_TrimZeroLenAsNull(obj[9]);
 					String     ht_bid = PuPubVO.getString_TrimZeroLenAsNull(obj[10]);
 					UFDate	  zjqrjzr = PuPubVO.getUFDate(obj[11]);	// 租金确认截至日期
-					UFDouble   jf_mny = yj_mny.sub(sj_mny);	// 应缴费金额 = 应缴房租 - 实缴房租
+					UFDouble   jf_mny = yj_mny.sub(sj_mny);			// 应缴费金额 = 应缴房租 - 实缴房租
+					UFDate	 end_date = PuPubVO.getUFDate(obj[12]);	// 合同行-结束日期
+					String       jffs = PuPubVO.getString_TrimZeroLenAsNull(obj[13]);	// 缴费方式
+					
+					if ("后付".equals(jffs)) {
+						jf_date = end_date;
+					}
 					
 					UFDate jisuanDate = dbilldate;	// 计算日期（如果租金确认截至日期，小于 当前日期， 那计算日期应该等于租金确认截至日期）
 					String vbmemo = null;			// 行备注（如果按租金确认截至日期来计算的，体现到行备注上）
 					if(zjqrjzr!=null && zjqrjzr.compareTo(dbilldate)<0) {
 						jisuanDate = zjqrjzr;
 						vbmemo = "租金确认截至日期"+zjqrjzr.toString().substring(0, 10);
+						jisuanDate = jisuanDate.getDateAfter(1);	// 如果有租金确认截至日期，则天数加一。
 					}
 					
 					Integer yq_num = jisuanDate.getDaysAfter(jf_date);	// 逾期天数 (19年9月27日，确定为不加一)
