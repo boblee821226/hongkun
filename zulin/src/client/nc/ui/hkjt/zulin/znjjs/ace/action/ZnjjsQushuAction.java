@@ -126,15 +126,15 @@ public class ZnjjsQushuAction extends NCAction {
 						.append(",substr(ctb.vbdef3,1,10) ")	// 6开始日期
 						.append(",ctb.norigtaxmny ")	// 7应缴金额
 						.append(",ctb.noritotalgpmny ")	// 8实缴金额
-						.append(",ctb.pk_ct_sale_b ")	// 9合同子表pk
-						.append(",ctb.pk_ct_sale ")		//10合同主表pk
+						.append(",ctb.pk_ct_sale ")		// 9合同主表pk
+						.append(",ctb.pk_ct_sale_b ")	//10合同子表pk
 						.append(",ct.vdef19 ")			//11租金确认截至日
 						.append(",substr(ctb.vbdef4,1,10) ")	//12结束日期
-						.append(",jffs.name ")	//13缴费方式
+						.append(",jffs.name ")			//13缴费方式
 						.append(" from ct_sale ct ")
 						.append(" inner join ct_sale_b ctb on ct.pk_ct_sale = ctb.pk_ct_sale ")
 						.append(" left join bd_defdoc srxm on ctb.vbdef1 = srxm.pk_defdoc ")	// 收入项目
-						.append(" left join bd_defdoc jffs on ctb.vbdef7 = jffs.pk_defdoc ")	// 缴费方式
+						.append(" left join bd_defdoc jffs on ct.vdef7 = jffs.pk_defdoc ")		// 缴费方式
 						.append(" where ct.dr = 0 and ctb.dr = 0 ")
 						.append(" and ct.blatest = 'Y' ")
 						.append(" and ct.pk_org = '"+pk_org+"' ")
@@ -142,7 +142,7 @@ public class ZnjjsQushuAction extends NCAction {
 						.append(" and (nvl(ctb.norigtaxmny,0)-nvl(ctb.noritotalgpmny,0))<>0 ")
 						.append(" and srxm.name not like '%押金%' ")
 						.append(" and srxm.name not like '%调整%' ")
-//						.append(" and ct.vbillcode = '20181212A008' ")	// 测试
+//						.append(" and ct.vbillcode = '201806151-2-10061-2-10071-3#1' ")	// 测试-合同号
 			;
 			
 			ArrayList list = (ArrayList)iUAPQueryBS.executeQuery(querySQL.toString(), new ArrayListProcessor());
@@ -224,25 +224,28 @@ public class ZnjjsQushuAction extends NCAction {
 		{
 			StringBuffer querySQL_2 = 
 			new StringBuffer("select ")
-					.append(" ct.pk_customer ")
-					.append(",ct.vdef15 ")
-					.append(",ct.vdef16 ")
-					.append(",ct.vbillcode ")
-					.append(",ctb.crowno ")
-					.append(",skb.def1 ")
-					.append(",substr(skb.def3,1,10) ")
-					.append(",skb.money_cr ")
-					.append(",0 ")
-					.append(",ctb.pk_ct_sale_b ")
-					.append(",ctb.pk_ct_sale ")
-					.append(",substr(skb.busidate,1,10) ")
-					.append(",sk.billno ")
-					.append(",skb.pk_gatherbill ")
+					.append(" ct.pk_customer ")		// 0客户pk
+					.append(",ct.vdef15 ")			// 1区域pk
+					.append(",ct.vdef16 ")			// 2房号pk
+					.append(",ct.vbillcode ")		// 3合同号
+					.append(",ctb.crowno ")			// 4合同行号
+					.append(",skb.def1 ")			// 5收入项目pk
+					.append(",substr(skb.def3,1,10) ")	// 6计算日期
+					.append(",skb.money_cr ")		// 7应缴金额
+					.append(",0 ")					// 8实缴金额
+					.append(",ctb.pk_ct_sale ")		// 9合同主pk
+					.append(",ctb.pk_ct_sale_b ")	//10合同子pk
+					.append(",substr(skb.busidate,1,10) ")	//11收款日期 为 租金确认截至日期
+					.append(",sk.billno ")			//12收款单号
+					.append(",skb.pk_gatherbill ")	//13收款单bid
+					.append(",substr(ctb.vbdef4,1,10) ")	//14结束日期
+					.append(",jffs.name ")					//15缴费方式
 					.append(" from ar_gatherbill sk ")
 					.append(" inner join ar_gatheritem skb on sk.pk_gatherbill = skb.pk_gatherbill ")
 					.append(" inner join ct_sale_b ctb on skb.src_itemid = ctb.pk_ct_sale_b ")
 					.append(" inner join ct_sale ct on ctb.pk_ct_sale = ct.pk_ct_sale ")
-					.append(" left join bd_defdoc srxm on skb.def1 = srxm.pk_defdoc ")
+					.append(" left join bd_defdoc srxm on skb.def1 = srxm.pk_defdoc ")	// 收入项目
+					.append(" left join bd_defdoc jffs on ct.vdef7 = jffs.pk_defdoc ")	// 缴费方式
 					.append(" left join hk_zulin_znjjs_b jsb on (skb.pk_gatherbill = jsb.vbdef04 and jsb.dr = 0) ")
 					.append(" where sk.dr = 0 and skb.dr = 0 ")
 					.append(" and skb.src_tradetype = 'Z3-01' ")
@@ -250,7 +253,8 @@ public class ZnjjsQushuAction extends NCAction {
 					.append(" and srxm.name not like '%调整%' ")
 					.append(" and ct.pk_org = '"+pk_org+"' ")
 					.append(" and jsb.pk_hk_zulin_znjjs_b is null ")
-//					.append(" and sk.billno = 'D22019092400008794' ")	// 测试
+//					.append(" and sk.billno = '' ")	// 测试-收款单号
+//					.append(" and ct.vbillcode = '201806151-2-10061-2-10071-3#1' ")	// 测试-合同号
 			;
 			ArrayList list_2 = (ArrayList)iUAPQueryBS.executeQuery(querySQL_2.toString(), new ArrayListProcessor());
 			
@@ -274,6 +278,12 @@ public class ZnjjsQushuAction extends NCAction {
 					UFDouble   jf_mny = yj_mny.sub(sj_mny);	// 应缴费金额 = 应缴房租 - 实缴房租
 					String     skCode = PuPubVO.getString_TrimZeroLenAsNull(obj[12]);	// 收款单号
 					String     skBid = PuPubVO.getString_TrimZeroLenAsNull(obj[13]);	// 收款单bid
+					UFDate	 end_date = PuPubVO.getUFDate(obj[14]);						// 合同行-结束日期
+					String       jffs = PuPubVO.getString_TrimZeroLenAsNull(obj[15]);	// 缴费方式
+					
+					if ("后付".equals(jffs)) {
+						jf_date = end_date;
+					}
 					
 					UFDate jisuanDate = dbilldate;	// 计算日期（如果租金确认截至日期，小于 当前日期， 那计算日期应该等于租金确认截至日期）
 					String vbmemo = null;			// 行备注（如果按租金确认截至日期来计算的，体现到行备注上）
