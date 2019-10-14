@@ -205,7 +205,7 @@ public class BodyAddLineAction extends
 					
 					getCardPanel().getHeadItem("vdef03").setValue(total_je);	// 表头-合计金额
 					if(isSameYjfrq && yjfrq_str!=null) {
-						getCardPanel().getHeadItem("vdef19").setValue(new UFDate(yjfrq_str));	// 表头-合计金额
+						getCardPanel().getHeadItem("vdef19").setValue(new UFDate(yjfrq_str));	// 表头-日期
 					}
 					
 				}
