@@ -58,9 +58,12 @@ public class N_25_SAVE extends AbstractCompiler2 {
       /**
        * HK
        * 2019年10月15日 15点20分
-       * 增加判断， 看下游 转固单，是否都生成了 资产卡片
+       * 增加判断，看下游 转固单，是否都生成了 资产卡片
+       * 修改判断逻辑，固定资产属性的物料 ，必须都生成了卡片。
        */
       if(true) {
+    	  
+    	  String pk_org = vos[0].getParentVO().getPk_org();
     	  
     	  StringBuffer pkInvoices = new StringBuffer("('null'");
     	  for(int i=0;i<vos.length;i++) {
@@ -84,10 +87,12 @@ public class N_25_SAVE extends AbstractCompiler2 {
 		    	  .append(" inner join ic_purchasein_b cgrkb on fpb.csourcebid = cgrkb.cgeneralbid ")
 		    	  .append(" inner join fa_transasset_b zgb on  cgrkb.cgeneralbid = zgb.pk_bill_b_src ")
 		    	  .append(" inner join bd_material inv on fpb.pk_material = inv.pk_material ")
+		    	  .append(" inner join bd_materialfi invfi on (inv.pk_material = invfi.pk_material and invfi.dr = 0 and invfi.pk_org = '").append(pk_org).append("') ")
 		    	  .append(" left join fa_card card on (zgb.pk_transasset_b = card.pk_bill_b_src and card.dr = 0) ")
 		    	  .append(" left join fa_cardhistory cardhis on (card.pk_card = cardhis.pk_card and cardhis.laststate_flag='Y' and cardhis.dr = 0) ")
 		    	  .append(" where fp.dr = 0 and fpb.dr = 0 ")
 		    	  .append(" and cgrkb.dr = 0 and zgb.dr = 0 ")
+		    	  .append(" and invfi.materialvaluemgt = 2 ")	// 只取 固定资产 类的。
 		    	  .append(" and fp.pk_invoice in ").append(pkInvoices)
 		    	  .append(" group by fpb.pk_invoice_b ")
 		    	  .append(" having max(zgb.amount) <> sum(nvl(cardhis.card_num,0)) ")
@@ -103,11 +108,11 @@ public class N_25_SAVE extends AbstractCompiler2 {
     			  Object[] obj = (Object[])list.get(i);
         		  String invCode = PuPubVO.getString_TrimZeroLenAsNull(obj[0]);
         		  String invName = PuPubVO.getString_TrimZeroLenAsNull(obj[1]);
-        		  UFDouble zgNum = PuPubVO.getUFDouble_NullAsZero(obj[4]);
+        		  UFDouble rkNum = PuPubVO.getUFDouble_NullAsZero(obj[3]);
         		  UFDouble kpNum = PuPubVO.getUFDouble_NullAsZero(obj[5]);
         		  errMSg
         		  .append("【").append(invCode).append(invName).append("】")
-        		  .append("{转固单数量：").append(zgNum).append("}、")
+        		  .append("{入库数量：").append(rkNum).append("}、")
         		  .append("{卡片数量：").append(kpNum).append("}")
         		  .append("\r\n")
         		  ;
