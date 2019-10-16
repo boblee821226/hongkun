@@ -451,10 +451,10 @@ public class CloseBookImpl extends BatchDocBaseDAO implements ICloseBookService,
 	        		  UFDouble zgNum = PuPubVO.getUFDouble_NullAsZero(obj[3]);
 	        		  UFDouble kpNum = PuPubVO.getUFDouble_NullAsZero(obj[4]);
 	        		  errMSg_temp
-	        		  .append("【").append(billCode).append("】")
-	        		  .append("【").append(invCode).append(invName).append("】")
-	        		  .append("{转固单数量：").append(zgNum).append("}、")
-	        		  .append("{卡片数量：").append(kpNum).append("}")
+	        		  .append("【转固单号：").append(billCode).append("】")
+	        		  .append("【物料：").append(invCode).append(invName).append("】")
+	        		  .append("{转固单物料数量：").append(zgNum).append("}、")
+	        		  .append("{已生成资产卡片数量：").append(kpNum).append("}")
 	        		  .append("\r\n")
 	        		  ;
 	    		  }
