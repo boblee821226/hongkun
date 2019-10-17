@@ -85,17 +85,17 @@ public class N_25_SAVE extends AbstractCompiler2 {
 		    	  .append("from po_invoice fp ")
 		    	  .append(" inner join po_invoice_b fpb on fp.pk_invoice = fpb.pk_invoice ")
 		    	  .append(" inner join ic_purchasein_b cgrkb on fpb.csourcebid = cgrkb.cgeneralbid ")
-		    	  .append(" inner join fa_transasset_b zgb on  cgrkb.cgeneralbid = zgb.pk_bill_b_src ")
-		    	  .append(" inner join bd_material inv on fpb.pk_material = inv.pk_material ")
-		    	  .append(" inner join bd_materialfi invfi on (inv.pk_material = invfi.pk_material and invfi.dr = 0 and invfi.pk_org = '").append(pk_org).append("') ")
+		    	  .append(" left join fa_transasset_b zgb on (cgrkb.cgeneralbid = zgb.pk_bill_b_src and zgb.dr = 0) ")
+		    	  .append(" left join bd_material inv on fpb.pk_material = inv.pk_material ")
+		    	  .append(" left join bd_materialfi invfi on (inv.pk_material = invfi.pk_material and invfi.dr = 0 and invfi.pk_org = '").append(pk_org).append("') ")
 		    	  .append(" left join fa_card card on (zgb.pk_transasset_b = card.pk_bill_b_src and card.dr = 0) ")
 		    	  .append(" left join fa_cardhistory cardhis on (card.pk_card = cardhis.pk_card and cardhis.laststate_flag='Y' and cardhis.dr = 0) ")
 		    	  .append(" where fp.dr = 0 and fpb.dr = 0 ")
-		    	  .append(" and cgrkb.dr = 0 and zgb.dr = 0 ")
+		    	  .append(" and cgrkb.dr = 0 ")
 		    	  .append(" and invfi.materialvaluemgt = 2 ")	// 只取 固定资产 类的。
 		    	  .append(" and fp.pk_invoice in ").append(pkInvoices)
 		    	  .append(" group by fpb.pk_invoice_b ")
-		    	  .append(" having max(zgb.amount) <> sum(nvl(cardhis.card_num,0)) ")
+		    	  .append(" having max(cgrkb.nnum) <> sum(nvl(cardhis.card_num,0)) ")
     	  ;
     	  
     	  BaseDAO dao = new BaseDAO();
@@ -111,9 +111,9 @@ public class N_25_SAVE extends AbstractCompiler2 {
         		  UFDouble rkNum = PuPubVO.getUFDouble_NullAsZero(obj[3]);
         		  UFDouble kpNum = PuPubVO.getUFDouble_NullAsZero(obj[5]);
         		  errMSg
-        		  .append("【").append(invCode).append(invName).append("】")
-        		  .append("{入库数量：").append(rkNum).append("}、")
-        		  .append("{卡片数量：").append(kpNum).append("}")
+        		  .append("【物料：").append(invCode).append(invName).append("】")
+        		  .append("{入库单物料数量：").append(rkNum).append("} ")
+        		  .append("{已生成资产卡片数量：").append(kpNum).append("} ")
         		  .append("\r\n")
         		  ;
     		  }
