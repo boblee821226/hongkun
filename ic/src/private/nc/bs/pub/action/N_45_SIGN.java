@@ -1,13 +1,19 @@
 package nc.bs.pub.action;
 
+import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.List;
 
+import nc.bs.dao.BaseDAO;
 import nc.bs.framework.common.NCLocator;
 import nc.bs.pub.compiler.AbstractCompiler2;
 import nc.itf.ic.m45.self.IPurchaseInMaintain;
+import nc.jdbc.framework.processor.ArrayListProcessor;
 import nc.vo.pub.BusinessException;
 import nc.vo.pub.compiler.PfParameterVO;
 import nc.vo.pubapp.pattern.exception.ExceptionUtils;
+import nc.vo.ic.m45.entity.PurchaseInBodyVO;
+import nc.vo.ic.m45.entity.PurchaseInVO;
 
 /**
  * 备注：库存采购入库单的签字 单据动作执行中的动态执行类的动态执行类。 创建日期：(2010-3-31)
@@ -44,8 +50,46 @@ public class N_45_SIGN extends AbstractCompiler2 {
        * 2019年10月15日 09点57分
        * 签字后，进行判断：如果是固定资产类 则 生成转固单。
        */
-      inVOs = NCLocator.getInstance().lookup(IPurchaseInMaintain.class)
-              .generateFixedAsset(inVOs);
+      //首先判断 是否存在 固定资产类的物料
+      List<PurchaseInVO> voList = new ArrayList();
+      for (PurchaseInVO billVo : inVOs) {
+    	String pk_org = billVo.getParentVO().getPk_org();
+    	PurchaseInBodyVO[] bodyvos = billVo.getBodys();
+    	// 表体物料pk集合
+		ArrayList list = new ArrayList<String>();
+		for (PurchaseInBodyVO bvo : bodyvos) {
+			list.add(bvo.getCmaterialvid());
+		}
+    	// 查询物料、实物物料价值管理模式
+		String sql = "select pk_material "
+//				+ ",(case materialvaluemgt when 1 then '存货核算' when 2 then '固定资产' when 3 then '费用' else '其他' end)  wltype "
+				+ " from bd_materialfi " +
+				" where dr = 0 " +
+				" and materialvaluemgt = 2 " +	// 固定资产
+				" and pk_material in ( '' ";
+		for (int i = 0; i < list.size(); i++) {
+			sql = sql + ",'" + list.get(i) + "'";
+		}
+		sql += " ) and pk_org = (select pk_financeorg "
+				+ " from org_stockorg " + " where pk_stockorg = '" + pk_org
+				+ "') ";
+		BaseDAO dao = new BaseDAO();
+		ArrayList<Object[]> retObj = (ArrayList<Object[]>) dao
+				.executeQuery(sql, new ArrayListProcessor());
+		if(retObj!=null && retObj.size()>0) {
+			voList.add(billVo);
+		}
+      }
+      
+      if(voList.size() > 0)
+      {
+    	  PurchaseInVO[] voList_arr = new PurchaseInVO[voList.size()];
+    	  voList_arr = voList.toArray(voList_arr);
+    	  
+		  NCLocator.getInstance().lookup(IPurchaseInMaintain.class)
+				  .generateFixedAsset(voList_arr);
+      }
+      
       /***END***/
       
       return inVOs;
