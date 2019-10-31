@@ -73,12 +73,14 @@ public class PuValidateAction extends CtScriptPFlowAction {
          * HK
          * 2019年10月21日 10点46分
          * 判断附件个数，是否大于等于2个
+         * 2019年10月30日 10点35分
+         * 判断改为1个，参数传入最少附件数量
          */
-        if (!checkFujian()) {
+        if (!checkFujian(1)) {
       	  MessageDialog.showErrorDlg(
   	            this.getModel().getContext().getEntranceUI(),
   	            "附件检查",
-  	            "请上传附件，附件数量不能小于2个");
+  	            "请上传附件，附件数量不能小于1个");
       	  return;
         }
         /***END***/
@@ -105,7 +107,7 @@ public class PuValidateAction extends CtScriptPFlowAction {
    * 判断附件个数，是否大于等于2个
  * @throws BusinessException 
    */
-  private boolean checkFujian() throws BusinessException {
+  private boolean checkFujian(Integer fileNum) throws BusinessException {
 	
 	AggCtPuVO ctVo = (AggCtPuVO) this.getModel().getSelectedData();
 	String pk_bill = ctVo.getParentVO().getPk_ct_pu();
@@ -122,7 +124,7 @@ public class PuValidateAction extends CtScriptPFlowAction {
 	if(list!=null && list.size() > 0)
 	{
 		int fileCount = PuPubVO.getInteger_NullAs(((Object[])list.get(0))[0], 0);
-		if(fileCount >= 2) {
+		if(fileCount >= fileNum) {
 			return true;
 		}
 	}

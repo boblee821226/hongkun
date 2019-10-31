@@ -329,7 +329,7 @@ public class GenHtmxAction extends HelpAction {
 	 * 根据开始日期、结束日期、 缴费周期、行数   返回 每一期的 开始结束日期（连续 但 不交叉）
 	 * 将 参数所在的 结束日期 提前一天
 	 */
-	public UFDate[][] genQiJian(UFDate ksrq,UFDate jsrq,int jfzq,int row,UFDate LeapYearDate){
+	public static UFDate[][] genQiJian(UFDate ksrq,UFDate jsrq,int jfzq,int row,UFDate LeapYearDate){
 		
 		UFDate[][] result = new UFDate[row][];
 		
