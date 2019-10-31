@@ -69,8 +69,8 @@ public class N_F3_SAVE extends N_BASE_ACTION {
 			 * 如果为 合同付款，则赋值正确的 单据类型编码
 			 */
 			String befor_type = paraVo.m_preValueVo.getParentVO().getAttributeValue("pk_tradetypeid").toString();
-			if (IPub_data.GKHT_tradetypeid.equals(befor_type)) {
-				paraVo.m_preValueVo.getParentVO().setAttributeValue("pk_tradetype", IPub_data.GKHT_tradetype);
+			if (IPub_data.BKHT_tradetypeid.equals(befor_type)) {
+				paraVo.m_preValueVo.getParentVO().setAttributeValue("pk_tradetype", IPub_data.BKHT_tradetype);
 			}
 //			String befor_type_code = paraVo.m_preValueVo.getParentVO().getAttributeValue("pk_tradetype").toString();
 			/***END***/
@@ -107,7 +107,7 @@ public class N_F3_SAVE extends N_BASE_ACTION {
 				String updateSQL = 
 						" update ap_paybill " +
 						" set pk_tradetypeid = '"+befor_type+"' " +
-						" , pk_tradetype = '"+IPub_data.GKHT_tradetype+"' " +
+						" , pk_tradetype = '"+IPub_data.BKHT_tradetype+"' " +
 						" where pk_paybill = '"+pk+"' "
 				;
 //				daseDAO.setAddTimeStamp(false);
@@ -116,7 +116,7 @@ public class N_F3_SAVE extends N_BASE_ACTION {
 				if(flag>0)
 				{
 					return_obj[0].getParentVO().setAttributeValue("pk_tradetypeid",befor_type);
-					return_obj[0].getParentVO().setAttributeValue("pk_tradetype",IPub_data.GKHT_tradetype);
+					return_obj[0].getParentVO().setAttributeValue("pk_tradetype",IPub_data.BKHT_tradetype);
 				}
 			}
 			/***END***/
