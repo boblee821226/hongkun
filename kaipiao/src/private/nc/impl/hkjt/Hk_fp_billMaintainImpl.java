@@ -9,6 +9,7 @@ import nc.bs.hkjt.huiyuan.workplugin.HuiyuanPlugin;
 import nc.bs.hkjt.srgk.huiguan.zhangdan.workplugin.ImpZhangDanBill;
 import nc.bs.hkjt.srgk.jiudian.workplugin.ImpJiudianData;
 import nc.bs.hkjt.srgk.jiudian.workplugin.ImpJiudianData_xr;
+import nc.bs.hkjt.zulin.workplugin.ZnjjsPlugin;
 import nc.bs.uap.lock.PKLock;
 import nc.impl.pub.ace.AceHk_fp_billPubServiceImpl;
 import nc.impl.pubapp.pattern.data.bill.BillQuery;
@@ -267,8 +268,8 @@ public class Hk_fp_billMaintainImpl extends AceHk_fp_billPubServiceImpl
 		/**
 		 * ’Àµ•≤‚ ‘
 		 */
-		ImpZhangDanBill bb = new ImpZhangDanBill();
-		Object result = bb.executeTest(obj);
+//		ImpZhangDanBill bb = new ImpZhangDanBill();
+//		Object result = bb.executeTest(obj);
 		
 		/**
 		 * ª·‘±≤‚ ‘
@@ -287,6 +288,12 @@ public class Hk_fp_billMaintainImpl extends AceHk_fp_billPubServiceImpl
 		 */
 //		ImpJiudianData qlm = new ImpJiudianData();
 //		Object result = qlm.executeTest(obj);
+		
+		/**
+		 * ÷Õƒ…Ω
+		 */
+		ZnjjsPlugin znj = new ZnjjsPlugin();
+		Object result = znj.executeTest(obj);
 		
 		return result;
 	}
