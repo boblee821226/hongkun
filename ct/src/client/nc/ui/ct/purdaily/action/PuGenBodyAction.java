@@ -5,11 +5,13 @@ import hd.vo.pub.tools.PuPubVO;
 import java.awt.event.ActionEvent;
 
 import nc.ui.ct.saledaily.action.GenHtmxAction;
-import nc.ui.pub.beans.MessageDialog;
 import nc.ui.pub.beans.UIRefPane;
 import nc.ui.uif2.NCAction;
+import nc.vo.ct.entity.CtZzDzInfoVO;
 import nc.vo.pub.lang.UFDate;
 import nc.vo.pub.lang.UFDouble;
+
+import org.codehaus.jackson.map.ObjectMapper;
 
 public class PuGenBodyAction extends NCAction {
 
@@ -53,18 +55,29 @@ public class PuGenBodyAction extends NCAction {
 		String pk_org_v = PuPubVO.getString_TrimZeroLenAsNull(
 			this.getEditor().getBillCardPanel().getHeadItem("pk_org_v").getValueObject());
 		
+		// 涨租信息-递增方式
+		UIRefPane dz_type_ref = (UIRefPane)this.getEditor().getBillCardPanel().getHeadItem("vdef19").getComponent();
+		String dz_type = dz_type_ref.getRefName();
+		// 涨租信息-涨租数据
+		String vdef1 = PuPubVO.getString_TrimZeroLenAsNull(this.getEditor().getBillCardPanel().getHeadItem("vdef1").getValueObject());
+		ObjectMapper objectMapper = new ObjectMapper();
+		CtZzDzInfoVO dzInfoVO = null;
+		if (vdef1 != null) {
+			dzInfoVO = objectMapper.readValue(vdef1, CtZzDzInfoVO.class);
+		}
+		
 		// 合同开始日期
 		UFDate ht_date_begin = PuPubVO.getUFDate(
 			this.getEditor().getBillCardPanel().getHeadItem("valdate").getValueObject());
 		// 合同终止日期
 		UFDate ht_date_end = PuPubVO.getUFDate(
 			this.getEditor().getBillCardPanel().getHeadItem("invallidate").getValueObject());
-		// 免租开始日期
-		UFDate mz_date_begin = PuPubVO.getUFDate(
-			this.getEditor().getBillCardPanel().getHeadItem("vdef6").getValueObject());
-		// 免租结束日期
-		UFDate mz_date_end = PuPubVO.getUFDate(
-			this.getEditor().getBillCardPanel().getHeadItem("vdef14").getValueObject());
+//		// 免租开始日期
+//		UFDate mz_date_begin = PuPubVO.getUFDate(
+//			this.getEditor().getBillCardPanel().getHeadItem("vdef6").getValueObject());
+//		// 免租结束日期
+//		UFDate mz_date_end = PuPubVO.getUFDate(
+//			this.getEditor().getBillCardPanel().getHeadItem("vdef14").getValueObject());
 		// 单价-地上
 		UFDouble price_up = PuPubVO.getUFDouble_NullAsZero(
 			this.getEditor().getBillCardPanel().getHeadItem("vdef9").getValueObject());
@@ -77,19 +90,6 @@ public class PuGenBodyAction extends NCAction {
 		// 面积-地下
 		UFDouble area_down = PuPubVO.getUFDouble_NullAsZero(
 			this.getEditor().getBillCardPanel().getHeadItem("vdef11").getValueObject());
-		
-		// 每天的金额 = 单价-地上 * 面积-地上 + 单价-地下 * 面积-地下
-		UFDouble day_money = 
-					price_up.multiply(area_up)
-				.add(
-					price_down.multiply(area_down)
-				);
-		// 计算租金的天数 = 合同终止日期 - 合同开始日期 + 1 (包含 头 和 尾)
-		Integer days = ht_date_end.getDaysAfter(ht_date_begin) + 1;
-		
-		// 合同总金额 ntotalorigmny
-		UFDouble ht_money = day_money.multiply(days).setScale(2, UFDouble.ROUND_HALF_UP);
-		this.getEditor().getBillCardPanel().getHeadItem("ntotalorigmny").setValue(ht_money);
 		
 		// 付款方式
 		UIRefPane fk_type_ref = (UIRefPane)this.getEditor().getBillCardPanel().getHeadItem("vdef5").getComponent();
@@ -109,84 +109,300 @@ public class PuGenBodyAction extends NCAction {
 		Integer ht_month = PuPubVO.getInteger_NullAs(
 			this.getEditor().getBillCardPanel().getHeadItem("vdef2").getValueObject(), 0);
 		
-		// 付款次数 = 合同期限（月） / 付款周期（月）
-		Integer fk_count = ht_month / fk_month;
+		// 总合同总额（所有年的之和 包括涨租）
+		UFDouble total_ht_money = UFDouble.ZERO_DBL;
 		
-		Object[][] qijian = GenHtmxAction.genQiJian(ht_date_begin, ht_date_end, fk_month, fk_count, null);
+		// 将 合同期限（月）， 按照涨租次数， 来拆分。
+		Integer[] exec_time = new Integer[]{
+			12, 12, 12, 12, 12
+		};
+		// 找到 每个涨租期间的 开始、结束日期。
+		UFDate[][] exec_date = exec_date(ht_date_begin, ht_date_end, exec_time);
 		
-		UFDouble total_money = UFDouble.ZERO_DBL;	// 已分配的合同金额
+		UFDouble[][] dzInfo = getZzDzInfo(dz_type, dzInfoVO, exec_time);
 		
-		// 税率 vdef4
-		UIRefPane taxrate_ref = (UIRefPane)this.getEditor().getBillCardPanel().getHeadItem("vdef4").getComponent();
-		String taxrate = taxrate_ref.getRefName().replaceAll("%", "");
+		// 找到 每个期间的涨租比例-单价
+		UFDouble[] dzLvPrice = dzInfo[0];
+
+		// 找到 每个期间的涨租金额-单价
+		UFDouble[] dzJePrice = dzInfo[1];
 		
-		// 根据客户 找到税码税率
-//		String ctaxcodeid = "1001N5100000005N6HJG";
-		UFDouble ntaxrate = new UFDouble(taxrate);
-		Integer ftaxtypeflag = 0;	// 0：应税内含		1：应税外加
-		
-		// 根据付款次数，生成表体数据
-		for(int i = 0; i < fk_count; i++) {
-			UFDate body_date_begin = PuPubVO.getUFDate(qijian[i][0]);
-			UFDate body_date_end = PuPubVO.getUFDate(qijian[i][1]);
-			UFDate body_date_fk = body_date_begin;
-			String body_rowno = "" + ((i+1) * 10);
-			UFDouble body_money = UFDouble.ZERO_DBL;
-			if (i == fk_count - 1) {
-				body_money = ht_money.sub(total_money);
-			} else {
-				body_money = ht_money.div(fk_count).setScale(2, UFDouble.ROUND_HALF_UP);
-				total_money = total_money.add(body_money);
+		// 找到 每个期间的涨租比例-总额
+		UFDouble[] dzLvMoney = dzInfo[2];
+
+		// 找到 每个期间的涨租金额-总额
+		UFDouble[] dzJeMoney = dzInfo[3];
+
+		/**
+		 * 按照涨租次数，循环处理， 因为每次涨租的 租金不同。
+		 */
+		for (int time_i = 0; time_i < exec_time.length; time_i++)
+		{
+			UFDate date_begin = exec_date[time_i][0];
+			UFDate date_end = exec_date[time_i][1];
+			
+			Integer time_month = exec_time[time_i];
+			
+			// 每天的金额 = 单价-地上 * 面积-地上 + 单价-地下 * 面积-地下
+			UFDouble day_money = UFDouble.ZERO_DBL;
+			
+			// 涨租比例-单价
+			if (dzLvPrice != null) {
+				UFDouble dzLv_temp = dzLvPrice[time_i];
+				day_money = 
+					price_up.multiply(dzLv_temp).multiply(area_up)
+				.add(
+					price_down.multiply(dzLv_temp).multiply(area_down)
+				);
+			} else if (dzJePrice != null) {	// 涨租金额-单价
+				UFDouble dzJe_temp = dzJePrice[time_i];
+				day_money = 
+					price_up.add(dzJe_temp).multiply(area_up)
+				.add(
+					price_down.add(dzJe_temp).multiply(area_down)
+				);
+			} else { // 不涨租
+				day_money = 
+					price_up.multiply(area_up)
+				.add(
+					price_down.multiply(area_down)
+				);
 			}
 			
-			UFDouble body_tax = body_money.multiply(ntaxrate).div(100.00).setScale(2, UFDouble.ROUND_HALF_UP);
-			UFDouble body_mny = body_money.sub(body_tax);	// 无税金额
+			// 计算租金的天数 = 合同终止日期 - 合同开始日期 + 1 (包含 头 和 尾)
+			Integer days = date_end.getDaysAfter(date_begin) + 1;
 			
-			this.getEditor().getBillCardPanel().getBillModel().addLine();
-			this.getEditor().getBillCardPanel().getBillModel().setValueAt(body_rowno, i, "crowno");
-			this.getEditor().getBillCardPanel().getBillModel().setValueAt(zcxm_1, i, "vbdef1");
-			this.getEditor().getBillCardPanel().getBillModel().setValueAt(pk_group, i, "pk_group");
-			this.getEditor().getBillCardPanel().getBillModel().setValueAt(pk_org, i, "pk_org");
-			this.getEditor().getBillCardPanel().getBillModel().setValueAt(pk_org_v, i, "pk_org_v");
-			this.getEditor().getBillCardPanel().getBillModel().setValueAt(pk_org, i, "pk_financeorg");
-			this.getEditor().getBillCardPanel().getBillModel().setValueAt(pk_org_v, i, "pk_financeorg_v");
-			this.getEditor().getBillCardPanel().getBillModel().setValueAt(pk_org, i, "pk_arrvstock");
-			this.getEditor().getBillCardPanel().getBillModel().setValueAt(pk_org_v, i, "pk_arrvstock_v");
-			this.getEditor().getBillCardPanel().getBillModel().setValueAt(body_date_begin, i, "vbdef3");
-			this.getEditor().getBillCardPanel().getBillModel().setValueAt(body_date_end, i, "vbdef4");
-			this.getEditor().getBillCardPanel().getBillModel().setValueAt(body_date_fk, i, "vbdef2");
-			this.getEditor().getBillCardPanel().getBillModel().setValueAt(body_money, i, "norigtaxmny");
-			this.getEditor().getBillCardPanel().getBillModel().setValueAt(body_money, i, "ntaxmny");
-			this.getEditor().getBillCardPanel().getBillModel().setValueAt(body_money, i, "ncaltaxmny");
-			this.getEditor().getBillCardPanel().getBillModel().setValueAt("1.00/1.00", i, "vqtunitrate");
-			this.getEditor().getBillCardPanel().getBillModel().setValueAt("1.00/1.00", i, "vchangerate");
-			this.getEditor().getBillCardPanel().getBillModel().setValueAt("0001Z010000000079UJJ", i, "csendcountryid");
-			this.getEditor().getBillCardPanel().getBillModel().setValueAt("0001Z010000000079UJJ", i, "crececountryid");
-			this.getEditor().getBillCardPanel().getBillModel().setValueAt("0001Z010000000079UJJ", i, "ctaxcountryid");
-			this.getEditor().getBillCardPanel().getBillModel().setValueAt(2, i, "fbuysellflag");
-			this.getEditor().getBillCardPanel().getBillModel().setValueAt(ftaxtypeflag, i, "ftaxtypeflag");
-			this.getEditor().getBillCardPanel().getBillModel().setValueAt(body_tax, i, "ntax");
-			this.getEditor().getBillCardPanel().getBillModel().setValueAt(ntaxrate, i, "ntaxrate");
-			this.getEditor().getBillCardPanel().getBillModel().setValueAt(body_mny, i, "ncalcostmny");
-			this.getEditor().getBillCardPanel().getBillModel().setValueAt(body_mny, i, "nmny");
-			this.getEditor().getBillCardPanel().getBillModel().setValueAt(body_mny, i, "norigmny");
+			// 先计算出 每次涨租期间的合同总额。
+			// 合同总金额 ntotalorigmny
+			// 正常计算
+			UFDouble ht_money = day_money.multiply(days).setScale(2, UFDouble.ROUND_HALF_UP);
+			
+			// 再进行 合同金额的递增处理
+			if (dzLvMoney != null) {
+				UFDouble dzLv_temp = dzLvMoney[time_i];
+				ht_money = ht_money.multiply(dzLv_temp);
+			} else if (dzJeMoney != null) {
+				UFDouble dzJe_temp = dzJeMoney[time_i];
+				ht_money = ht_money.add(dzJe_temp);
+			}
+			
+			total_ht_money = total_ht_money.add(ht_money);
+			
+			// 付款次数 = 合同期限（月） / 付款周期（月）
+			Integer fk_count = time_month / fk_month;
+			
+			Object[][] qijian = GenHtmxAction.genQiJian(date_begin, date_end, fk_month, fk_count, null);
+			
+			UFDouble total_money = UFDouble.ZERO_DBL;	// 已分配的合同金额
+			
+			// 税率 vdef4
+			UIRefPane taxrate_ref = (UIRefPane)this.getEditor().getBillCardPanel().getHeadItem("vdef4").getComponent();
+			String taxrate = taxrate_ref.getRefName().replaceAll("%", "");
+			
+			// 根据客户 找到税码税率
+	//		String ctaxcodeid = "1001N5100000005N6HJG";
+			UFDouble ntaxrate = new UFDouble(taxrate);
+			Integer ftaxtypeflag = 0;	// 0：应税内含		1：应税外加
+			
+			// 根据付款次数，生成表体数据
+			for(int i = 0; i < fk_count; i++) {
+				UFDate body_date_begin = PuPubVO.getUFDate(qijian[i][0]);
+				UFDate body_date_end = PuPubVO.getUFDate(qijian[i][1]);
+				UFDate body_date_fk = body_date_begin;
+				UFDouble body_money = UFDouble.ZERO_DBL;
+				if (i == fk_count - 1) {
+					body_money = ht_money.sub(total_money);
+				} else {
+					body_money = ht_money.div(fk_count).setScale(2, UFDouble.ROUND_HALF_UP);
+					total_money = total_money.add(body_money);
+				}
+				
+				UFDouble body_tax = body_money.multiply(ntaxrate).div(100.00).setScale(2, UFDouble.ROUND_HALF_UP);
+				UFDouble body_mny = body_money.sub(body_tax);	// 无税金额
+				
+				this.getEditor().getBillCardPanel().getBillModel().addLine();
+				Integer rowNo = this.getEditor().getBillCardPanel().getBillModel().getRowCount() - 1;	// 当前操作的行
+				String body_rowno = "" + ((rowNo+1) * 10);
+				this.getEditor().getBillCardPanel().getBillModel().setValueAt(body_rowno, rowNo, "crowno");
+				this.getEditor().getBillCardPanel().getBillModel().setValueAt(zcxm_1, rowNo, "vbdef1");
+				this.getEditor().getBillCardPanel().getBillModel().setValueAt(pk_group, rowNo, "pk_group");
+				this.getEditor().getBillCardPanel().getBillModel().setValueAt(pk_org, rowNo, "pk_org");
+				this.getEditor().getBillCardPanel().getBillModel().setValueAt(pk_org_v, rowNo, "pk_org_v");
+				this.getEditor().getBillCardPanel().getBillModel().setValueAt(pk_org, rowNo, "pk_financeorg");
+				this.getEditor().getBillCardPanel().getBillModel().setValueAt(pk_org_v, rowNo, "pk_financeorg_v");
+				this.getEditor().getBillCardPanel().getBillModel().setValueAt(pk_org, rowNo, "pk_arrvstock");
+				this.getEditor().getBillCardPanel().getBillModel().setValueAt(pk_org_v, rowNo, "pk_arrvstock_v");
+				this.getEditor().getBillCardPanel().getBillModel().setValueAt(body_date_begin, rowNo, "vbdef3");
+				this.getEditor().getBillCardPanel().getBillModel().setValueAt(body_date_end, rowNo, "vbdef4");
+				this.getEditor().getBillCardPanel().getBillModel().setValueAt(body_date_fk, rowNo, "vbdef2");
+				this.getEditor().getBillCardPanel().getBillModel().setValueAt(body_money, rowNo, "norigtaxmny");
+				this.getEditor().getBillCardPanel().getBillModel().setValueAt(body_money, rowNo, "ntaxmny");
+				this.getEditor().getBillCardPanel().getBillModel().setValueAt(body_money, rowNo, "ncaltaxmny");
+				this.getEditor().getBillCardPanel().getBillModel().setValueAt("1.00/1.00", rowNo, "vqtunitrate");
+				this.getEditor().getBillCardPanel().getBillModel().setValueAt("1.00/1.00", rowNo, "vchangerate");
+				this.getEditor().getBillCardPanel().getBillModel().setValueAt("0001Z010000000079UJJ", rowNo, "csendcountryid");
+				this.getEditor().getBillCardPanel().getBillModel().setValueAt("0001Z010000000079UJJ", rowNo, "crececountryid");
+				this.getEditor().getBillCardPanel().getBillModel().setValueAt("0001Z010000000079UJJ", rowNo, "ctaxcountryid");
+				this.getEditor().getBillCardPanel().getBillModel().setValueAt(2, rowNo, "fbuysellflag");
+				this.getEditor().getBillCardPanel().getBillModel().setValueAt(ftaxtypeflag, rowNo, "ftaxtypeflag");
+				this.getEditor().getBillCardPanel().getBillModel().setValueAt(body_tax, rowNo, "ntax");
+				this.getEditor().getBillCardPanel().getBillModel().setValueAt(ntaxrate, rowNo, "ntaxrate");
+				this.getEditor().getBillCardPanel().getBillModel().setValueAt(body_mny, rowNo, "ncalcostmny");
+				this.getEditor().getBillCardPanel().getBillModel().setValueAt(body_mny, rowNo, "nmny");
+				this.getEditor().getBillCardPanel().getBillModel().setValueAt(body_mny, rowNo, "norigmny");
+				
+			}
 			
 		}
 		
 		// 将 参照翻译过来
 		getEditor().getBillCardPanel().getBillModel().loadLoadRelationItemValue();
+		// 表头- 合同总额
+		this.getEditor().getBillCardPanel().getHeadItem("ntotalorigmny").setValue(total_ht_money);
+				
+	}
+	
+	/**
+	 * 获取涨租期间段的 开始，结束日期。
+	 */
+	private static UFDate[][] exec_date(UFDate ht_date_begin, UFDate ht_date_end, Integer[] exec_time) {
+		UFDate[][] result = new UFDate[exec_time.length][];
 		
-//		MessageDialog.showErrorDlg(
-//			this.getEditor(),
-//			"测试",
-//			"" + days 
-//			+ "-" + day_money 
-//			+ "-" + ht_money 
-//			+ "-" + fk_type 
-//			+ "-" + fk_month 
-//			+ "-" + fk_count
-//		);
+		UFDate date_begin = ht_date_begin;
+		UFDate date_end = null;
 		
+		for(int i = 0; i < exec_time.length; i++) {
+			
+			int addMonth = exec_time[i];
+			
+			date_end = addMonth(date_begin, addMonth);
+			
+			result[i] = new UFDate[]{
+				PuPubVO.getUFDate(date_begin.clone()),
+				PuPubVO.getUFDate(date_end.clone()),
+			};
+			
+			date_begin = date_end.getDateAfter(1);
+		}
+		
+		return result;
 	}
 
+	/**
+	 * 根据 日期，增加的月份， 返回 之后的日期(注意要减一天)。
+	 */
+	public static UFDate addMonth(UFDate date, Integer addMonth_parm) {
+		
+		if(addMonth_parm == 0) {
+			return date;
+		}
+		
+		UFDate result = null;
+		
+		Integer year = date.getYear();
+		Integer month = date.getMonth();
+		Integer day = date.getDay();
+		
+		Integer newMonth = month + addMonth_parm;
+		
+		Integer addYear  = newMonth / 12;
+		Integer addMonth = newMonth % 12;
+		
+		result = new UFDate(""+(year+addYear)+"-"+(addMonth)+"-"+day);
+		
+		return result.getDateBefore(1);
+	}
+	
+	/**
+	 * 根据 合同期限（月）、涨租方式、涨租数据 ， 返回 拆分的阶段 涨租信息。
+	 */
+	public static UFDouble[][] getZzDzInfo(String dz_type, CtZzDzInfoVO dzInfoVO, Integer[] exec_time) {
+		
+		// 找到 每个期间的涨租比例-单价
+		UFDouble[] dzLvPrice = null;
+
+		// 找到 每个期间的涨租金额-单价
+		UFDouble[] dzJePrice = null;
+
+		// 找到 每个期间的涨租比例-总额
+		UFDouble[] dzLvMoney = null;
+
+		// 找到 每个期间的涨租金额-总额
+		UFDouble[] dzJeMoney = null;
+		
+		if(dz_type != null
+		&& dzInfoVO != null
+		&& exec_time != null
+		) {
+			Integer dzYear = dzInfoVO.getDzYear();
+			UFDouble dzLv = PuPubVO.getUFDouble_ZeroAsNull(dzInfoVO.getDzLv());
+			UFDouble dzJe = PuPubVO.getUFDouble_ZeroAsNull(dzInfoVO.getDzJe());
+	
+			if ("单价".equals(dz_type)) {
+				if (dzLv != null) {// 递增的比例 默认为1
+					dzLvPrice = new UFDouble[exec_time.length];
+					dzLvPrice[0] = UFDouble.ONE_DBL;
+					for (int i = 1; i < exec_time.length; i++) {
+						// 先取过来过来 上一期的值
+						UFDouble temp = dzLvPrice[i-1];
+						if (i % dzYear == 0 ) { // 如果跨到了递增年限， 说明要进行 增加处理
+							temp = temp.add(
+								temp.multiply(dzLv).div(100.00)
+							);
+						}
+						dzLvPrice[i] = temp;
+					}
+				} else if (dzJe != null) {// 递增的金额 默认为0
+					dzJePrice = new UFDouble[exec_time.length];
+					dzJePrice[0] = UFDouble.ZERO_DBL;
+					for (int i = 1; i < exec_time.length; i++) {
+						// 先取过来过来 上一期的值
+						UFDouble temp = dzJePrice[i-1];
+						if (i % dzYear == 0 ) { // 如果跨到了递增年限， 说明要进行 增加处理
+							temp = temp.add(
+								dzJe
+							);
+						}
+						dzJePrice[i] = temp;
+					}
+				}
+			} else if ("年总价".equals(dz_type)) {
+				if (dzLv != null) {// 递增的比例 默认为1
+					dzLvMoney = new UFDouble[exec_time.length];
+					dzLvMoney[0] = UFDouble.ONE_DBL;
+					for (int i = 1; i < exec_time.length; i++) {
+						// 先取过来过来 上一期的值
+						UFDouble temp = dzLvMoney[i-1];
+						if (i % dzYear == 0 ) { // 如果跨到了递增年限， 说明要进行 增加处理
+							temp = temp.add(
+								temp.multiply(dzLv).div(100.00)
+							);
+						}
+						dzLvMoney[i] = temp;
+					}
+				} else if (dzJe != null) {// 递增的金额 默认为0
+					dzJeMoney = new UFDouble[exec_time.length];
+					dzJeMoney[0] = UFDouble.ZERO_DBL;
+					for (int i = 1; i < exec_time.length; i++) {
+						// 先取过来过来 上一期的值
+						UFDouble temp = dzJeMoney[i-1];
+						if (i % dzYear == 0 ) { // 如果跨到了递增年限， 说明要进行 增加处理
+							temp = temp.add(
+								dzJe
+							);
+						}
+						dzJeMoney[i] = temp;
+					}
+				}
+			}
+		}
+		
+		return new UFDouble[][]{
+			dzLvPrice,
+			dzJePrice,
+			dzLvMoney,
+			dzJeMoney
+		};
+	}
+	
 }
