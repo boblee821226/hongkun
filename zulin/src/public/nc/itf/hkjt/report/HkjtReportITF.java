@@ -1,11 +1,13 @@
 package nc.itf.hkjt.report;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import nc.pub.smart.context.SmartContext;
 import nc.pub.smart.data.DataSet;
 import nc.vo.pu.m25.entity.InvoiceVO;
 import nc.vo.pub.BusinessException;
+import nc.vo.sf.allocateapply.AggAllocateApplyVO;
 
 /**
  * 报表接口、以及其它乱七八糟的接口 都在此实现。
@@ -41,4 +43,13 @@ public interface HkjtReportITF {
 	 */
 	public Object genYbyztzByPoInvoice(InvoiceVO[] poInvoiceVOs, Object ohter) 
 			throws BusinessException;
+	
+	/**
+	 * 根据 结算单，生成 下拨申请
+	 */
+	public Object genXbsqByJsd(ArrayList<Object[]> list, Object other) throws BusinessException;
+	/**
+	 * 删除 下拨申请时，还原 结算单的状态
+	 */
+	public Object delXbsqBackJsd(AggAllocateApplyVO billVO, Object other) throws BusinessException;
 }
