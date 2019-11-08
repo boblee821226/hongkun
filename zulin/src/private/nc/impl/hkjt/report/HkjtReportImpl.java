@@ -37,6 +37,7 @@ import nc.vo.pub.lang.UFBoolean;
 import nc.vo.pub.lang.UFDate;
 import nc.vo.pub.lang.UFDateTime;
 import nc.vo.pub.lang.UFDouble;
+import nc.vo.sf.allocateapply.AggAllocateApplyVO;
 
 public class HkjtReportImpl implements HkjtReportITF {
 
@@ -957,4 +958,17 @@ public class HkjtReportImpl implements HkjtReportITF {
 		}
 		return null;
 	}
+
+	@Override
+	public Object genXbsqByJsd(ArrayList<Object[]> list, Object other)
+			throws BusinessException {
+		return new BusinessDAO().genXbsqByJsd(list, other);
+	}
+
+	@Override
+	public Object delXbsqBackJsd(AggAllocateApplyVO billVO, Object other)
+			throws BusinessException {
+		return new BusinessDAO().delXbsqBackJsd(billVO, other);
+	}
+	
 }
