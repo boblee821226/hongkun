@@ -1,6 +1,8 @@
 package hd.vo.pub.tools;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 import nc.vo.pub.lang.UFBoolean;
 import nc.vo.pub.lang.UFDate;
@@ -109,5 +111,25 @@ public class PuPubVO {
         else
             return new UFBoolean(value.toString().trim());
     }
+	
+	/**
+	 * 将 ArrayList 转成sql的in
+	 * 返回格式：  ('null','value1','value2')
+	 * 进行去重
+	 */
+	public static String getSqlInByList(ArrayList<String> list) {
+		
+		HashMap<String, String> map = new HashMap<String, String>();
+		for (String str : list) {
+			map.put(str, str);
+		}
+		
+		StringBuffer result = new StringBuffer(" ('null'");
+		for (String str : map.keySet()) {
+			result.append(",'").append(str).append("'");
+		}
+		result.append(") ");
+		return result.toString();
+	}
 	
 }
