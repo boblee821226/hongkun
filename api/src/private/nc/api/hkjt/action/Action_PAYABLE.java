@@ -127,6 +127,15 @@ public class Action_PAYABLE {
 				
 				vo.setCtCode(	PuPubVO.getString_TrimZeroLenAsNull(value[12]));	// 合同号
 				
+				/**
+				 * HK 2019年11月11日 17点52分
+				 * 将摘要里 收入的描述 给去掉
+				 */
+				if (vo.getScomment() != null) {
+					vo.setScomment(vo.getScomment().replaceAll("收入", ""));
+				}
+				/***END***/
+				
 				result[i] = vo;
 			}
 		}

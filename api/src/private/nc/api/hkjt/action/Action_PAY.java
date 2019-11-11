@@ -142,6 +142,14 @@ public class Action_PAY {
 					
 					payBVOs[k].setCtCode(	PuPubVO.getString_TrimZeroLenAsNull(value[13]));	// 合同号
 					
+					/**
+					 * HK 2019年11月11日 17点52分
+					 * 将摘要里 收入的描述 给去掉
+					 */
+					if (payBVOs[k].getScomment() != null) {
+						payBVOs[k].setScomment(payBVOs[k].getScomment().replaceAll("收入", ""));
+					}
+					/***END***/
 				}
 				
 				payVO.setPayBVOs(payBVOs);
