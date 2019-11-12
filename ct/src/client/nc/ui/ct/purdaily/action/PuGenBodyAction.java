@@ -3,6 +3,7 @@ package nc.ui.ct.purdaily.action;
 import hd.vo.pub.tools.PuPubVO;
 
 import java.awt.event.ActionEvent;
+import java.util.ArrayList;
 
 import nc.ui.ct.saledaily.action.GenHtmxAction;
 import nc.ui.pub.beans.UIRefPane;
@@ -112,13 +113,19 @@ public class PuGenBodyAction extends NCAction {
 		// 总合同总额（所有年的之和 包括涨租）
 		UFDouble total_ht_money = UFDouble.ZERO_DBL;
 		
+		// 从第几月之后开始涨租，默认为12，意义为从第二年开始
+		Integer zzBeginMonth = 12;
+		
 		// 将 合同期限（月）， 按照涨租次数， 来拆分。
-		Integer[] exec_time = new Integer[]{
-			12, 12, 12, 12, 12
-		};
+		Integer[] exec_time = getExecTime(ht_month, zzBeginMonth, dzInfoVO);
+//				new Integer[]{
+////			12, 12, 12, 12, 12
+//			12, 6,6, 6,6, 6,6, 6,6
+//		};
 		// 找到 每个涨租期间的 开始、结束日期。
 		UFDate[][] exec_date = exec_date(ht_date_begin, ht_date_end, exec_time);
 		
+		// 返回涨租的租金递增信息
 		UFDouble[][] dzInfo = getZzDzInfo(dz_type, dzInfoVO, exec_time);
 		
 		// 找到 每个期间的涨租比例-单价
@@ -133,6 +140,9 @@ public class PuGenBodyAction extends NCAction {
 		// 找到 每个期间的涨租金额-总额
 		UFDouble[] dzJeMoney = dzInfo[3];
 
+		// 保存第一年的租金，作为 后续 年总额涨租的 基数
+		UFDouble FirstYearMny = null;
+		
 		/**
 		 * 按照涨租次数，循环处理， 因为每次涨租的 租金不同。
 		 */
@@ -174,9 +184,21 @@ public class PuGenBodyAction extends NCAction {
 			
 			// 先计算出 每次涨租期间的合同总额。
 			// 合同总金额 ntotalorigmny
-			// 正常计算
+			// 正常计算 = 单价 * 实际天数
 			UFDouble ht_money = day_money.multiply(days).setScale(2, UFDouble.ROUND_HALF_UP);
 			
+			// 记录第一年的 年租金
+			if (time_i==0) {
+				FirstYearMny = ht_money;
+			}
+			
+			// 如果是 合同总额的递增方式， 那么 就需要以首年金额，为基数
+			// 因为涨租期间 不定，所以要计算出 实际期间的 合同基数。用 涨租月数 / 一年的12个月 ，得出比例，然后乘以 首年金额。
+			if (dzLvMoney != null || dzJeMoney != null) {
+				ht_money = FirstYearMny.multiply(
+							new UFDouble(time_month).div(12.00)
+						);
+			}
 			// 再进行 合同金额的递增处理
 			if (dzLvMoney != null) {
 				UFDouble dzLv_temp = dzLvMoney[time_i];
@@ -186,6 +208,7 @@ public class PuGenBodyAction extends NCAction {
 				ht_money = ht_money.add(dzJe_temp);
 			}
 			
+			// 记录 合同总额
 			total_ht_money = total_ht_money.add(ht_money);
 			
 			// 付款次数 = 合同期限（月） / 付款周期（月）
@@ -240,7 +263,7 @@ public class PuGenBodyAction extends NCAction {
 				this.getEditor().getBillCardPanel().getBillModel().setValueAt(body_money, rowNo, "ncaltaxmny");
 				this.getEditor().getBillCardPanel().getBillModel().setValueAt("1.00/1.00", rowNo, "vqtunitrate");
 				this.getEditor().getBillCardPanel().getBillModel().setValueAt("1.00/1.00", rowNo, "vchangerate");
-				this.getEditor().getBillCardPanel().getBillModel().setValueAt("0001Z010000000079UJJ", rowNo, "csendcountryid");
+				this.getEditor().getBillCardPanel().getBillModel().setValueAt("0001Z010000000079UJJ", rowNo, "csendcountryid");	// 国家相关
 				this.getEditor().getBillCardPanel().getBillModel().setValueAt("0001Z010000000079UJJ", rowNo, "crececountryid");
 				this.getEditor().getBillCardPanel().getBillModel().setValueAt("0001Z010000000079UJJ", rowNo, "ctaxcountryid");
 				this.getEditor().getBillCardPanel().getBillModel().setValueAt(2, rowNo, "fbuysellflag");
@@ -334,7 +357,7 @@ public class PuGenBodyAction extends NCAction {
 		&& dzInfoVO != null
 		&& exec_time != null
 		) {
-			Integer dzYear = dzInfoVO.getDzYear();
+//			Integer dzMonth = dzInfoVO.getDzMonth();
 			UFDouble dzLv = PuPubVO.getUFDouble_ZeroAsNull(dzInfoVO.getDzLv());
 			UFDouble dzJe = PuPubVO.getUFDouble_ZeroAsNull(dzInfoVO.getDzJe());
 	
@@ -345,11 +368,11 @@ public class PuGenBodyAction extends NCAction {
 					for (int i = 1; i < exec_time.length; i++) {
 						// 先取过来过来 上一期的值
 						UFDouble temp = dzLvPrice[i-1];
-						if (i % dzYear == 0 ) { // 如果跨到了递增年限， 说明要进行 增加处理
+//						if (i % dzMonth == 0 ) { // 如果跨到了递增月限， 说明要进行 增加处理
 							temp = temp.add(
 								temp.multiply(dzLv).div(100.00)
 							);
-						}
+//						}
 						dzLvPrice[i] = temp;
 					}
 				} else if (dzJe != null) {// 递增的金额 默认为0
@@ -358,11 +381,11 @@ public class PuGenBodyAction extends NCAction {
 					for (int i = 1; i < exec_time.length; i++) {
 						// 先取过来过来 上一期的值
 						UFDouble temp = dzJePrice[i-1];
-						if (i % dzYear == 0 ) { // 如果跨到了递增年限， 说明要进行 增加处理
+//						if (i % dzMonth == 0 ) { // 如果跨到了递增月限， 说明要进行 增加处理
 							temp = temp.add(
 								dzJe
 							);
-						}
+//						}
 						dzJePrice[i] = temp;
 					}
 				}
@@ -373,11 +396,11 @@ public class PuGenBodyAction extends NCAction {
 					for (int i = 1; i < exec_time.length; i++) {
 						// 先取过来过来 上一期的值
 						UFDouble temp = dzLvMoney[i-1];
-						if (i % dzYear == 0 ) { // 如果跨到了递增年限， 说明要进行 增加处理
+//						if (i % dzMonth == 0 ) { // 如果跨到了递增月限， 说明要进行 增加处理
 							temp = temp.add(
 								temp.multiply(dzLv).div(100.00)
 							);
-						}
+//						}
 						dzLvMoney[i] = temp;
 					}
 				} else if (dzJe != null) {// 递增的金额 默认为0
@@ -386,11 +409,11 @@ public class PuGenBodyAction extends NCAction {
 					for (int i = 1; i < exec_time.length; i++) {
 						// 先取过来过来 上一期的值
 						UFDouble temp = dzJeMoney[i-1];
-						if (i % dzYear == 0 ) { // 如果跨到了递增年限， 说明要进行 增加处理
+//						if (i % dzMonth == 0 ) { // 如果跨到了递增月限， 说明要进行 增加处理
 							temp = temp.add(
 								dzJe
 							);
-						}
+//						}
 						dzJeMoney[i] = temp;
 					}
 				}
@@ -403,6 +426,44 @@ public class PuGenBodyAction extends NCAction {
 			dzLvMoney,
 			dzJeMoney
 		};
+	}
+	
+	/**
+	 * 根据 合同期限（总月数），开始涨租月数，涨租频率，来返回租金期间段
+	 */
+	public static Integer[] getExecTime(Integer total, Integer begin, CtZzDzInfoVO zzInfo) {
+		
+		// 如果涨租信息为空，意义为不涨租，直接返回  合同期限
+		if (zzInfo == null) {
+			return new Integer[]{
+				total
+			};
+		}
+		
+		ArrayList<Integer> list = new ArrayList<Integer>();
+		// 添加首期
+		list.add(begin);
+		// 只有频率大于0 才能处理
+		Integer rate = zzInfo.getDzMonth();
+		if (rate <=0 ) {
+			return new Integer[]{
+				total
+			};
+		}
+		
+		Integer sub = total - begin;
+		// 循环添加，剩余期间数， 按 涨租频率
+		while (sub > 0) {
+			if (sub >= rate) {
+				list.add(rate);
+				sub = sub - rate;
+			} else {
+				list.add(sub);
+				sub = 0;
+			}
+		}
+		
+		return list.toArray(new Integer[0]);
 	}
 	
 }
