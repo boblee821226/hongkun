@@ -11,25 +11,25 @@ public class CtZzDzInfoVO implements Serializable {
 	 */
 	private static final long serialVersionUID = 5059746724694484041L;
 	
-	private Integer dzYear;
+	private Integer dzMonth;
 	private Double dzLv;
 	private Double dzJe;
 	
 	public CtZzDzInfoVO () {
 	}
 	
-	public CtZzDzInfoVO (Integer dzYear, Double dzLv, Double dzJe) {
-		this.dzYear = dzYear;
+	public CtZzDzInfoVO (Integer dzMonth, Double dzLv, Double dzJe) {
+		this.dzMonth = dzMonth;
 		this.dzLv = dzLv;
 		this.dzJe = dzJe;
 	}
 	
-	public Integer getDzYear() {
-		return dzYear;
+	public Integer getDzMonth() {
+		return dzMonth;
 	}
 	
-	public void setDzYear(Integer dzYear) {
-		this.dzYear = dzYear;
+	public void setDzMonth(Integer dzMonth) {
+		this.dzMonth = dzMonth;
 	}
 
 	public Double getDzLv() {
