@@ -57,6 +57,8 @@ public class N_HK37_SAVEBASE extends AbstractPfAction<YuebaoBillVO> {
 				YuebaoHVO    hvo = clientFullVOs[i].getParentVO();
 				YuebaoBVO[] bvos = (YuebaoBVO[])clientFullVOs[i].getChildrenVO();
 				
+				hvo.setVbilltypecode("HK37");
+				
 				if(bvos==null||bvos.length<=0)
 					throw new BusinessException("表体数据不能为空");
 				
@@ -71,6 +73,7 @@ public class N_HK37_SAVEBASE extends AbstractPfAction<YuebaoBillVO> {
 					new StringBuffer(" select y.pk_hk_zulin_yuebao ")
 							.append(" from hk_zulin_yuebao y ")
 							.append(" where y.dr=0 ")
+							.append(" and y.vbilltypecode = 'HK37' ")
 							.append(" and y.pk_org = '"+pk_org+"' ")
 							.append(" and y.vdef01 = '"+qijian+"' ")
 							.append(" and y.pk_hk_zulin_yuebao != '"+pk+"' ")
