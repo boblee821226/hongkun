@@ -102,19 +102,19 @@ public String srxm;
 */
 public static final String TS="ts";
 /**
-*自定义项01  （客户名称）
+*自定义项01
 */
 public static final String VBDEF01="vbdef01";
 /**
-*自定义项02  （房间号）
+*自定义项02
 */
 public static final String VBDEF02="vbdef02";
 /**
-*自定义项03  （收入项目）
+*自定义项03
 */
 public static final String VBDEF03="vbdef03";
 /**
-*自定义项04  （区域）
+*自定义项04
 */
 public static final String VBDEF04="vbdef04";
 /**

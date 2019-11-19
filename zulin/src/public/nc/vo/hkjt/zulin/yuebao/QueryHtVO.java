@@ -15,35 +15,35 @@ public class QueryHtVO extends SuperVO {
 	 */
 	private static final long serialVersionUID = -8402875174487316565L;
 
-	public UFDate ksrq;			// 合同明细-开始日期
-	public UFDate jsrq;			// 合同明细-结束日期
-	public UFDouble danjia;		// 合同明细-单价
-	public UFDouble mianji;		// 合同明细-面积
-	public String pk_customer;	// 合同表头-客户
+	public UFDate ksrq;			// 合同明细-开始日期		开始日期
+	public UFDate jsrq;			// 合同明细-结束日期		结束日期
+	public UFDouble danjia;		// 合同明细-单价		单价
+	public UFDouble mianji;		// 合同明细-面积		面积
+	public String pk_customer;	// 合同表头-客户		对方pk
 	public String pk_room;		// 合同表头-房间号
-	public String pk_srxm;		// 合同明细-收入项目
+	public String pk_srxm;		// 合同明细-收入项目		支出项目
 	public String pk_quyu;		// 合同表头-区域
 	
 	public UFDate zzrq;			// 合同表头-终止日期（退租日期）
 	
-	public UFDate yb_ksrq;		// 月报-开始日期
-	public UFDate yb_jsrq;		// 月报-结束日期
-	public Integer yb_days;		// 月报-计费天数
-	public UFDouble yb_mny;		// 月报-收入金额
+	public UFDate yb_ksrq;		// 月报-开始日期		开始日期
+	public UFDate yb_jsrq;		// 月报-结束日期		结束日期
+	public Integer yb_days;		// 月报-计费天数		费用天数
+	public UFDouble yb_mny;		// 月报-收入金额		费用
 	
-	public String vdef01;	// 客户-名称
-	public String vdef02;	// 房间号-名称
-	public String vdef03;	// 收入项目-名称
-	public String vdef04;	// 区域-名称
-	public String vdef05;	// 部门pk
+	public String vdef01;	// 客户-名称			对方名称
+	public String vdef02;	// 房间号-名称			发票类型-名称
+	public String vdef03;	// 收入项目-名称		支出项目-名称
+	public String vdef04;	// 区域-名称			部门名称
+	public String vdef05;	// 部门pk				部门pk
 	public String vdef06;
-	public String vdef07;	// 实际合同金额
+	public String vdef07;	// 实际合同金额			合同总额
 	public String vdef08;
 	public String vdef09;	
-	public String vdef10;	// 合同号
+	public String vdef10;	// 合同号				合同号
 	
-	public UFDouble vdef11;
-	public UFDouble vdef12;
+	public UFDouble vdef11;	//					无税金额
+	public UFDouble vdef12;	//					含税金额
 	public UFDouble vdef13;
 	public UFDouble vdef14;
 	public UFDouble vdef15;
