@@ -1,18 +1,14 @@
 package nc.impl.pub.ace;
 
-import java.util.ArrayList;
-
-import nc.bs.dao.BaseDAO;
-import nc.bs.hkjt.nc.ui.hkjt.zulin.yuebao.ace.bp.AceHk_zulin_yuebaoInsertBP;
-import nc.bs.hkjt.nc.ui.hkjt.zulin.yuebao.ace.bp.AceHk_zulin_yuebaoUpdateBP;
-import nc.bs.hkjt.nc.ui.hkjt.zulin.yuebao.ace.bp.AceHk_zulin_yuebaoDeleteBP;
-import nc.bs.hkjt.nc.ui.hkjt.zulin.yuebao.ace.bp.AceHk_zulin_yuebaoSendApproveBP;
-import nc.bs.hkjt.nc.ui.hkjt.zulin.yuebao.ace.bp.AceHk_zulin_yuebaoUnSendApproveBP;
-import nc.bs.hkjt.nc.ui.hkjt.zulin.yuebao.ace.bp.AceHk_zulin_yuebaoApproveBP;
-import nc.bs.hkjt.nc.ui.hkjt.zulin.yuebao.ace.bp.AceHk_zulin_yuebaoUnApproveBP;
+import nc.bs.hkjt.zulin.bkfyft.ace.bp.AceHk_zulin_yuebaoInsertBP;
+import nc.bs.hkjt.zulin.bkfyft.ace.bp.AceHk_zulin_yuebaoUpdateBP;
+import nc.bs.hkjt.zulin.bkfyft.ace.bp.AceHk_zulin_yuebaoDeleteBP;
+import nc.bs.hkjt.zulin.bkfyft.ace.bp.AceHk_zulin_yuebaoSendApproveBP;
+import nc.bs.hkjt.zulin.bkfyft.ace.bp.AceHk_zulin_yuebaoUnSendApproveBP;
+import nc.bs.hkjt.zulin.bkfyft.ace.bp.AceHk_zulin_yuebaoApproveBP;
+import nc.bs.hkjt.zulin.bkfyft.ace.bp.AceHk_zulin_yuebaoUnApproveBP;
 import nc.impl.pubapp.pattern.data.bill.BillLazyQuery;
 import nc.impl.pubapp.pattern.data.bill.tool.BillTransferTool;
-import nc.jdbc.framework.processor.ArrayListProcessor;
 import nc.ui.querytemplate.querytree.IQueryScheme;
 import nc.vo.hkjt.zulin.yuebao.YuebaoBillVO;
 import nc.vo.pub.BusinessException;
@@ -124,29 +120,6 @@ public abstract class AceHk_zulin_yuebaoPubServiceImpl {
 			YuebaoBillVO[] originBills) throws BusinessException {
 		for (int i = 0; clientFullVOs != null && i < clientFullVOs.length; i++) {
 			clientFullVOs[i].getParentVO().setStatus(VOStatus.UPDATED);
-			
-			/**
-			 * HK 2018年11月5日17:43:25
-			 * 如果生成了凭证  则不允许删除。 必须先要删除凭证。
-			 */
-			String PK = clientFullVOs[i].getParentVO().getPk_hk_zulin_yuebao();
-			StringBuffer querySQL = 
-				new StringBuffer("SELECT ls.src_freedef1 ")
-						.append(" FROM fip_operatinglog ls ")
-						.append(" WHERE src_relationid in ( '"+PK+"' ) and src_billtype = 'HK37' ")
-						.append(" union all ")
-						.append(" SELECT zs.src_freedef1 ")
-						.append(" FROM fip_relation zs ")
-						.append(" WHERE src_relationid in ( '"+PK+"' ) and src_billtype = 'HK37' ")
-			;
-			BaseDAO dao = new BaseDAO();
-			ArrayList list = (ArrayList)dao.executeQuery(querySQL.toString(), new ArrayListProcessor());
-			if(list!=null && list.size()>0)
-			{
-				throw new BusinessException("请先删除凭证");
-			}
-			/***END***/
-			
 		}
 		AceHk_zulin_yuebaoUnApproveBP bp = new AceHk_zulin_yuebaoUnApproveBP();
 		YuebaoBillVO[] retvos = bp.unApprove(clientFullVOs, originBills);
