@@ -108,6 +108,8 @@ public class SkKaipiaoAction extends NCAction {
 			String[] str_billno = new String[rows.length];
 			
 			String pk_customer = null;
+			String pk_org = null;
+			String pk_org_v = null;
 			
 			for(int i=0;i<rows.length;i++)
 			{
@@ -125,6 +127,22 @@ public class SkKaipiaoAction extends NCAction {
 					}
 				}
 				
+				String temp_pk_org = PuPubVO.getString_TrimZeroLenAsNull( hModel.getValueAt(rows[i], "pk_org") );
+				String temp_pk_org_v = PuPubVO.getString_TrimZeroLenAsNull( hModel.getValueAt(rows[i], "pk_org_v") );
+				if(pk_org==null)
+				{
+					pk_org = temp_pk_org;
+					pk_org_v = temp_pk_org_v;
+				}
+				else
+				{
+					if(!pk_org.equals(temp_pk_org))
+					{
+						MessageDialog.showErrorDlg(this.getListView() , "", "组织不同 不能开票。");
+						return;
+					}
+				}
+				
 				str_pk_gatherbill[i] = PuPubVO.getString_TrimZeroLenAsNull( hModel.getValueAt(rows[i], "pk_gatherbill") );
 				str_billno[i] = PuPubVO.getString_TrimZeroLenAsNull( hModel.getValueAt(rows[i], "billno") );
 				
@@ -134,6 +152,8 @@ public class SkKaipiaoAction extends NCAction {
 			MAP_SkKaiPiao.put("pk_gatherbill", str_pk_gatherbill);
 			MAP_SkKaiPiao.put("billno", str_billno);
 			MAP_SkKaiPiao.put("ts", System.currentTimeMillis());	// 记录点按钮的时间戳
+			MAP_SkKaiPiao.put("pk_org", pk_org);
+			MAP_SkKaiPiao.put("pk_org_v", pk_org_v);
 			
 		}
 		
