@@ -14,21 +14,24 @@ public class AceHk_zulin_yuebaoUpdateBP {
 
 	public YuebaoBillVO[] update(YuebaoBillVO[] bills,
 			YuebaoBillVO[] originBills) {
+		
+		String vbilltypecode = bills[0].getParentVO().getVbilltypecode();
+		
 		// 调用修改模板
 		UpdateBPTemplate<YuebaoBillVO> bp = new UpdateBPTemplate<YuebaoBillVO>(
 				Hk_zulin_yuebaoPluginPoint.UPDATE);
 		// 执行前规则
-		this.addBeforeRule(bp.getAroundProcesser());
+		this.addBeforeRule(bp.getAroundProcesser(), vbilltypecode);
 		// 执行后规则
-		this.addAfterRule(bp.getAroundProcesser());
+		this.addAfterRule(bp.getAroundProcesser(), vbilltypecode);
 		return bp.update(bills, originBills);
 	}
 
-	private void addAfterRule(CompareAroundProcesser<YuebaoBillVO> processer) {
+	private void addAfterRule(CompareAroundProcesser<YuebaoBillVO> processer, String vbilltypecode) {
 		// TODO 后规则
 		IRule<YuebaoBillVO> rule = null;
 		rule = new nc.bs.pubapp.pub.rule.BillCodeCheckRule();
-		((nc.bs.pubapp.pub.rule.BillCodeCheckRule) rule).setCbilltype("HK43");
+		((nc.bs.pubapp.pub.rule.BillCodeCheckRule) rule).setCbilltype(vbilltypecode);
 		((nc.bs.pubapp.pub.rule.BillCodeCheckRule) rule)
 				.setCodeItem("vbillcode");
 		((nc.bs.pubapp.pub.rule.BillCodeCheckRule) rule)
@@ -38,14 +41,14 @@ public class AceHk_zulin_yuebaoUpdateBP {
 
 	}
 
-	private void addBeforeRule(CompareAroundProcesser<YuebaoBillVO> processer) {
+	private void addBeforeRule(CompareAroundProcesser<YuebaoBillVO> processer, String vbilltypecode) {
 		// TODO 前规则
 		IRule<YuebaoBillVO> rule = null;
 		rule = new nc.bs.pubapp.pub.rule.FillUpdateDataRule();
 		processer.addBeforeRule(rule);
 		nc.impl.pubapp.pattern.rule.ICompareRule<YuebaoBillVO> ruleCom = new nc.bs.pubapp.pub.rule.UpdateBillCodeRule();
 		((nc.bs.pubapp.pub.rule.UpdateBillCodeRule) ruleCom)
-				.setCbilltype("HK43");
+				.setCbilltype(vbilltypecode);
 		((nc.bs.pubapp.pub.rule.UpdateBillCodeRule) ruleCom)
 				.setCodeItem("vbillcode");
 		((nc.bs.pubapp.pub.rule.UpdateBillCodeRule) ruleCom)

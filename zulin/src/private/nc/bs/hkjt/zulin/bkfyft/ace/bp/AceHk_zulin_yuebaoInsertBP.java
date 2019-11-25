@@ -13,10 +13,12 @@ public class AceHk_zulin_yuebaoInsertBP {
 
 	public YuebaoBillVO[] insert(YuebaoBillVO[] bills) {
 
+		String vbilltypecode = bills[0].getParentVO().getVbilltypecode();
+		
 		InsertBPTemplate<YuebaoBillVO> bp = new InsertBPTemplate<YuebaoBillVO>(
 				Hk_zulin_yuebaoPluginPoint.INSERT);
-		this.addBeforeRule(bp.getAroundProcesser());
-		this.addAfterRule(bp.getAroundProcesser());
+		this.addBeforeRule(bp.getAroundProcesser(),vbilltypecode);
+		this.addAfterRule(bp.getAroundProcesser(),vbilltypecode);
 		return bp.insert(bills);
 
 	}
@@ -26,11 +28,11 @@ public class AceHk_zulin_yuebaoInsertBP {
 	 * 
 	 * @param processor
 	 */
-	private void addAfterRule(AroundProcesser<YuebaoBillVO> processor) {
+	private void addAfterRule(AroundProcesser<YuebaoBillVO> processor, String vbilltypecode) {
 		// TODO 新增后规则
 		IRule<YuebaoBillVO> rule = null;
 		rule = new nc.bs.pubapp.pub.rule.BillCodeCheckRule();
-		((nc.bs.pubapp.pub.rule.BillCodeCheckRule) rule).setCbilltype("HK43");
+		((nc.bs.pubapp.pub.rule.BillCodeCheckRule) rule).setCbilltype(vbilltypecode);
 		((nc.bs.pubapp.pub.rule.BillCodeCheckRule) rule)
 				.setCodeItem("vbillcode");
 		((nc.bs.pubapp.pub.rule.BillCodeCheckRule) rule)
@@ -44,13 +46,13 @@ public class AceHk_zulin_yuebaoInsertBP {
 	 * 
 	 * @param processor
 	 */
-	private void addBeforeRule(AroundProcesser<YuebaoBillVO> processer) {
+	private void addBeforeRule(AroundProcesser<YuebaoBillVO> processer, String vbilltypecode) {
 		// TODO 新增前规则
 		IRule<YuebaoBillVO> rule = null;
 		rule = new nc.bs.pubapp.pub.rule.FillInsertDataRule();
 		processer.addBeforeRule(rule);
 		rule = new nc.bs.pubapp.pub.rule.CreateBillCodeRule();
-		((nc.bs.pubapp.pub.rule.CreateBillCodeRule) rule).setCbilltype("HK43");
+		((nc.bs.pubapp.pub.rule.CreateBillCodeRule) rule).setCbilltype(vbilltypecode);
 		((nc.bs.pubapp.pub.rule.CreateBillCodeRule) rule)
 				.setCodeItem("vbillcode");
 		((nc.bs.pubapp.pub.rule.CreateBillCodeRule) rule)
