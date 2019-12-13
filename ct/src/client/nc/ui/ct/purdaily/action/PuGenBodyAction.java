@@ -5,7 +5,9 @@ import hd.vo.pub.tools.PuPubVO;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 
+import nc.uap.ws.message.MessageUtil;
 import nc.ui.ct.saledaily.action.GenHtmxAction;
+import nc.ui.pub.beans.MessageDialog;
 import nc.ui.pub.beans.UIRefPane;
 import nc.ui.uif2.NCAction;
 import nc.vo.ct.entity.CtZzDzInfoVO;
@@ -45,6 +47,12 @@ public class PuGenBodyAction extends NCAction {
 
 	@Override
 	public void doAction(ActionEvent event) throws Exception {
+		
+		boolean hasBody = this.getEditor().getBillCardPanel().getBillModel().getRowCount() > 0;
+		if (hasBody) {
+			MessageDialog.showErrorDlg(this.getEditor(), "", "表体存在数据，请先删除。");
+			return;
+		}
 		
 		// pk_group
 		String pk_group = PuPubVO.getString_TrimZeroLenAsNull(
@@ -331,7 +339,15 @@ public class PuGenBodyAction extends NCAction {
 		Integer addYear  = newMonth / 12;
 		Integer addMonth = newMonth % 12;
 		
-		result = new UFDate(""+(year+addYear)+"-"+(addMonth)+"-"+day);
+		Integer afterYear = year+addYear;
+		Integer afterMonth = addMonth;
+		
+		if (addMonth == 0) {
+			afterYear--;
+			afterMonth = 12;
+		}
+		
+		result = new UFDate(""+(afterYear)+"-"+(afterMonth)+"-"+day);
 		
 		return result.getDateBefore(1);
 	}

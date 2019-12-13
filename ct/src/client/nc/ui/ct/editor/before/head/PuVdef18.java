@@ -15,8 +15,10 @@ public class PuVdef18 implements IHeadTailBeforeEditEventListener {
      * HK
      * 2019年10月30日 10点48分
      * 收支项目 只过滤出 支出的
+     * 2019年12月13日15:25:12
+     * 只显示出 已启用的
      */
-    panel.setWhereString(" (innercode like '866S__%') ");
+    panel.setWhereString(" (innercode like '866S__%' and enablestate = 2) ");
     /***END***/
   }
 }
