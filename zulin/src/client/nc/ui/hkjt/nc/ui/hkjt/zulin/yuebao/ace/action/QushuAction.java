@@ -582,7 +582,8 @@ public class QushuAction extends NCAction {
 					.append(" from hk_zulin_tiaozheng tz ")
 					.append(" inner join hk_zulin_tiaozheng_b tzb on tz.pk_hk_zulin_tiaozheng = tzb.pk_hk_zulin_tiaozheng ")
 					.append(" where tz.dr=0 and tzb.dr=0 ")
-					.append(" and tz.ibillstatus = 1 ")		// 只取 审核通过的
+					.append(" and tz.vbilltypecode = 'HK38' ")	// 单据类型过滤
+					.append(" and tz.ibillstatus = 1 ")			// 只取 审核通过的
 					.append(" and tz.yearmonth = '"+yearMonth+"' ")
 					.append(" and tz.pk_org = '"+pk_org+"' ")
 			;
