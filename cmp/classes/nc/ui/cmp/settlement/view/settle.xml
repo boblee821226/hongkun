@@ -61,7 +61,10 @@
 		<property name="model" ref="ManageAppModel"></property>
 		<property name="nodekey" value="2201" />
 		<property name="multiSelectionEnable" value="true" />
-		<property name="multiSelectionMode" value="0" />
+		<!-- HK 2019年11月5日 17点50分 -->
+		<!-- 0为鼠标选中模式  1为框选择模式 ， 由 0改为1 -->
+		<property name="multiSelectionMode" value="1" />
+		<!-- END -->
 		<property name="paginationDelegate" ref="paginationDelegator" />
 		<!-- 自定义项 -->
 		<property name="userdefitemListPreparator" ref="userdefitemListPreparator" />
@@ -316,6 +319,10 @@
 				<ref bean="billRelatedActionGroup" />
 				<ref bean="separatorAction" />
 				<ref bean="printActionGroup" />
+				<!-- HK 2019年11月5日 18点23分 -->
+				<ref bean="separatorAction" />
+				<ref bean="genXbsqAction" />
+				<!-- END -->
 			</list>
 		</property>
 	</bean>
@@ -1019,6 +1026,26 @@
 		<property name="billForm" ref="billFormEditor" />
 		<property name="dataManager" ref="modelDataManager" />
 	</bean>
+	<!-- END -->
+	
+	<!-- HK 2019年11月5日 18点18分 -->
+	<!-- 生成下拨申请 -->
+	<bean id="genXbsqAction" class="nc.ui.cmp.settlement.actions.HkGenXbsqAction">
+		<property name="model" ref="ManageAppModel" />
+		<property name="listView" ref="listView" />
+		<property name="billForm" ref="billFormEditor" />
+		<property name="dataManager" ref="modelDataManager" />
+		<property name="caSignerXbsq" ref="clientSignerXbsq" />
+	</bean>
+	<!-- 下拨申请的数字签名 -->
+	<bean id="clientSignerXbsq" class="nc.ui.tmpub.security.DefCommonClientSign">
+		<constructor-arg ref="context" />
+		<property name="constructClassName" value="nc.vo.sf.allocateapply.AllocateApplyEncryptVO" />
+		<property name="signAttributeNameVO" ref="signAttributeNameVOXbsq" />
+	</bean>
+	<bean id="signAttributeNameVOXbsq" class="nc.vo.tmpub.security.SignAttributeNameVO">
+     	<property name="parentAttributeName" value="encryptkey" />
+    </bean>
 	<!-- END -->
 	
 	<!-- 实现联查接口 -->

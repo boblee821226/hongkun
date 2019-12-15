@@ -90,7 +90,7 @@
 			<list>
 				<bean class="nc.ui.hkjt.zulin.sjdy.ace.action.BodyAddLineAction" />
 				<!-- <bean class="nc.ui.pubapp.uif2app.actions.BodyInsertLineAction" /> -->
-				<!-- <bean class="nc.ui.pubapp.uif2app.actions.BodyDelLineAction" /> -->
+				<bean class="nc.ui.hkjt.zulin.sjdy.ace.action.BodyDelLineAction" />
 			</list>
 		</property>
 	</bean>

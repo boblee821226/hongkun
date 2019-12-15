@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
+	<classpathentry kind="src" output="api_admin/classes" path="api_admin/src/public"/>
+	<classpathentry kind="src" output="api_admin/classes" path="api_admin/src/private"/>
+	<classpathentry kind="src" output="sf/classes" path="sf/src/private"/>
 	<classpathentry kind="src" output="erm/classes" path="erm/src/private"/>
 	<classpathentry kind="src" path="erm/src/client"/>
 	<classpathentry kind="src" output="fa/classes" path="fa/src/private"/>

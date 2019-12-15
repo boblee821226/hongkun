@@ -245,6 +245,7 @@
 				<bean class="nc.ui.pubapp.uif2app.event.EventHandlerGroup">
 					<property name="event" value="nc.ui.pubapp.uif2app.event.card.CardHeadTailAfterEditEvent" />
 					<property name="handler">
+						<!-- HK 2019年11月12日19点09分 -->
 						<bean class="nc.ui.hkjt.nc.ui.hkjt.zulin.yuebao.ace.handler.YuebaoCardHeadAfterEditEvent" >
 							<property name="cardForm" ref="billForm" />
 							<property name="model" ref="bmModel" />
