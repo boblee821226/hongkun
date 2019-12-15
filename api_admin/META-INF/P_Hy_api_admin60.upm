@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding='gb2312'?>
+<module name="hkjt">
+  <public>
+	<component remote="true" singleton="true"  tx="CMT">
+	  <interface>nc.api.admin.itf.ApiBusinessItf</interface>
+	  <implementation>nc.api.admin.impl.ApiBusinessImpl</implementation>
+	</component>
+  </public> 
+</module> 
