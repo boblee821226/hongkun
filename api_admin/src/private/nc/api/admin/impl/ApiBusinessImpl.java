@@ -4,7 +4,6 @@ import nc.api.admin.impl.service.ApprovalFlowQueryCountService;
 import nc.api.admin.impl.service.ApprovalFlowQueryService;
 import nc.api.admin.impl.service.ApprovalFlowWorkService;
 import nc.api.admin.impl.service.DocService;
-import nc.api.admin.impl.service.HttpClient;
 import nc.api.admin.itf.ApiBusinessItf;
 import nc.api.admin.itf.ApiPubInfo;
 import nc.api.admin.vo.ActionVO;
@@ -35,7 +34,7 @@ public class ApiBusinessImpl implements ApiBusinessItf {
 		 * ”√”⁄≤‚ ‘
 		 */
 		if (ApiPubInfo.BILLTYPE_TEST.equals(billType)) {
-			return HttpClient.doHttp();
+			return "test";
 		}
 		
 		/**
