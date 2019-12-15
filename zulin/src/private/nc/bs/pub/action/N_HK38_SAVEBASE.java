@@ -57,6 +57,8 @@ public class N_HK38_SAVEBASE extends AbstractPfAction<TzBillVO> {
 				TzHVO    hvo = clientFullVOs[i].getParentVO();
 				TzBVO[] bvos = (TzBVO[])clientFullVOs[i].getChildrenVO();
 				
+				hvo.setVbilltypecode("HK38");
+				
 				if(bvos==null||bvos.length<=0)
 					throw new BusinessException("表体数据不能为空");
 				
@@ -71,6 +73,7 @@ public class N_HK38_SAVEBASE extends AbstractPfAction<TzBillVO> {
 					new StringBuffer(" select tz.pk_hk_zulin_tiaozheng ")
 							.append(" from hk_zulin_tiaozheng tz ")
 							.append(" where tz.dr=0 ")
+							.append(" and tz.vbilltypecode = 'HK38' ")
 							.append(" and tz.pk_org = '"+pk_org+"' ")
 							.append(" and tz.vdef01 = '"+qijian+"' ")
 							.append(" and tz.pk_hk_zulin_tiaozheng != '"+pk+"' ")
