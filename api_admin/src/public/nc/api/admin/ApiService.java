@@ -147,6 +147,7 @@ public class ApiService extends HttpServlet {
 		InvocationInfoProxy.getInstance().setUserCode(userCode);
 		InvocationInfoProxy.getInstance().setUserId(userId);
 		InvocationInfoProxy.getInstance().setGroupId(groupId);
+//		InvocationInfoProxy.getInstance().setBizDateTime(bizDateTime);
 		
 		SecurityMocker usm = new SecurityMocker();
 		usm.ensureSecurity();
