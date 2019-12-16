@@ -227,6 +227,20 @@
 						<bean class="nc.ui.hkjt.zulin.bkfytz.ace.handler.AceAddHandler" />
 					</property>
 				</bean>
+				
+				<!--表头编辑后事件-->
+				<!--HK 2019年12月15日14:55:28-->
+				<bean class="nc.ui.pubapp.uif2app.event.EventHandlerGroup">
+					<property name="event" value="nc.ui.pubapp.uif2app.event.card.CardHeadTailAfterEditEvent" />
+					<property name="handler">
+						<bean class="nc.ui.hkjt.zulin.tiaozheng.ace.handler.TzCardHeadAfterEditEvent" >
+							<property name="cardForm" ref="billForm" />
+							<property name="model" ref="bmModel" />
+						</bean>
+					</property>
+				</bean>
+				<!--END-->
+				
 			</list>
 		</property>
 	</bean>
