@@ -148,10 +148,8 @@
 		<property name="actions">
 			<list>
 				<ref bean="addAction" />
-				<ref bean="editAction" />
 				<ref bean="deleteScriptAction" />
 				<ref bean="defaultQueryAction" />
-				<ref bean="copyAction" />
 				<ref bean="separatorAction" />
 				<ref bean="defaultRefreshAction" />
 				<ref bean="separatorAction" />
@@ -160,11 +158,7 @@
 				<ref bean="approveScriptAction" />
 				<ref bean="uNApproveScriptAction" />
 				<ref bean="separatorAction" />
-				<ref bean="linkQueryAction" />
-				<ref bean="separatorAction" />
 				<ref bean="metaDataBasedPrintAction" />
-				<ref bean="metaDataBasedPrintActiona" />
-				<ref bean="outputAction" />
 				<ref bean="separatorAction" />
 				<ref bean="pFApproveStatusInfoAction" />
 

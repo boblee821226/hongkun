@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import nc.bs.framework.common.NCLocator;
+import nc.itf.hkjt.IPub_data;
 import nc.itf.uap.IUAPQueryBS;
 import nc.jdbc.framework.processor.ArrayListProcessor;
 import nc.jdbc.framework.processor.BeanListProcessor;
@@ -107,8 +108,7 @@ public class QushuAction extends NCAction {
 				.append(" left join org_dept dept on ht.depid = dept.pk_dept ")
 				.append(" left join bd_supplier gys on ht.cvendorid = gys.pk_supplier ")
 				.append(" where ht.dr = 0 and htb.dr = 0 ")
-//				.append(" and ht.ctrantypeid = '1001N510000000AGYP1K' ")
-				.append(" and nvl(htb.vbdef3, '~') <> '~' ")
+				.append(" and ht.vtrantypecode = '").append(IPub_data.BKHT_type_code).append("' ")
 				.append(" and ht.pk_org = '").append(pk_org).append("' ")
 				.append(" and ( ")
 				.append(" 	'").append(str_yb_ksrq).append("' between substr(htb.vbdef3,1,10) and substr(htb.vbdef4,1,10) ")
