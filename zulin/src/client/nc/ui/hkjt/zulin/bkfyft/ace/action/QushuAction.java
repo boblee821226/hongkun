@@ -107,14 +107,15 @@ public class QushuAction extends NCAction {
 				.append(" left join org_dept dept on ht.depid = dept.pk_dept ")
 				.append(" left join bd_supplier gys on ht.cvendorid = gys.pk_supplier ")
 				.append(" where ht.dr = 0 and htb.dr = 0 ")
-				.append(" and ht.ctrantypeid = '1001N510000000AGYP1K' ")
+//				.append(" and ht.ctrantypeid = '1001N510000000AGYP1K' ")
+				.append(" and nvl(htb.vbdef3, '~') <> '~' ")
 				.append(" and ht.pk_org = '").append(pk_org).append("' ")
 				.append(" and ( ")
 				.append(" 	'").append(str_yb_ksrq).append("' between substr(htb.vbdef3,1,10) and substr(htb.vbdef4,1,10) ")
 				.append(" 	or ")
 				.append("  	'").append(str_yb_jsrq).append("' between substr(htb.vbdef3,1,10) and substr(htb.vbdef4,1,10) ")
 				.append(" ) ")
-				.append(" and ht.vbillcode like '20191112%' ")
+//				.append(" and ht.vbillcode like '20191112%' ")
 		;
 		
 		IUAPQueryBS iUAPQueryBS = (IUAPQueryBS)NCLocator.getInstance().lookup(IUAPQueryBS.class.getName()); 
@@ -450,54 +451,55 @@ public class QushuAction extends NCAction {
 		}
 		/***END***/
 		
-//		/**
-//		 *查询 本月调整数据
-//		 */
-//		{
-//			StringBuffer querySQL_TZ = 
-//				new StringBuffer(" select ")
-//					.append(" tzb.vbdef11 ")
-//					.append(",tzb.vbdef12 ")
-//					.append(",tzb.dytzje ")
-//					.append(" from hk_zulin_tiaozheng tz ")
-//					.append(" inner join hk_zulin_tiaozheng_b tzb on tz.pk_hk_zulin_tiaozheng = tzb.pk_hk_zulin_tiaozheng ")
-//					.append(" where tz.dr=0 and tzb.dr=0 ")
-//					.append(" and tz.ibillstatus = 1 ")		// 只取 审核通过的
-//					.append(" and tz.yearmonth = '"+yearMonth+"' ")
-//					.append(" and tz.pk_org = '"+pk_org+"' ")
-//			;
-//			
-//			ArrayList list_TZ = (ArrayList)iUAPQueryBS.executeQuery(
-//					querySQL_TZ.toString()
-//					,new ArrayListProcessor()
-//			);
-//			if(list_TZ!=null&&list_TZ.size()>0)
-//			{
-//				for( int i=0;i<list_TZ.size();i++ )
-//				{
-//					Object[] obj = (Object[])list_TZ.get(i);
-//					
-//					String pk_cutomer = PuPubVO.getString_TrimZeroLenAsNull(obj[0]);
-//					String roomno = PuPubVO.getString_TrimZeroLenAsNull(obj[1]);
-//					
-//					// 客户##房间号
-//					String key = pk_cutomer+"##"+roomno;
-//					
-//					UFDouble tzje = PuPubVO.getUFDouble_NullAsZero(obj[2]);		// 调整金额
-//					
-//					YuebaoBVO yuebaoBVO = MAP_yuebaoBVO.get(key);
-//					if(yuebaoBVO!=null)
-//					{// 表体自定义08 存储 调整金额
-//						yuebaoBVO.setVbdef08(tzje.toString());
-//					}
-//					else
-//					{// 如果发生数据 没有  则不做处理
-//						
-//					}
-//				}
-//			}
-//		}
-//		/***END***/
+		/**
+		 *查询 本月调整数据
+		 */
+		{
+			StringBuffer querySQL_TZ = 
+				new StringBuffer(" select ")
+					.append(" tzb.vbdef11 ")	// 对方pk
+					.append(",tzb.vbdef12 ")	// 合同号
+					.append(",tzb.dytzje ")
+					.append(" from hk_zulin_tiaozheng tz ")
+					.append(" inner join hk_zulin_tiaozheng_b tzb on tz.pk_hk_zulin_tiaozheng = tzb.pk_hk_zulin_tiaozheng ")
+					.append(" where tz.dr=0 and tzb.dr=0 ")
+					.append(" and tz.vbilltypecode = 'HK44' ")	// 单据类型过滤
+					.append(" and tz.ibillstatus = 1 ")		// 只取 审核通过的
+					.append(" and tz.yearmonth = '"+yearMonth+"' ")
+					.append(" and tz.pk_org = '"+pk_org+"' ")
+			;
+			
+			ArrayList list_TZ = (ArrayList)iUAPQueryBS.executeQuery(
+					querySQL_TZ.toString()
+					,new ArrayListProcessor()
+			);
+			if(list_TZ!=null&&list_TZ.size()>0)
+			{
+				for( int i=0;i<list_TZ.size();i++ )
+				{
+					Object[] obj = (Object[])list_TZ.get(i);
+					
+					String pk_cutomer = PuPubVO.getString_TrimZeroLenAsNull(obj[0]);
+					String roomno = PuPubVO.getString_TrimZeroLenAsNull(obj[1]);
+					
+					// 对方##合同号
+					String key = pk_cutomer+"##"+roomno;
+					
+					UFDouble tzje = PuPubVO.getUFDouble_NullAsZero(obj[2]);		// 调整金额
+					
+					YuebaoBVO yuebaoBVO = MAP_yuebaoBVO.get(key);
+					if(yuebaoBVO!=null)
+					{// 表体自定义08 存储 调整金额
+						yuebaoBVO.setVbdef08(tzje.toString());
+					}
+					else
+					{// 如果发生数据 没有  则不做处理
+						
+					}
+				}
+			}
+		}
+		/***END***/
 		
 		YuebaoBVO[] bodyVOs = MAP_yuebaoBVO.values().toArray(new YuebaoBVO[0]);
 		
@@ -516,7 +518,10 @@ public class QushuAction extends NCAction {
 			bvo.setQmyskye(qmye);
 			
 			// 反算单价 = 总额/天/面积/
-			if(bvo.getDysrqrje() != null && bvo.getMianji() != null && bvo.getDysrqrts() != null)
+			if(bvo.getDysrqrje() != null && bvo.getMianji() != null && bvo.getDysrqrts() != null
+			&& !UFDouble.ZERO_DBL.equals(bvo.getDysrqrts())	
+			&& !UFDouble.ZERO_DBL.equals(bvo.getMianji())	
+			)
 			{
 				UFDouble danjia = // 当月确认费用/天数/面积
 						  bvo.getDysrqrje()

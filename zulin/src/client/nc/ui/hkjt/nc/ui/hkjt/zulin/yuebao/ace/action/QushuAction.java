@@ -300,7 +300,7 @@ public class QushuAction extends NCAction {
 		}
 		
 		/**
-		 * 查询 调整的数据
+		 * 查询 调整的数据（所指的是 合同表体行的 调整数据）
 		 */
 		{
 			StringBuffer querySQL_TZ = 
