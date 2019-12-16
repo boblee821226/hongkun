@@ -28,8 +28,9 @@ public class PayPlanDataUtil {
      * HK 2019年10月31日 10点38分
      * 如果是 闭口合同，需要 按照表体数据 生成 付款计划
      */
-    String ctrantypeid = vos[0].getParentVO().getCtrantypeid();
-    if(IPub_data.BKHT_type.equals(ctrantypeid)) {
+//    String ctrantypeid = vos[0].getParentVO().getCtrantypeid();
+	  String vtrantypecode = vos[0].getParentVO().getVtrantypecode();
+    if(IPub_data.BKHT_type_code.equals(vtrantypecode)) {
     	List<PayPlanVO> list_new = new ArrayList<PayPlanVO>();
     	for(int i = 0; i < vos.length; i++) {
     		CtPuVO     hvo = vos[i].getParentVO();
