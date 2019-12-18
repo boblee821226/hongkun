@@ -9,7 +9,8 @@ public class BillInfoVO implements Serializable {
 	 */
 	private static final long serialVersionUID = -761315158975590302L;
 
-	private String id;
+	private String billId;
+	private String billType;
 	private String ts;
 	private String checkNote;		// 批语
 	private String approveResult;	// N-不批准  Y-批准  R-驳回
@@ -21,12 +22,22 @@ public class BillInfoVO implements Serializable {
 		this.setResMsg(resMsg);
 	}
 	
-	public String getId() {
-		return id;
+	public String getBillId() {
+		return billId;
 	}
-	public void setId(String id) {
-		this.id = id;
+
+	public void setBillId(String billId) {
+		this.billId = billId;
 	}
+
+	public String getBillType() {
+		return billType;
+	}
+
+	public void setBillType(String billType) {
+		this.billType = billType;
+	}
+
 	public String getTs() {
 		return ts;
 	}
