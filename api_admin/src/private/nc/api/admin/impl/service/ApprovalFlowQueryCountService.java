@@ -3,21 +3,15 @@ package nc.api.admin.impl.service;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import nc.api.admin.itf.ApiPubInfo;
 import nc.api.admin.tool.PuPubVO;
-import nc.api.admin.vo.ApprovalFlowQueryResVO;
 import nc.api.admin.vo.ApprovalFlowQueryVO;
-import nc.api.admin.vo.BillTypeVO;
 import nc.bs.dao.BaseDAO;
-import nc.impl.pub.util.db.BillQueryByCond;
 import nc.jdbc.framework.processor.ArrayListProcessor;
 import nc.vo.pub.BusinessException;
-import nc.vo.pub.ISuperVO;
-import nc.vo.pubapp.pattern.model.entity.bill.IBill;
 
 public class ApprovalFlowQueryCountService {
 	public static Object doAction(String account, String billType, Object paramObj, String action, String userId) throws BusinessException  {
-		BaseDAO dao = new BaseDAO();
+		BaseDAO dao = new BaseDAO(account);
 		ApprovalFlowQueryVO param = (ApprovalFlowQueryVO)paramObj;
 		if (param==null) param = new ApprovalFlowQueryVO();
 		
@@ -92,7 +86,7 @@ public class ApprovalFlowQueryCountService {
 			if (list != null && list.size() > 0) {
 				billCount = PuPubVO.getInteger_NullAs(((Object[])list.get(0))[0], 0);
 			}
-			result.put("sendingCount", billCount);
+			result.put("sendCount", billCount);
 		}
 		return result;
 	}

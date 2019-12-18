@@ -17,7 +17,7 @@ import nc.vo.pubapp.pattern.model.entity.bill.IBill;
 
 public class ApprovalFlowQueryService {
 	public static Object doAction(String account, String billType, Object paramObj, String action, String userId) throws BusinessException  {
-		BaseDAO dao = new BaseDAO();
+		BaseDAO dao = new BaseDAO(account);
 		
 		ApprovalFlowQueryVO param = (ApprovalFlowQueryVO)paramObj;
 		if (param==null) param = new ApprovalFlowQueryVO();
@@ -204,7 +204,7 @@ public class ApprovalFlowQueryService {
 				resVO.setBillId(billid);
 				resVO.setTs(ts);
 				resVO.setBillType(pk_billtype);
-				resVO.setSendMan(ApiPubInfo.DOC_CACHE.get(account).get("sm_user").get(billInfo[3]).get("name"));
+				resVO.setSendMan(ApiPubInfo.CACHE_DOC.get(account).get("sm_user").get(billInfo[3]).get("name"));
 				resVO.setSendDate(billInfo[4]);
 				resVO.setTemplateListData(templateListData);
 				result.add(resVO);

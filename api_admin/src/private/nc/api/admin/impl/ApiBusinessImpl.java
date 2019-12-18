@@ -4,6 +4,7 @@ import nc.api.admin.impl.service.ApprovalFlowQueryCountService;
 import nc.api.admin.impl.service.ApprovalFlowQueryService;
 import nc.api.admin.impl.service.ApprovalFlowWorkService;
 import nc.api.admin.impl.service.DocService;
+import nc.api.admin.impl.service.PublicService;
 import nc.api.admin.itf.ApiBusinessItf;
 import nc.api.admin.itf.ApiPubInfo;
 import nc.api.admin.vo.ActionVO;
@@ -31,12 +32,20 @@ public class ApiBusinessImpl implements ApiBusinessItf {
 		Class paramClass = actionVO.getParamClass();
 		
 		/**
+		 * 初始化
+		 */
+		if (ApiPubInfo.BILLTYPE_INIT.equals(billType)) {
+			PublicService.getGroup(account);
+			PublicService.getUser(account);
+			DocService.doAction(account);
+			return "初始化完成";
+		}
+		/**
 		 * 用于测试
 		 */
 		if (ApiPubInfo.BILLTYPE_TEST.equals(billType)) {
 			return "test";
 		}
-		
 		/**
 		 * 更新档案
 		 * key：数据源
@@ -49,10 +58,28 @@ public class ApiBusinessImpl implements ApiBusinessItf {
 			return DocService.doAction(account);
 		}
 		/**
+		 * 更新用户
+		 *  key：数据源
+		 * 		key：email
+		 * 			value：userId
+		 */
+		if (ApiPubInfo.BILLTYPE_USER.equals(billType)) {
+			return PublicService.getUser(account);
+		}
+		/**
+		 * 更新集团
+		 *  key：数据源
+		 * 		key：集团name
+		 * 			value：GroupId
+		 */
+		if (ApiPubInfo.BILLTYPE_USER.equals(billType)) {
+			return PublicService.getGroup(account);
+		}
+		/**
 		 * 判断，档案如果为空，就先查询档案
 		 */
-		if ( ApiPubInfo.DOC_CACHE == null 
-		|| ApiPubInfo.DOC_CACHE.get(account) == null 
+		if ( ApiPubInfo.CACHE_DOC == null 
+		|| ApiPubInfo.CACHE_DOC.get(account) == null 
 		) {
 			DocService.doAction(account);
 		}

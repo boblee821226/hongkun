@@ -14,7 +14,9 @@ public class ApiPubInfo {
 	 * （经过测试后，所支持的单据类型）
 	 */
 	public static HashMap<String,BillTypeVO> BILLTYPE = new HashMap<String,BillTypeVO>();
+	public static String BILLTYPE_INIT = "INIT";
 	public static String BILLTYPE_DOC = "DOC";
+	public static String BILLTYPE_USER = "USER";
 	public static String BILLTYPE_TEST = "TEST";
 	/**
 	 * 动作
@@ -73,6 +75,23 @@ public class ApiPubInfo {
 	 * 4、仓库
 	 */
 	public static HashMap<String,HashMap<String,HashMap<String,HashMap<String,String>>>> 
-	DOC_CACHE = new HashMap<String,HashMap<String,HashMap<String,HashMap<String,String>>>>();
+	CACHE_DOC = new HashMap<String,HashMap<String,HashMap<String,HashMap<String,String>>>>();
 	
+	/**
+	 * 加载用户信息,用于 掉接口时，翻译成 userId
+	 * key：数据源
+	 * 		key：email
+	 * 			value：userId
+	 */
+	public static HashMap<String, HashMap<String, String>>
+	CACHE_USER = new HashMap<String, HashMap<String, String>>();
+	
+	/**
+	 * 加载集团信息
+	 * key：数据源
+	 * 		key：集团name
+	 * 			value：GroupId
+	 */
+	public static HashMap<String, HashMap<String, String>>
+	CACHE_GROUP = new HashMap<String, HashMap<String, String>>();
 }
