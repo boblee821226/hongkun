@@ -343,13 +343,17 @@ public class HkjtReportImpl implements HkjtReportITF {
 							.append(",rkb.daccountdate ")		//12、调整入库会计期间计算日期 
 							.append(",js.vbillcode ")			//13、结算单号
 							.append(",jsb.crowno ")				//14、结算行号	
-							.append(",rk.caccountperiod ")		//15、采购入库的期间
+							.append(",rk.caccountperiod ")		//15、调整入库的期间 
+							.append(",cgrk.caccountperiod ")	//16、采购入库的期间 
 							// 结算单
 							.append(" from po_settlebill js ")	
 							.append(" inner join po_settlebill_b jsb on js.pk_settlebill = jsb.pk_settlebill ")
 							// 入库单
 							.append(" inner join IA_I2BILL_B rkb on rkb.csrcbid = jsb.pk_settlebill_b ")
 							.append(" inner join IA_I2BILL rk on rkb.cbillid = rk.cbillid ")
+							// 关联 采购入库
+							.append(" inner join ia_i2bill_b cgrkb on jsb.pk_purchasein_b = cgrkb.csrcbid")
+							.append(" inner join IA_I2BILL cgrk on cgrkb.cbillid = cgrk.cbillid ")
 							// where
 							.append(" where js.dr=0 and jsb.dr=0 and rkb.dr=0 and rk.dr=0 ")
 							.append(" and jsb.PK_INVOICE = '"+hVO.getPk_invoice()+"' ")	// 发票id
@@ -375,7 +379,8 @@ public class HkjtReportImpl implements HkjtReportITF {
 						UFDate rkkjDate = PuPubVO.getUFDate(value[12]);		// 调整入库-会计期间计算日期 
 						String jsCode 	= PuPubVO.getString_TrimZeroLenAsNull(value[13]);	// 结算单号
 						String jsRowno 	= PuPubVO.getString_TrimZeroLenAsNull(value[14]);	// 结算行号
-						String yyyymm 	= PuPubVO.getString_TrimZeroLenAsNull(value[15]);	// 期间（以生成的调整入库为准）
+						String yyyymm_end 	= PuPubVO.getString_TrimZeroLenAsNull(value[15]);	// 截止期间（以生成的调整入库为准）
+						String yyyymm_begin = PuPubVO.getString_TrimZeroLenAsNull(value[16]);	// 开始期间（以采购入库为准）
 						
 						Object[] value_item = 
 							new Object[]{
@@ -390,7 +395,8 @@ public class HkjtReportImpl implements HkjtReportITF {
 								pk_js_b,	// 8、结算bid
 								jsCode,		// 9、结算单号
 								jsRowno,	//10、结算行号
-								yyyymm,		//11、期间
+								yyyymm_begin,	//11、开始期间
+								yyyymm_end,		//12、结束期间
 							};
 						
 						String MAP_key = pk_fp_b;	// Map的key = 发票bid
@@ -438,7 +444,8 @@ public class HkjtReportImpl implements HkjtReportITF {
 							String pk_js_b    = PuPubVO.getString_TrimZeroLenAsNull(MAP_value.get(0)[8]);	// 成本域
 							String jsCode     = PuPubVO.getString_TrimZeroLenAsNull(MAP_value.get(0)[9]);	// 成本域
 							String jsRowno    = PuPubVO.getString_TrimZeroLenAsNull(MAP_value.get(0)[10]);	// 成本域
-							String yyyymm     = PuPubVO.getString_TrimZeroLenAsNull(MAP_value.get(0)[11]);	// 期间
+							String yyyymm_begin = PuPubVO.getString_TrimZeroLenAsNull(MAP_value.get(0)[11]);	// 开始期间
+							String yyyymm_end 	= PuPubVO.getString_TrimZeroLenAsNull(MAP_value.get(0)[12]);	// 结束期间
 							String pk_inv  	  = bVO.getPk_material();				// 物料v
 							String pk_inv_src = bVO.getPk_srcmaterial();			// 物料src
 							String pk_cgrk 	  = bVO.getCsourceid();					// 发票对应的采购入库id
@@ -455,7 +462,7 @@ public class HkjtReportImpl implements HkjtReportITF {
 									.append(" from ia_monthnab ")
 									.append(" inner join ia_calcrange on ia_monthnab.ccalcrangeid = ia_calcrange.ccalcrangeid ")
 									.append(" where ia_monthnab.dr = 0 ")
-									.append(" and ia_monthnab.caccountperiod = '"+ReportDataUtil.getYyyymmAddMm(yyyymm,-1)+"' ")
+									.append(" and ia_monthnab.caccountperiod = '"+ReportDataUtil.getYyyymmAddMm(yyyymm_begin,-1)+"' ")
 									.append(" and ia_monthnab.pk_org = '"+pk_org+"' ")
 									.append(" and ia_monthnab.pk_book = '"+pk_book+"' ")
 									.append(" and ia_monthnab.cinventoryid = '"+pk_inv+"' ")
@@ -490,7 +497,7 @@ public class HkjtReportImpl implements HkjtReportITF {
 									.append(" inner join ia_calcrange on ia_detailledger.ccalcrangeid = ia_calcrange.ccalcrangeid ")
 									.append(" where ")
 									.append(" ia_detailledger.dr = 0 ")
-									.append(" and ia_detailledger.caccountperiod >= '"+yyyymm+"' and ia_detailledger.caccountperiod <= '"+yyyymm+"' ")
+									.append(" and ia_detailledger.caccountperiod >= '"+yyyymm_begin+"' and ia_detailledger.caccountperiod <= '"+yyyymm_end+"' ")
 									.append(" and ia_detailledger.pk_org = '"+pk_org+"' ")
 									.append(" and ia_detailledger.pk_book = '"+pk_book+"' ")
 									.append(" and ia_detailledger.cinventoryid = '"+pk_inv+"' ")
@@ -645,7 +652,7 @@ public class HkjtReportImpl implements HkjtReportITF {
 											IAHeadVO iaHVO = new IAHeadVO();
 											iaHVO.setBconvertflag(UFBoolean.FALSE);
 											iaHVO.setBsystemflag(UFBoolean.FALSE);
-											iaHVO.setCaccountperiod(yyyymm);
+											iaHVO.setCaccountperiod(yyyymm_end);
 											iaHVO.setCdeptid(cdeptid);			// 找出库单的部门
 											iaHVO.setCdeptvid(cdeptvid);		// 找出库单的部门v
 											iaHVO.setCstockorgid(cstockorgid);	// 找出库单的库存组织
@@ -661,7 +668,7 @@ public class HkjtReportImpl implements HkjtReportITF {
 											// 表体
 											IAItemVO iaBVO = new IAItemVO();
 											iaBVO.setBreworkflag(UFBoolean.FALSE);
-											iaBVO.setCaccountperiod(yyyymm);
+											iaBVO.setCaccountperiod(yyyymm_end);
 											iaBVO.setCcurrencyid("1002Z0100000000001K1");	// 币种（可以固定）
 											iaBVO.setCinventoryid(pk_inv_src);	// 物料src
 											iaBVO.setCinventoryvid(pk_inv);		// 物料v
