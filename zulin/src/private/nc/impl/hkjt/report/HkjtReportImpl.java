@@ -355,7 +355,9 @@ public class HkjtReportImpl implements HkjtReportITF {
 							.append(" inner join ia_i2bill_b cgrkb on jsb.pk_purchasein_b = cgrkb.csrcbid")
 							.append(" inner join IA_I2BILL cgrk on cgrkb.cbillid = cgrk.cbillid ")
 							// where
-							.append(" where js.dr=0 and jsb.dr=0 and rkb.dr=0 and rk.dr=0 ")
+							.append(" where js.dr=0 and jsb.dr=0 ")
+							.append(" and rkb.dr=0 and rk.dr=0 ")
+							.append(" and cgrkb.dr=0 and cgrk.dr=0 ")
 							.append(" and jsb.PK_INVOICE = '"+hVO.getPk_invoice()+"' ")	// ·¢Æ±id
 					;
 					ArrayList list = (ArrayList)dao.executeQuery(querySQL_1.toString(), new ArrayListProcessor());
