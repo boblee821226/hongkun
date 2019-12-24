@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import nc.bs.dao.BaseDAO;
 import nc.bs.framework.common.NCLocator;
 import nc.bs.pub.compiler.AbstractCompiler2;
-import nc.itf.hkjt.report.HkjtReportITF;
 import nc.itf.pu.m25.IInvoiceApprove;
 import nc.jdbc.framework.processor.ArrayListProcessor;
 import nc.vo.pub.BusinessException;
@@ -77,6 +76,9 @@ public class N_25_UNAPPROVE extends AbstractCompiler2 {
           }
           
       }
+//      if (true) {
+//    	  throw new BusinessException("测试");
+//      }
       /***END***/
       
       /************* 该组件为批动作工作流处理开始...不能进行修改 *********************/
