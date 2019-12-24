@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding='gb2312'?>
+<module name="hkjt">
+  <public>
+	<component remote="true" singleton="true"  tx="CMT">
+	  <interface>nc.itf.pms.PmsItf</interface>
+	  <implementation>nc.impl.pms.PmsImpl</implementation>
+	</component>
+  </public> 
+</module> 
