@@ -155,6 +155,9 @@
 				<ref bean="defaultQueryAction" />
 				<ref bean="separatorAction" />
 				<ref bean="defaultRefreshAction" />
+				<!-- HK 2019年12月24日16:21:40 -->
+				<ref bean="separatorAction" />
+				<ref bean="chaifenAction" />
 			</list>
 		</property>
 		
@@ -162,7 +165,9 @@
 			<list>
 				<ref bean="saveScriptAction" />
 				<ref bean="cancelAction" />
-				
+				<!-- HK 2019年12月24日16:21:40 -->
+				<ref bean="separatorAction" />
+				<ref bean="fanghaoAction" />
 			</list>
 		</property>
 
@@ -444,6 +449,24 @@
 		<property name="context"><ref bean="context" /></property>
 	</bean>
 	
-	
 	<!-- 批量保存校验服务类 -->
+	
+	<!-- HK 2019年12月24日16:18:50 -->
+	<!--拆分-->
+	<bean id="chaifenAction" class="nc.ui.hkjt.srgk.jiudian.ruzhangmingxi.ace.action.ChaifenAction">
+		<property name="model"><ref bean="bmModel"/></property>
+		<property name="editor"><ref bean="billForm"/></property>
+		<property name="listview"><ref bean="billListView"/></property>
+		<property name="exceptionHandler"><ref bean="exceptionHandler" /></property>
+	</bean>
+	
+	<!-- HK 2019年12月24日16:18:50 -->
+	<!--拆分-->
+	<bean id="fanghaoAction" class="nc.ui.hkjt.srgk.jiudian.ruzhangmingxi.ace.action.FanghaoAction">
+		<property name="model"><ref bean="bmModel"/></property>
+		<property name="editor"><ref bean="billForm"/></property>
+		<property name="listview"><ref bean="billListView"/></property>
+		<property name="exceptionHandler"><ref bean="exceptionHandler" /></property>
+	</bean>
+	
 </beans>
