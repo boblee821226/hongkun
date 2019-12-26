@@ -117,7 +117,7 @@ public class Jd_rzmxMaintainImpl extends AceJd_rzmxPubServiceImpl
 			.append(" where s.dr = 0 ")
 			.append(" and s.pk_org = '").append(_0309_org).append("' ")
 		;
-		ArrayList list_spfl = (ArrayList)dao.executeQuery(querySQL.toString(), new ArrayListProcessor());
+		ArrayList list_spfl = (ArrayList)dao.executeQuery(querySQL_spfl.toString(), new ArrayListProcessor());
 		if (list_spfl != null && list_spfl.size() > 0) {
 			for (Object obj : list_spfl) {
 				Object[] row = (Object[])obj;
@@ -144,7 +144,7 @@ public class Jd_rzmxMaintainImpl extends AceJd_rzmxPubServiceImpl
 			// 循环表体，找出 需要转移的数据VO
 			for (RzmxBVO bVO : bVOs) {
 				String rmno = bVO.getRmno();
-				String bId = bVO.getPk_hk_srgk_jd_rzmx_b();
+//				String bId = bVO.getPk_hk_srgk_jd_rzmx_b();
 				if (rmno != null && _0309_room.containsKey(rmno)) {
 					bVOList.add(bVO);
 				}
@@ -192,29 +192,29 @@ public class Jd_rzmxMaintainImpl extends AceJd_rzmxPubServiceImpl
 					_0309_billId = _0309_billVO_res[0].getParentVO().getPk_hk_srgk_jd_rzmx();
 				}
 			}
-			if (_0309_billId != null) {
-				// 1、将数据转移到 0309
-//				String bIdListStr = PuPubVO.getSqlInByList(bIdList);
-//				StringBuffer updateSQL = 
-//				new StringBuffer(" update hk_srgk_jd_rzmx_b ")
-//					.append(" set ")
-//					.append(" pk_hk_srgk_jd_rzmx = '").append(_0309_billId).append("' ")
-//					.append(" where pk_hk_srgk_jd_rzmx_b in ").append(bIdListStr).append(" ")
-//				;
-//				int update_res = dao.executeUpdate(updateSQL.toString());
-				
+			if (_0309_billId != null) {				
 				// 1、将数据转移到0309，并且变更档案pk、商品分类、部门、父部门。
 				for (RzmxBVO bVO : bVOList) {
 					String spfl = bVO.getSpfl_name();
 					String[] spfl_info = SPFL_DOC.get(spfl);
+					String spflId = null;
+					String bmId = null;
+					String bmFid = null;
+					if (spfl_info != null) {
+						spflId = spfl_info[0];
+						bmId = spfl_info[1];
+						bmFid = spfl_info[2];
+					} 
 					bVO.setPk_hk_srgk_jd_rzmx(_0309_billId);
-					bVO.setSpfl_id(spfl_info[0]);
-					bVO.setBm_id(spfl_info[1]);
-					bVO.setBm_fid(spfl_info[2]);
+					bVO.setSpfl_id(spflId);
+					bVO.setBm_id(bmId);
+					bVO.setBm_fid(bmFid);
+					bVO.setDirty(false);
+					bVO.setAttributeValue("dr", 0);
 				}
 				int update_res = dao.updateVOArray(bVOList.toArray(new RzmxBVO[0]));
 				
-				if (update_res > 0) {
+				if (true) {
 					// 2、更新 0308 和 0309 表头的合计金额
 					StringBuffer updateSQL_3 = 
 					new StringBuffer(" update hk_srgk_jd_rzmx h ")
