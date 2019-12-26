@@ -1,5 +1,7 @@
 package nc.itf.hkjt;
 
+import java.util.ArrayList;
+
 import nc.ui.querytemplate.querytree.IQueryScheme;
 import nc.vo.hkjt.srgk.jiudian.ruzhangmingxi.RzmxBillVO;
 import nc.vo.pub.BusinessException;
@@ -29,4 +31,13 @@ public interface IJd_rzmxMaintain {
 
 	public RzmxBillVO[] unapprove(RzmxBillVO[] clientFullVOs,
 			RzmxBillVO[] originBills) throws BusinessException;
+	
+	/**
+	 * ²ð·Ö 0308->0309
+	 * @param billVOs
+	 * @return
+	 * @throws BusinessException
+	 */
+	public Object chaifen(RzmxBillVO[] billVOs) 
+			throws BusinessException;
 }

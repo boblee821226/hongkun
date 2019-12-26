@@ -86,19 +86,26 @@ public class PuPubVO {
 	public static final Integer ZERO_INTEGER = new Integer(0);
 	public static final Integer	ONE_INTEGER = new Integer(1);
 	
-	public static Integer getInteger_NullAs(Object  value,Integer iDefaultValue) {
+	public static Integer getInteger_NullAs(Object value,Integer iDefaultValue) {
 		  if ( value == null || value.toString().trim().equals("") ){
 		    if (iDefaultValue.equals(PuPubVO.ZERO_INTEGER)) {
-		      return  PuPubVO.ZERO_INTEGER ;
+		      return PuPubVO.ZERO_INTEGER ;
 		    }else if (iDefaultValue.equals(PuPubVO.ONE_INTEGER)) {
-		      return  PuPubVO.ONE_INTEGER ;
+		      return PuPubVO.ONE_INTEGER ;
 		    }else{
-		      return  iDefaultValue;
+		      return iDefaultValue;
 		    }
-		  }else if(value  instanceof  Integer){
-		    return  (Integer)value ;
+		  }else if(value instanceof Integer){
+		    return (Integer)value ;
 		  }else{
-		    return  new Integer(value.toString().trim());
+			  String valueNew = value.toString().trim();
+			  if (valueNew.indexOf(".") >= 0) {
+				  String[] valueNewSplit = valueNew.split("\\.");
+				  if (valueNewSplit!=null && valueNewSplit.length > 0 ) {
+					  valueNew = valueNewSplit[0];
+				  }
+			  }
+		    return new Integer(valueNew);
 		  }
 		}
 	
@@ -132,4 +139,27 @@ public class PuPubVO {
 		return result.toString();
 	}
 	
+	/**
+	 *  根据 开始、结束日期，返回 这期间内，所有日期的 ArrayList<String>
+	 */
+	public static ArrayList<String> getEveryDateList(String beginDateStr, String endDateStr) {
+		ArrayList<String> result = new ArrayList();
+		
+		UFDate beginDate = PuPubVO.getUFDate(beginDateStr);
+		UFDate endDate = PuPubVO.getUFDate(endDateStr);
+		
+		Integer days = endDate.getDaysAfter(beginDate);	// 开始结束 日期之间，相差的天数
+		
+		result.add(beginDateStr);
+		
+		if (days >= 1) {
+			for (int i = 1; i <= days; i++) {
+				UFDate date = beginDate.getDateAfter(i);
+				String strDate = date.toString().substring(0, 10);
+				result.add(strDate);
+			}
+		}
+		
+		return result;
+	}
 }
