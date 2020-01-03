@@ -5,7 +5,6 @@ import hd.vo.pub.tools.PuPubVO;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 
-import nc.uap.ws.message.MessageUtil;
 import nc.ui.ct.saledaily.action.GenHtmxAction;
 import nc.ui.pub.beans.MessageDialog;
 import nc.ui.pub.beans.UIRefPane;
@@ -50,8 +49,13 @@ public class PuGenBodyAction extends NCAction {
 		
 		boolean hasBody = this.getEditor().getBillCardPanel().getBillModel().getRowCount() > 0;
 		if (hasBody) {
-			MessageDialog.showErrorDlg(this.getEditor(), "", "表体存在数据，请先删除。");
-			return;
+			Integer isFugai = MessageDialog.showYesNoDlg(this.getEditor(), "", "表体存在数据，是否覆盖。");
+			if (isFugai == MessageDialog.ID_YES) {
+				// 清空表体
+				this.getEditor().getBillCardPanel().getBillModel().clearBodyData();
+			} else {
+				return;
+			}
 		}
 		
 		// pk_group
