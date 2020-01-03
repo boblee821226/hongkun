@@ -826,7 +826,7 @@ public class HkjtReportImpl implements HkjtReportITF {
 					String pk_org_v  = fpHVO.getPk_org_v();
 					String billMaker = fpHVO.getApprover();		// 发票审核人 为 调整单的创建人。
 					String currPk 	= "1002Z0100000000001K1";	// 币种
-					String remark	= "采购结算调整原值";				// 备注
+					String remark	= "采购结算调整原值";			// 备注
 					billType = "HG";							// 原币原值调整单-单据类型
 					String transiType = "HG-01";				// 原币原值调整单-交易类型
 					String transiPk = "0001N510000000001IXK";	// 原币原值调整单-交易类型pk
@@ -947,6 +947,8 @@ public class HkjtReportImpl implements HkjtReportITF {
 					tzBillVO.setParentVO(tzHVO);
 					tzBillVO.setChildrenVO(tzBVOs);
 					
+//					if (true) throw new BusinessException("==测试==");	
+					
 					TransportBillVO result = 
 							NCLocator.getInstance().lookup(IAlter.class)
 							.insert(null, tzBillVO, showAlterKeyList);
@@ -961,6 +963,7 @@ public class HkjtReportImpl implements HkjtReportITF {
 					throw new Exception(ex);
 				}
 			}
+			
 		} 
 		catch(Exception ex) {
 			throw new BusinessException(ex);
