@@ -200,11 +200,17 @@ public class HkGenXbsqAction extends NCAction {
 				.append(",jsb.pay ")			// 5 金额
 				.append(",case fkb.prepay when 0 then '应付款' when 1 then '预付款' else '未知' end ")	// 6 付款性质
 				.append(",fktype.name ")		// 7 付款业务类型
+				.append(",zjxm.pk_fundplan ")	// 8 资金项目pk
+				.append(",zjxm.name ")			// 9 资金项目name
 				.append(" from cmp_settlement js ")
 				.append(" inner join cmp_detail jsb on js.pk_settlement = jsb.pk_settlement ")
 				.append(" left join ap_payitem fkb on (jsb.pk_billdetail = fkb.pk_payitem and fkb.dr = 0) ")
 				.append(" left join ap_paybill fk on (fkb.pk_paybill = fk.pk_paybill and fk.dr = 0) ")
 				.append(" left join fi_recpaytype fktype on (fkb.pk_recpaytype = fktype.pk_recpaytype) ")
+				// 收支项目
+				.append(" left join bd_inoutbusiclass szxm on (fkb.pk_subjcode = szxm.pk_inoutbusiclass) ")
+				// 资金项目
+				.append(" left join bd_fundplan zjxm on (szxm.def5 = zjxm.pk_fundplan) ")
 				.append(" where js.dr = 0 and jsb.dr = 0 ")
 				.append(" and nvl(js.def1,'N') <> '").append(IPub_data.JSXB_done).append("' ")
 				.append(" and js.pk_settlement in ").append(pkSettlementStr)
@@ -235,11 +241,19 @@ public class HkGenXbsqAction extends NCAction {
 			String fkxz 	= PuPubVO.getString_TrimZeroLenAsNull(rowObj[6]);	// 付款性质
 			String fklx 	= PuPubVO.getString_TrimZeroLenAsNull(rowObj[7]);	// 付款类型
 			
-			String zjjxxm	= IPub_data.JSXB_jhxm_caigou;	// 资金计划项目（默认为采购款）
+			String zjjxxm 		= PuPubVO.getString_TrimZeroLenAsNull(rowObj[6]);	// 资金项目pk
+			String zjjxxm_name	= PuPubVO.getString_TrimZeroLenAsNull(rowObj[7]);	// 资金项目name
 			
-			if ("工程款".equals(fkxz)) {
-				zjjxxm = IPub_data.JSXB_jhxm_gongcheng;	// 工程款
+			if (zjjxxm == null) {
+				zjjxxm = IPub_data.JSXB_jhxm_caigou;
+				zjjxxm_name = "采购款";
 			}
+			
+//			String zjjxxm	= IPub_data.JSXB_jhxm_caigou;	// 资金计划项目（默认为采购款）
+			
+//			if ("工程款".equals(fkxz)) {
+//				zjjxxm = IPub_data.JSXB_jhxm_gongcheng;	// 工程款
+//			}
 			
 			if (PK_GROUP == null) {
 				PK_GROUP = pk_group;
@@ -249,7 +263,8 @@ public class HkGenXbsqAction extends NCAction {
 			
 			String[] zhanghuInfo = map_zhanghu.get(pk_org);
 			
-			String zhaiyao = fkxz + fklx;
+//			String zhaiyao = fkxz + fklx;
+			String zhaiyao = fkxz + zjjxxm_name; // 摘要 = 付款性质 + 资金计划项目
 			
 			if (!map_body.containsKey(zhaiyao)) {
 				rowCount++;
