@@ -1,0 +1,298 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+
+<beans default-lazy-init="true">
+
+	<!-- 环境变量 -->
+	<bean id="context" class="nc.vo.uif2.LoginContext"/>
+	
+	<!-- 模型部分配置########################################################### -->
+	
+	<!-- 应用服务类，负责进行模型操作的处理 -->
+	<bean id="batchModelService" class="nc.ui.ct.purdaily.model.PayPlanModelService">
+	</bean>
+
+	<!-- 对象转换器工厂，由此获取操作对象的特征信息 -->
+	<bean id="boadatorfactory" class="nc.ui.pubapp.uif2app.view.value.CAVO2BDObjectAdapterFactory" >
+		<property name="id_field" value="pk_ct_payplan" />
+		<property name="code_field" value="vbillcode" />
+		<property name="name_field" value="vbillcode" />
+		<property name="pid_field" value="pk_ct_pu" />
+		<property name="pk_org_field" value="pk_org" />
+		<property name="pk_group_field" value="pk_group" />
+	</bean>
+
+	<!-- 批量操作前台校验 -->
+	<bean id="batchValidateSerice" class="nc.ui.uif2.model.DefaultBatchValidationService">
+		<property name="editor" ref="list"/>
+	</bean>
+	
+	<!-- 批量操作应用模型 -->
+	<bean id="batchBillTableModel" class="nc.ui.scmf.payplan.model.PayPlanModel">
+		<property name="context" ref="context"></property>
+		<property name="service" ref="batchModelService"></property>
+		<property name="businessObjectAdapterFactory" ref="boadatorfactory"></property>
+		<property name="validationService" ref="batchValidateSerice"></property>
+	</bean>
+	
+	<!-- 数据模型管理器，主要负责各种方式的模型初始化 -->
+	<bean id="modelDataManager" class="nc.ui.pubapp.uif2app.query2.model.ModelDataManager">
+		<property name="model" ref="batchBillTableModel"></property>
+		<property name="service" ref="batchModelService"></property>
+	</bean>
+	
+	
+	<!-- 界面元素 ###########################################################-->
+	<!-- 组织面板 -->
+	<bean id="orgPanel" class="nc.ui.scmf.payplan.view.PayPlanOrgPanel" init-method="initUI">
+		<property name="model" ref="batchBillTableModel" />
+		<property name="dataManager" ref="modelDataManager"/>
+	</bean>
+	<!-- 列表控件的取值策略 -->
+	<bean id="componentValueManager" class="nc.ui.scmf.payplan.view.PayPlanVOValueAdapter">
+		<property name="bodyVOName" value="nc.vo.ct.purdaily.entity.PayPlanViewVO"/> 
+	</bean>
+	<!-- 列表控件 -->
+	<bean id="list" class="nc.ui.scmf.payplan.view.PayPlanBillForm" init-method="initUI">
+		<property name="model" ref="batchBillTableModel"/>
+		<property name="componentValueManager" ref="componentValueManager"/>
+		<property name="voClassName" value="nc.vo.ct.purdaily.entity.PayPlanViewVO" />
+		<property name="isBodyAutoAddLine" value="false"/>
+	</bean> 
+	
+	<!-- 关闭节点的提示 -->
+	<bean id="ClosingListener" class="nc.ui.uif2.FunNodeClosingHandler">
+		<property name="model" ref="batchBillTableModel" />
+		<property name="saveaction" ref="saveAction" />
+		<property name="cancelaction" ref="cancelAction" />
+	</bean>
+	
+	<bean id="InitDataListener" class="nc.ui.scmf.payplan.view.PayPlanInitData">
+		<property name="model" ref="batchBillTableModel"></property>
+		<property name="list" ref="list"></property>
+		<property name="orgPanel" ref="orgPanel" />
+    </bean>
+	
+	<!-- 采购组织的编辑事件 -->
+	<bean id="purhchaseOrganization" class="nc.ui.scmf.payplan.editor.PayPlanOrgChgEventHandler">
+		<property name="editor" ref="list"/>
+	</bean>
+	<!-- 卡片表体编辑前事件处理类 -->
+	<bean id="cardBodyBeforeEdit"
+		class="nc.ui.ct.purdaily.editor.before.PayPlanCardBodyBeforeEventHandler" />
+	<!-- 卡片表体编辑事件处理类  -->
+	<bean id="cardBodyAfterEdit"
+		class="nc.ui.ct.purdaily.editor.after.PayPlanCardBodyAfterEditEventHandler" >
+			<property name="list" ref="list" />
+		</bean>
+	<!-- 编辑事件-->
+	<bean id="appEventHandlerMediator" class="nc.ui.pubapp.uif2app.model.AppEventHandlerMediator">
+       <property name="model" ref="batchBillTableModel"/>
+       <property name="handlerMap">
+           <map>
+              	<!-- 采购组织切换事件 -->
+				<entry key="nc.ui.pubapp.uif2app.event.OrgChangedEvent">
+					<list>
+						<ref bean="purhchaseOrganization" />
+					</list>
+				</entry>
+				<!-- 卡片表体编辑前事件 -->
+				<entry key="nc.ui.pubapp.uif2app.event.card.CardBodyBeforeEditEvent">
+					<list>
+						<ref bean="cardBodyBeforeEdit" />
+					</list>
+				</entry>
+				<!-- 卡片表体编辑后事件 -->
+				<entry key="nc.ui.pubapp.uif2app.event.card.CardBodyAfterEditEvent">
+					<list>
+						<ref bean="cardBodyAfterEdit" />
+					</list>
+				</entry>
+           </map>
+       </property>
+    </bean> 
+	
+	<!-- 界面布局总装########################################################### -->
+	<bean id="container" class="nc.ui.uif2.TangramContainer"
+		init-method="initUI">
+		<property name="tangramLayoutRoot">
+			<bean class="nc.ui.uif2.tangramlayout.node.VSNode">
+				<property name="down">
+					<bean class="nc.ui.uif2.tangramlayout.node.CNode">
+						<property name="component" ref="list"></property>
+					</bean>
+				</property>
+				<property name="up">
+					<bean class="nc.ui.uif2.tangramlayout.node.CNode">
+						<property name="component" ref="orgPanel"></property>
+					</bean>
+				</property>
+				<property name="dividerLocation" value="31"></property>
+			</bean>
+		</property>
+		<property name="actions">
+			<list>
+				<ref bean="editAction" />
+				<ref bean="separatorAction" />
+				<ref bean="payAction" />
+				<!-- HK 2020年1月3日21:36:02 去掉 生成付款申请按钮-->
+<!--				<ref bean="payreqAction" />-->
+				<!-- END -->
+<!--				<ref bean="cancelpayreqAction" />-->
+				<ref bean="separatorAction" />
+				<ref bean="linkQueryAction" />
+				<ref bean="separatorAction" />
+				<ref bean="printMenuAction"/>
+			</list>
+		</property>
+		<property name="editActions">
+			<list>
+				<!-- <ref bean="rowMenuAction" /> -->
+				<ref bean="separatorAction" />
+				<ref bean="saveAction" />
+				<ref bean="separatorAction" />
+				<ref bean="cancelAction" />
+				<ref bean="separatorAction" />
+				<ref bean="addAction" />
+				<ref bean="separatorAction" />
+				<ref bean="insAction" />
+				<ref bean="separatorAction" />
+				<ref bean="delAction" />
+				<ref bean="separatorAction" />
+				<ref bean="copyAction" />
+				<ref bean="separatorAction" />
+				<ref bean="pasteAction" />
+			</list>
+		</property>
+		<property name="model" ref="batchBillTableModel"/>
+	</bean>
+	<!-- 打印 下拉 -->
+	<bean id="printMenuAction" class="nc.funcnode.ui.action.GroupAction">
+		<property name="code" value="print" />
+		<property name="actions">
+			<list>
+				<ref bean="printAction" />
+				<ref bean="previewAction" />
+			</list>
+		</property>
+	</bean>
+	<bean id="rowMenuAction" class="nc.ui.scmf.payplan.action.PayPlanRowMenuAction">
+		<property name="model" ref="batchBillTableModel"/>
+		<property name="actions">
+			<list>
+				<ref bean="addAction" />
+				<ref bean="insAction" />
+				<ref bean="delAction" />
+				<ref bean="copyAction" />
+				<ref bean="pasteAction" />
+			</list>
+		</property>
+	</bean>
+
+	<!-- Actions ###########################################################-->
+	<bean id="orderQryDLGInitializer" class="nc.ui.ct.purdaily.query.PurPayPlanQryCondDLGInitializer"/>
+	<bean id="queryAction" class="nc.ui.pubapp.uif2app.query2.action.DefaultQueryAction">
+		<property name="dataManager" ref="modelDataManager" />
+		<property name="qryCondDLGInitializer" ref="orderQryDLGInitializer"/>
+		<property name="model" ref="batchBillTableModel" />
+	</bean>
+	<bean id="addAction" class="nc.ui.scmf.payplan.action.PayPlanAddLineAction">
+		<property name="model" ref="batchBillTableModel"/>
+	  	<property name="voClassName" value="nc.vo.ct.purdaily.entity.PayPlanViewVO"/>
+	  	<property name="copyItems">
+		    <list>
+		      <value>corigcurrencyid</value>
+		      <value>ccurrencyid</value>
+		      <value>nexchangerate</value>
+		      <value>pk_financeorg</value>
+		      <value>pk_ct_pu</value>
+		      <value>pk_financeorg_v</value>
+		      <value>hts</value>
+		      <value>fstatusflag</value>
+		      <value>ntotalorigmny</value>
+		      <value>pk_group</value>
+	        </list>
+        </property>
+	</bean>
+	<bean id="insAction" class="nc.ui.scmf.payplan.action.PayPlanInsertLineAction">
+		<property name="model" ref="batchBillTableModel"/>
+	  	<property name="voClassName" value="nc.vo.ct.purdaily.entity.PayPlanViewVO"/>
+	  	<property name="copyItems">
+		    <list>
+		      <value>corigcurrencyid</value>
+		      <value>ccurrencyid</value>
+		      <value>nexchangerate</value>
+		      <value>pk_financeorg</value>
+		      <value>pk_ct_pu</value>
+		      <value>pk_financeorg_v</value>
+		      <value>hts</value>
+		      <value>fstatusflag</value>
+		      <value>ntotalorigmny</value>
+		      <value>pk_group</value>
+	        </list>
+        </property>
+	</bean>
+	<bean id="editAction" class="nc.ui.ct.purdaily.action.payplan.PurdailyPayPlanEditAction">
+		<property name="model" ref="batchBillTableModel"/>
+	</bean>
+	<bean id="payAction" class="nc.ui.ct.purdaily.action.payplan.PurdailyPayAction">
+		<property name="model" ref="batchBillTableModel"/>
+		<property name="editor" ref="list"/>
+	</bean>
+	<bean id="payreqAction" class="nc.ui.ct.purdaily.action.payplan.PurdailyPayAppAction">
+		<property name="model" ref="batchBillTableModel"/>
+		<property name="editor" ref="list"/>
+	</bean>
+	<bean id="cancelpayreqAction" class="nc.ui.ct.purdaily.action.payplan.PurdailyCancelPayAppAction">
+		<property name="model" ref="batchBillTableModel"/>
+		<property name="editor" ref="list"/>
+	</bean>
+	<bean id="linkQueryAction" class="nc.ui.ct.purdaily.action.payplan.PayPlanLinkQueryAction">
+	<property name="model" ref="batchBillTableModel"/>
+        <property name="billType" value="Z2"/>
+    </bean>
+	<bean id="delAction" class="nc.ui.scmf.payplan.action.PayPlanDelLineAction">
+		<property name="model" ref="batchBillTableModel"/>
+	</bean>
+	<bean id="copyAction" class="nc.ui.pubapp.uif2app.actions.batch.BatchCopyLineAction">
+		<property name="model" ref="batchBillTableModel"/>
+	</bean>
+	<bean id="pasteAction" class="nc.ui.scmf.payplan.action.PayPlanPasteLineAction">
+		<property name="model" ref="batchBillTableModel"/>
+		<property name="clearItems">
+		    <list>
+		      <value>naccumpayorgmny</value>
+	          <value>naccumpaymny</value>
+		      <value>naccumpayapporgmny</value>
+		      <value>naccumpayappmny</value>
+		      <value>pk_ct_payplan</value>
+		      <value>iaccounttermno</value>
+	        </list>
+        </property>
+	</bean>
+	<bean id="saveAction" class="nc.ui.pubapp.uif2app.actions.batch.BatchSaveAction">
+		<property name="model" ref="batchBillTableModel"/>
+		<property name="editor" ref="list"/>
+	</bean>
+	<bean id="cancelAction" class="nc.ui.pubapp.uif2app.actions.batch.BatchCancelAction">
+		<property name="model" ref="batchBillTableModel"/>
+		<property name="editor" ref="list"/>
+	</bean>
+	<!-- 分隔按钮 -->
+	<bean id="separatorAction" class="nc.funcnode.ui.action.SeparatorAction" />
+	<bean id="printProcessor" class="nc.ui.scmf.payplan.action.PayPlanPrintProcesser">
+		<property name="model" ref="batchBillTableModel" />
+	</bean>
+	<bean id="previewAction" class="nc.ui.ct.purdaily.action.payplan.PurdailyPayPlanPrintAction">
+		<property name="model" ref="batchBillTableModel"/>
+		<property name="preview" value="true"/>
+		<property name="beforePrintDataProcess" ref="printProcessor" />
+	</bean>
+	<bean id="printAction" class="nc.ui.ct.purdaily.action.payplan.PurdailyPayPlanPrintAction">
+		<property name="model" ref="batchBillTableModel"/>
+		<property name="preview" value="false"/>
+		<property name="beforePrintDataProcess" ref="printProcessor" />
+	</bean>
+</beans>
+
