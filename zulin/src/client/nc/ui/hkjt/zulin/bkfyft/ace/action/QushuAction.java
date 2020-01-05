@@ -109,6 +109,8 @@ public class QushuAction extends NCAction {
 				.append(" left join bd_supplier gys on ht.cvendorid = gys.pk_supplier ")
 				.append(" where ht.dr = 0 and htb.dr = 0 ")
 				.append(" and ht.vtrantypecode = '").append(IPub_data.BKHT_type_code).append("' ")
+				// 不取保证金
+				.append(" and szxm.code not in ('2005', '2022') ")
 				.append(" and ht.pk_org = '").append(pk_org).append("' ")
 				.append(" and ( ")
 				.append(" 	'").append(str_yb_ksrq).append("' between substr(htb.vbdef3,1,10) and substr(htb.vbdef4,1,10) ")
