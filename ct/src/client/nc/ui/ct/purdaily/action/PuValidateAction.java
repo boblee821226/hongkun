@@ -75,12 +75,14 @@ public class PuValidateAction extends CtScriptPFlowAction {
          * 判断附件个数，是否大于等于2个
          * 2019年10月30日 10点35分
          * 判断改为1个，参数传入最少附件数量
+         * 2020年1月5日14:35:05
+         * 根据版本判断，附件数量与 版本号 一致。（即，一个版本对应一个附件，变更时 保留之前的附件）
          */
         if (!checkFujian(1)) {
       	  MessageDialog.showErrorDlg(
   	            this.getModel().getContext().getEntranceUI(),
   	            "附件检查",
-  	            "请上传附件，附件数量不能小于1个");
+  	            "请上传附件，附件数量不能小于版本号");
       	  return;
         }
         /***END***/
@@ -111,7 +113,8 @@ public class PuValidateAction extends CtScriptPFlowAction {
 	
 	AggCtPuVO ctVo = (AggCtPuVO) this.getModel().getSelectedData();
 	String pk_bill = ctVo.getParentVO().getPk_ct_pu();
-	  
+	Integer version = ctVo.getParentVO().getVersion().intValue();
+	fileNum = version;	// 附件数量，应为 版本数量
 	StringBuilder querySQL = new StringBuilder();
 	querySQL.append(" select count(0) ")
 			.append(" from sm_pub_filesystem ")
