@@ -4,6 +4,8 @@ import hd.vo.pub.tools.PuPubVO;
 
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import nc.ui.ct.saledaily.action.GenHtmxAction;
 import nc.ui.pub.beans.MessageDialog;
@@ -122,6 +124,25 @@ public class PuGenBodyAction extends NCAction {
 		Integer ht_month = PuPubVO.getInteger_NullAs(
 			this.getEditor().getBillCardPanel().getHeadItem("vdef2").getValueObject(), 0);
 		
+		// 履约保证金
+		String lybzj = PuPubVO.getString_TrimZeroLenAsNull(
+				this.getEditor().getBillCardPanel().getHeadItem("vdef7").getValueObject());
+		Map<String, String> lybzjMap = new HashMap<>();
+		lybzjMap.put("2005", "1001N5100000000EYKBT");	// 保证金（经营）
+		lybzjMap.put("2022", "1001N510000000AEFM6J");	// 保证金（新项目）
+		String lybzj_szxm = null;
+		UFDouble lybzj_mny = null;
+		if (!"无".equals(lybzj)) {
+			// 将 全角逗号，转换成 半角
+			lybzj.replaceAll("，", ",");
+			
+			if (lybzj.contains(",")) {
+				String[] splitStr = lybzj.split(",");
+				lybzj_szxm = lybzjMap.get(splitStr[0]);
+				lybzj_mny = PuPubVO.getUFDouble_NullAsZero(splitStr[1]);
+			}
+		}
+		
 		// 总合同总额（所有年的之和 包括涨租）
 		UFDouble total_ht_money = UFDouble.ZERO_DBL;
 		
@@ -154,6 +175,46 @@ public class PuGenBodyAction extends NCAction {
 
 		// 保存第一年的租金，作为 后续 年总额涨租的 基数
 		UFDouble FirstYearMny = null;
+		
+		Integer ftaxtypeflag = 0;	// 0：应税内含		1：应税外加
+		
+		// 判断，是否需要生成 履约金行
+		if (lybzj_szxm != null || lybzj_mny != null) {
+			this.getEditor().getBillCardPanel().getBillModel().addLine();
+			Integer rowNo = this.getEditor().getBillCardPanel().getBillModel().getRowCount() - 1;	// 当前操作的行
+			String body_rowno = "" + ((rowNo+1) * 10);
+			// 保证金 是无税的
+			UFDouble body_tax = UFDouble.ZERO_DBL;
+			UFDouble body_mny = PuPubVO.getUFDouble_NullAsZero(lybzj_mny).sub(body_tax);	// 无税金额
+			
+			this.getEditor().getBillCardPanel().getBillModel().setValueAt(body_rowno, rowNo, "crowno");
+			this.getEditor().getBillCardPanel().getBillModel().setValueAt(lybzj_szxm, rowNo, "vbdef1");
+			this.getEditor().getBillCardPanel().getBillModel().setValueAt(pk_group, rowNo, "pk_group");
+			this.getEditor().getBillCardPanel().getBillModel().setValueAt(pk_org, rowNo, "pk_org");
+			this.getEditor().getBillCardPanel().getBillModel().setValueAt(pk_org_v, rowNo, "pk_org_v");
+			this.getEditor().getBillCardPanel().getBillModel().setValueAt(pk_org, rowNo, "pk_financeorg");
+			this.getEditor().getBillCardPanel().getBillModel().setValueAt(pk_org_v, rowNo, "pk_financeorg_v");
+			this.getEditor().getBillCardPanel().getBillModel().setValueAt(pk_org, rowNo, "pk_arrvstock");
+			this.getEditor().getBillCardPanel().getBillModel().setValueAt(pk_org_v, rowNo, "pk_arrvstock_v");
+			this.getEditor().getBillCardPanel().getBillModel().setValueAt(ht_date_begin, rowNo, "vbdef3");
+			this.getEditor().getBillCardPanel().getBillModel().setValueAt(ht_date_end, rowNo, "vbdef4");
+			this.getEditor().getBillCardPanel().getBillModel().setValueAt(ht_date_begin, rowNo, "vbdef2");
+			this.getEditor().getBillCardPanel().getBillModel().setValueAt(lybzj_mny, rowNo, "norigtaxmny");
+			this.getEditor().getBillCardPanel().getBillModel().setValueAt(lybzj_mny, rowNo, "ntaxmny");
+			this.getEditor().getBillCardPanel().getBillModel().setValueAt(lybzj_mny, rowNo, "ncaltaxmny");
+			this.getEditor().getBillCardPanel().getBillModel().setValueAt("1.00/1.00", rowNo, "vqtunitrate");
+			this.getEditor().getBillCardPanel().getBillModel().setValueAt("1.00/1.00", rowNo, "vchangerate");
+			this.getEditor().getBillCardPanel().getBillModel().setValueAt("0001Z010000000079UJJ", rowNo, "csendcountryid");	// 国家相关
+			this.getEditor().getBillCardPanel().getBillModel().setValueAt("0001Z010000000079UJJ", rowNo, "crececountryid");
+			this.getEditor().getBillCardPanel().getBillModel().setValueAt("0001Z010000000079UJJ", rowNo, "ctaxcountryid");
+			this.getEditor().getBillCardPanel().getBillModel().setValueAt(2, rowNo, "fbuysellflag");
+			this.getEditor().getBillCardPanel().getBillModel().setValueAt(ftaxtypeflag, rowNo, "ftaxtypeflag");
+			this.getEditor().getBillCardPanel().getBillModel().setValueAt(body_tax, rowNo, "ntax");
+			this.getEditor().getBillCardPanel().getBillModel().setValueAt(UFDouble.ZERO_DBL, rowNo, "ntaxrate");
+			this.getEditor().getBillCardPanel().getBillModel().setValueAt(body_mny, rowNo, "ncalcostmny");
+			this.getEditor().getBillCardPanel().getBillModel().setValueAt(body_mny, rowNo, "nmny");
+			this.getEditor().getBillCardPanel().getBillModel().setValueAt(body_mny, rowNo, "norigmny");
+		}
 		
 		/**
 		 * 按照涨租次数，循环处理， 因为每次涨租的 租金不同。
@@ -237,7 +298,6 @@ public class PuGenBodyAction extends NCAction {
 			// 根据客户 找到税码税率
 	//		String ctaxcodeid = "1001N5100000005N6HJG";
 			UFDouble ntaxrate = new UFDouble(taxrate);
-			Integer ftaxtypeflag = 0;	// 0：应税内含		1：应税外加
 			
 			// 根据付款次数，生成表体数据
 			for(int i = 0; i < fk_count; i++) {
