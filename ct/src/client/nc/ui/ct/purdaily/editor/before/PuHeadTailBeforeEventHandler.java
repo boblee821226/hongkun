@@ -12,6 +12,7 @@ import nc.ui.ct.editor.before.head.GroupExChangeRate;
 import nc.ui.ct.editor.before.head.Personal;
 import nc.ui.ct.editor.before.head.ProjectFilter;
 import nc.ui.ct.editor.before.head.PuVdef13;
+import nc.ui.ct.editor.before.head.PuVdef17;
 import nc.ui.ct.editor.before.head.PuVdef18;
 import nc.ui.ct.editor.before.head.Supplier;
 import nc.ui.ct.editor.handler.AbstractHeadTailBeforeEditEventHandler;
@@ -70,8 +71,12 @@ public class PuHeadTailBeforeEventHandler extends
      * HK
      * 2019年10月30日 10点40分
      * 表头自定义项13、18 为 收支项目，进行过滤 只显示出 支出类，并且是非停用的
+     * 2020年1月8日15:04:39
+     * 13 与 17 相同，分别为 收支项目1、2
+     * 18 为 保证金项目
      */
     listenerMap.put(CtAbstractVO.VDEF13, new PuVdef13());
+    listenerMap.put(CtAbstractVO.VDEF17, new PuVdef17());
     listenerMap.put(CtAbstractVO.VDEF18, new PuVdef18());
     /***END***/
   }

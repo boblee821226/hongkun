@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import nc.bs.logging.Logger;
 import nc.ui.ct.saledaily.action.GenHtmxAction;
 import nc.ui.pub.beans.MessageDialog;
 import nc.ui.pub.beans.UIRefPane;
@@ -127,20 +128,30 @@ public class PuGenBodyAction extends NCAction {
 		// 履约保证金
 		String lybzj = PuPubVO.getString_TrimZeroLenAsNull(
 				this.getEditor().getBillCardPanel().getHeadItem("vdef7").getValueObject());
-		Map<String, String> lybzjMap = new HashMap<>();
-		lybzjMap.put("2005", "1001N5100000000EYKBT");	// 保证金（经营）
-		lybzjMap.put("2022", "1001N510000000AEFM6J");	// 保证金（新项目）
-		String lybzj_szxm = null;
-		UFDouble lybzj_mny = null;
-		if (!"无".equals(lybzj)) {
-			// 将 全角逗号，转换成 半角
-			lybzj.replaceAll("，", ",");
-			
-			if (lybzj.contains(",")) {
-				String[] splitStr = lybzj.split(",");
-				lybzj_szxm = lybzjMap.get(splitStr[0]);
-				lybzj_mny = PuPubVO.getUFDouble_NullAsZero(splitStr[1]);
-			}
+		// 支出项目，保证金
+		String zcxm_bzj = PuPubVO.getString_TrimZeroLenAsNull(
+			this.getEditor().getBillCardPanel().getHeadItem("vdef18").getValueObject());
+//		Map<String, String> lybzjMap = new HashMap<>();
+//		lybzjMap.put("2005", "1001N5100000000EYKBT");	// 保证金（经营）
+//		lybzjMap.put("2022", "1001N510000000AEFM6J");	// 保证金（新项目）
+//		String lybzj_szxm = null;
+//		UFDouble lybzj_mny = null;
+//		if (!"无".equals(lybzj)) {
+//			// 将 全角逗号，转换成 半角
+//			lybzj.replaceAll("，", ",");
+//			
+//			if (lybzj.contains(",")) {
+//				String[] splitStr = lybzj.split(",");
+//				lybzj_szxm = lybzjMap.get(splitStr[0]);
+//				lybzj_mny = PuPubVO.getUFDouble_NullAsZero(splitStr[1]);
+//			}
+//		}
+		String lybzj_szxm = zcxm_bzj;
+		UFDouble lybzj_mny = UFDouble.ZERO_DBL;
+		try {
+			lybzj_mny = PuPubVO.getUFDouble_NullAsZero(lybzj);
+		} catch (Exception ex) {
+			Logger.error(ex.getMessage());
 		}
 		
 		// 总合同总额（所有年的之和 包括涨租）

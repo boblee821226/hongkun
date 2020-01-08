@@ -19,6 +19,8 @@ public class PuVdef13 implements IHeadTailBeforeEditEventListener {
      * 只显示出 已启用的
      * 2020年1月3日17:43:08
      * 增加收款类，不让选择非末级
+     * 2020年1月8日15:10:01
+     * 支出项目1
      */
     panel.setWhereString(" ((innercode like '866S__%' or innercode like 'YKGL__%') and enablestate = 2) ");
     panel.getRefModel().setNotLeafSelectedEnabled(false);

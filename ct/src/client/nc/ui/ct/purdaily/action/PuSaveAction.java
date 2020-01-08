@@ -368,12 +368,12 @@ public class PuSaveAction extends CtScriptPFlowAction {
 	   mustFieldMap.put("vdef8", "地上建筑面积");
 	   mustFieldMap.put("vdef9", "地上单价（每天每平米）");
 	   mustFieldMap.put("vdef10", "地上楼层数");
-	   mustFieldMap.put("vdef11", "免租开始日期");
+	   mustFieldMap.put("vdef11", "地下建筑面积");
 	   mustFieldMap.put("vdef12", "地下单价（每天每平米）");
 	   mustFieldMap.put("vdef15", "地下楼层数");
 	   mustFieldMap.put("vdef19", "租金递增方式");
 //	   mustFieldMap.put("vdef20", "占地面积");
-	   mustFieldMap.put("vdef7", "履约保证金");
+	   mustFieldMap.put("vdef7", "保证金");
 	   String isZulin = PuPubVO.getString_TrimZeroLenAsNull(
 			   this.getCardForm().getBillCardPanel().getHeadItem("vdef16").getValueObject());
 	   if ("1001N510000000A2THSN".equals(isZulin)) {
