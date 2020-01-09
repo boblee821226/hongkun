@@ -134,7 +134,7 @@ public class QushuAction extends NCAction {
 			
 			String fplx = htVO.getVdef02();		// 发票
 			UFDouble ht_mny = htVO.getVdef12();	// 含税
-			if ("专用发票".equals(fplx)) {	// 专票 用无税
+			if ("专用发票".equals(fplx)) {			// 专票 用无税
 				ht_mny = htVO.getVdef11();
 			}
 			
