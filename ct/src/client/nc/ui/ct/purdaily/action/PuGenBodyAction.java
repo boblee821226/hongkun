@@ -4,8 +4,6 @@ import hd.vo.pub.tools.PuPubVO;
 
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 import nc.bs.logging.Logger;
 import nc.ui.ct.saledaily.action.GenHtmxAction;
@@ -187,6 +185,10 @@ public class PuGenBodyAction extends NCAction {
 		// 保存第一年的租金，作为 后续 年总额涨租的 基数
 		UFDouble FirstYearMny = null;
 		
+		/**
+		 * HK 2020年1月9日20:35:22
+		 * 改为 价外税。
+		 */
 		Integer ftaxtypeflag = 0;	// 0：应税内含		1：应税外加
 		
 		// 判断，是否需要生成 履约金行
@@ -323,8 +325,21 @@ public class PuGenBodyAction extends NCAction {
 					total_money = total_money.add(body_money);
 				}
 				
-				UFDouble body_tax = body_money.multiply(ntaxrate).div(100.00).setScale(2, UFDouble.ROUND_HALF_UP);
-				UFDouble body_mny = body_money.sub(body_tax);	// 无税金额
+				/**
+				 * 价内税的算法： 
+				 * 		先算 税额 = 含税 * 税率  
+				 * 		再算 无税 = 含税 - 税额
+				 */
+//				UFDouble body_tax = body_money.multiply(ntaxrate).div(100.00).setScale(2, UFDouble.ROUND_HALF_UP);
+//				UFDouble body_mny = body_money.sub(body_tax);	// 无税金额
+				
+				/**
+				 * 价外税的算法： 
+				 * 		先算 无税 = 含税 / (1+税率)  
+				 * 		再算 税额 = 含税 - 无税
+				 */
+				UFDouble body_mny = body_money.div(UFDouble.ONE_DBL.add(ntaxrate.div(100.00)));
+				UFDouble body_tax = body_money.sub(body_mny);
 				
 				this.getEditor().getBillCardPanel().getBillModel().addLine();
 				Integer rowNo = this.getEditor().getBillCardPanel().getBillModel().getRowCount() - 1;	// 当前操作的行
