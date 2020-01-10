@@ -112,12 +112,14 @@ public class QushuAction extends NCAction {
 				// 不取保证金
 				.append(" and szxm.code not in ('2005', '2022') ")
 				.append(" and ht.pk_org = '").append(pk_org).append("' ")
+				// 只取最新版
+				.append(" and ht.blatest = 'Y' ")
 				.append(" and ( ")
 				.append(" 	'").append(str_yb_ksrq).append("' between substr(htb.vbdef3,1,10) and substr(htb.vbdef4,1,10) ")
 				.append(" 	or ")
 				.append("  	'").append(str_yb_jsrq).append("' between substr(htb.vbdef3,1,10) and substr(htb.vbdef4,1,10) ")
 				.append(" ) ")
-//				.append(" and ht.vbillcode like '20191112%' ")
+//				.append(" and ht.vbillcode like 'Z22020010900000007%' ")
 		;
 		
 		IUAPQueryBS iUAPQueryBS = (IUAPQueryBS)NCLocator.getInstance().lookup(IUAPQueryBS.class.getName()); 
