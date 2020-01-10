@@ -93,6 +93,7 @@ public class N_25_SAVE extends AbstractCompiler2 {
 		    	  .append(" where fp.dr = 0 and fpb.dr = 0 ")
 		    	  .append(" and cgrkb.dr = 0 ")
 		    	  .append(" and invfi.materialvaluemgt = 2 ")	// 只取 固定资产 类的。
+		    	  .append(" and substr(cgrkb.dbizdate,1,10) >= '2020-01-07' ")	// 只判断 入库日期 大于等于2020-01-07 (HK 2020年1月10日17:04:33)
 		    	  .append(" and fp.pk_invoice in ").append(pkInvoices)
 		    	  .append(" group by fpb.pk_invoice_b ")
 		    	  .append(" having max(cgrkb.nnum) <> sum(nvl(cardhis.card_num,0)) ")
