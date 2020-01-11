@@ -121,6 +121,7 @@ public class PuValidateAction extends CtScriptPFlowAction {
 			.append(" where ")
 			.append(" filepath like '").append(pk_bill).append("/%' ")
 			.append(" and nvl(isfolder,'n') in ('N','n') ")
+			.append(" and dr = 0 ")
 	;
 	IUAPQueryBS iUAPQueryBS = (IUAPQueryBS)NCLocator.getInstance().lookup(IUAPQueryBS.class.getName());
 	ArrayList list = (ArrayList)iUAPQueryBS.executeQuery(querySQL.toString(), new ArrayListProcessor());
