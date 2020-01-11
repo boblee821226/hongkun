@@ -38,8 +38,8 @@ public class QueryHtVO extends SuperVO {
 	public String vdef05;	// 部门pk				部门pk
 	public String vdef06;
 	public String vdef07;	// 实际合同金额			合同总额
-	public String vdef08;
-	public String vdef09;	
+	public String vdef08;	//					整体合同开始日期
+	public String vdef09;	//					整体合同结束日期
 	public String vdef10;	// 合同号				合同号
 	
 	public UFDouble vdef11;	//					无税金额
