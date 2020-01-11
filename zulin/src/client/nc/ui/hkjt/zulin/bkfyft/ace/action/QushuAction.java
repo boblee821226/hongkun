@@ -101,6 +101,8 @@ public class QushuAction extends NCAction {
 				.append(",ht.cvendorid pk_customer ")	// 对方pk
 				.append(",gys.name vdef01 ")			// 对方name
 				.append(",ht.ntotalorigmny vdef07 ")	// 合同总额
+				.append(",substr(ht.valdate,1,10) vdef08 ")		// 整体合同开始日期	valdate
+				.append(",substr(ht.invallidate,1,10) vdef09 ")	// 整体合同结束日期	invallidate
 				.append(" from ct_pu ht ")
 				.append(" inner join ct_pu_b htb on ht.pk_ct_pu = htb.pk_ct_pu ")
 				.append(" left join bd_defdoc fplx on ht.vdef3 = fplx.pk_defdoc ")
@@ -152,6 +154,10 @@ public class QushuAction extends NCAction {
 			String ht_pk_customer = htVO.getPk_customer();	// 对方pk
 			
 			String srxm_name = htVO.getVdef03();	// 支出项目-名称
+			
+			UFDate zthtKsrq = PuPubVO.getUFDate(htVO.getVdef08());	// 整体合同开始日期
+			UFDate zthtJsrq = PuPubVO.getUFDate(htVO.getVdef09());	// 整体合同结束日期
+			Integer zthtTs = zthtJsrq.getDaysAfter(zthtKsrq) + 1;	// 整体合同天数
 			
 			Integer yb_days = 0;
 			
@@ -241,6 +247,7 @@ public class QushuAction extends NCAction {
 					yuebaoBVO.setVbdef05(htVO.getVdef05());		// 部门pk
 					yuebaoBVO.setVbdef07(htVO.getVdef07());		// 实际合同金额
 					yuebaoBVO.setVbdef10(htVO.getVdef10());		// 合同号
+					yuebaoBVO.setVbdef09(zthtTs.toString());	// 整体合同天数
 					
 //					yuebaoBVO.setVbmemo(htVO.getVdef10());		// 备注存放合同号
 //					yuebaoBVO.setVbdef06( ht_zzrq!=null ? ht_zzrq.toString().substring(0,10) : null );	// 合同终止日期  （HK 2018年12月26日17:39:31）
@@ -382,6 +389,7 @@ public class QushuAction extends NCAction {
 						.append(",max(yb.mianji) ")		// 面积
 						.append(",max(yb.danjia) ")		// 单价
 						.append(",max(yb.srxm) ")		// 收入项目pk
+						.append(",max(yb.vbdef09) ")	// 未摊销天数
 						
 						.append(" from hk_zulin_yuebao y ")
 						.append(" inner join hk_zulin_yuebao_b yb on y.pk_hk_zulin_yuebao = yb.pk_hk_zulin_yuebao ")
@@ -406,14 +414,18 @@ public class QushuAction extends NCAction {
 					String vbdef10 = PuPubVO.getString_TrimZeroLenAsNull(obj[1]);
 					
 					// 对方##合同号
-					String key = pk_cutomer + "##" + vbdef10;
+					String key = pk_cutomer + "##" + vbdef10;	// key
 					
 					UFDouble qcye = PuPubVO.getUFDouble_NullAsZero(obj[2]);		// 期初余额
+					
+					Integer ls_wtxts = PuPubVO.getInteger_NullAs(obj[13], 0);	// 未摊销天数
 					
 					YuebaoBVO yuebaoBVO = MAP_yuebaoBVO.get(key);
 					if(yuebaoBVO!=null)
 					{
 						yuebaoBVO.setQcyskye(qcye);
+						// 如果存在历史单据，则取 历史的未摊销天数
+						yuebaoBVO.setVbdef09(ls_wtxts.toString());
 					}
 					else
 					{
@@ -434,6 +446,7 @@ public class QushuAction extends NCAction {
 							.append(",max(yb.mianji) ")		// 面积				10
 							.append(",max(yb.danjia) ")		// 单价				11
 							.append(",max(yb.srxm) ")		// 收入项目pk			12
+															// 未摊销天数			13
 						 */
 						
 						yuebaoBVO.setMianji(PuPubVO.getUFDouble_NullAsZero(obj[10]));			// 面积
@@ -446,6 +459,7 @@ public class QushuAction extends NCAction {
 						yuebaoBVO.setVbdef04(PuPubVO.getString_TrimZeroLenAsNull(obj[6]));		// 区域名称
 						yuebaoBVO.setVbdef05(PuPubVO.getString_TrimZeroLenAsNull(obj[7]));		// 部门pk
 						yuebaoBVO.setVbdef07(PuPubVO.getString_TrimZeroLenAsNull(obj[8]));		// 实际合同金额
+						yuebaoBVO.setVbdef09(ls_wtxts.toString());	// 未摊销天数
 						yuebaoBVO.setVbmemo("【上期有余额，本期无发生】");	// 备注
 						
 						MAP_yuebaoBVO.put(key, yuebaoBVO);
@@ -456,7 +470,7 @@ public class QushuAction extends NCAction {
 		/***END***/
 		
 		/**
-		 *查询 本月调整数据
+		 * 查询 本月调整数据
 		 */
 		{
 			StringBuffer querySQL_TZ = 
@@ -535,6 +549,10 @@ public class QushuAction extends NCAction {
 				;
 				bvo.setDanjia(danjia);
 			}
+			
+			// 计算本次的历史未摊销天数
+			Integer byWtsts =  PuPubVO.getInteger_NullAs(bvo.getVbdef09(), 0) - bvo.getDysrqrts().intValue();
+			bvo.setVbdef09(byWtsts.toString());
 			
 //			/**
 //			 * 调差处理
