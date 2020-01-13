@@ -17,7 +17,6 @@ import nc.jdbc.framework.processor.ArrayListProcessor;
 import nc.ui.pub.beans.MessageDialog;
 import nc.ui.uif2.NCAction;
 import nc.vo.cmp.settlement.SettlementAggVO;
-import nc.vo.cmp.settlement.SettlementBodyVO;
 import nc.vo.cmp.settlement.SettlementHeadVO;
 import nc.vo.pub.VOStatus;
 import nc.vo.pub.lang.UFBoolean;
@@ -241,8 +240,8 @@ public class HkGenXbsqAction extends NCAction {
 			String fkxz 	= PuPubVO.getString_TrimZeroLenAsNull(rowObj[6]);	// 付款性质
 			String fklx 	= PuPubVO.getString_TrimZeroLenAsNull(rowObj[7]);	// 付款类型
 			
-			String zjjxxm 		= PuPubVO.getString_TrimZeroLenAsNull(rowObj[6]);	// 资金项目pk
-			String zjjxxm_name	= PuPubVO.getString_TrimZeroLenAsNull(rowObj[7]);	// 资金项目name
+			String zjjxxm 		= PuPubVO.getString_TrimZeroLenAsNull(rowObj[8]);	// 资金项目pk
+			String zjjxxm_name	= PuPubVO.getString_TrimZeroLenAsNull(rowObj[9]);	// 资金项目name
 			
 			if (zjjxxm == null) {
 				zjjxxm = IPub_data.JSXB_jhxm_caigou;
