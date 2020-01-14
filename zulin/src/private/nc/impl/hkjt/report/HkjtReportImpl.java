@@ -437,7 +437,7 @@ public class HkjtReportImpl implements HkjtReportITF {
 						&&	PuPubVO.getUFDouble_ZeroAsNull(xx_num)!=null
 						) {
 							// 只有 存在金额差，才需要往下进行。
-							UFDouble xx_price = null;	// 需要调整的单价（等下面确定了）
+							UFDouble xx_price = UFDouble.ZERO_DBL;	// 需要调整的单价（等下面确定了）
 							String pk_book 	  = PuPubVO.getString_TrimZeroLenAsNull(MAP_value.get(0)[3]);	// 账簿
 							String pk_js      = PuPubVO.getString_TrimZeroLenAsNull(MAP_value.get(0)[4]);	// 结算id
 							UFDate rkDate	  = PuPubVO.getUFDate(MAP_value.get(0)[5]);						// 调整入库日期
@@ -544,7 +544,13 @@ public class HkjtReportImpl implements HkjtReportITF {
 									find_cgrk = true;
 									
 									xx_num = xx_num.add(QC_num);
-									xx_price = xx_mny.div(xx_num);
+									if (PuPubVO.getUFDouble_ZeroAsNull(xx_num) != null) {
+										xx_price = xx_mny.div(xx_num);
+									}
+									
+									if (xx_price.compareTo(UFDouble.ZERO_DBL) < 0) {
+										System.out.println(xx_price);
+									}
 									
 									continue;
 								}
@@ -600,50 +606,6 @@ public class HkjtReportImpl implements HkjtReportITF {
 														xx_num = null;	// 调整完毕，将 调整数量 置空。
 													}
 												}
-//												// 如果期初数量 大于0  则先抵扣期初
-//												if( QC_num.compareTo(UFDouble.ZERO_DBL)>=0 ) {
-//													UFDouble temp_xx_num = QC_num.sub(ch_nnum);	// 与期初抵扣的差额 = 期初-本行出库数量
-//													if(temp_xx_num.compareTo(UFDouble.ZERO_DBL)>=0) {
-//														// 如果差额 大于0，说明 期初大于 本次要处理的出库，不做处理。
-//														// 将差额 赋值给 期初 即可。
-//														QC_num = temp_xx_num;
-//													}
-//													else {
-//														QC_num = UFDouble.ZERO_DBL;	// 期初 置为 0
-//														// 如果差额 小于0，说明 期初不够了， 要从 采购入库里取，并且需要生成 调整单了。
-//														UFDouble do_nnum = temp_xx_num.abs();			// 需要处理的数量
-//														UFDouble temp_xxxx_num = xx_num.sub(do_nnum);	// 与 采购入库抵扣的差额
-//														if(temp_xxxx_num.compareTo(UFDouble.ZERO_DBL)>0) {
-//															xx_num = temp_xxxx_num;		// 将差额 赋值给 采购入库数量
-//															// 如果差额大于零， 说明不是最后一次，则用 调差单价*处理数量   来计算 调整金额。
-//															tz_mny = xx_price.multiply(do_nnum).setScale(2, UFDouble.ROUND_HALF_UP);
-//															xx_mny = xx_mny.sub(tz_mny);	// 扣减 调整总额。
-//														}
-//														else if (temp_xxxx_num.compareTo(UFDouble.ZERO_DBL)<=0) {
-//															// 如果差额小于等于零，说明是最后一次，直接将剩余金额 拿过来。
-//															tz_mny = xx_mny;
-//															xx_mny = null;	// 调整完毕，将 调整总额 置空。
-//															xx_num = null;	// 调整完毕，将 调整数量 置空。
-//														}
-//													}
-//												}
-//												// 如果期初数量为0了，则判断 采购入库数量,如果不为空，则进行处理。
-//												else if ( xx_num != null ) {
-//													UFDouble do_nnum = ch_nnum;						// 需要处理的数量
-//													UFDouble temp_xxxx_num = xx_num.sub(do_nnum);	// 与采购入库抵扣的差额 = 入库-本行出库数量
-//													if(temp_xxxx_num.compareTo(UFDouble.ZERO_DBL)>0) {
-//														xx_num = temp_xxxx_num;		// 将差额 赋值给 采购入库数量
-//														// 如果差额大于零， 说明不是最后一次，则用 调差单价*处理数量   来计算 调整金额。
-//														tz_mny = xx_price.multiply(do_nnum).setScale(2, UFDouble.ROUND_HALF_UP);
-//														xx_mny = xx_mny.sub(tz_mny);	// 扣减 调整总额。
-//													}
-//													else if (temp_xxxx_num.compareTo(UFDouble.ZERO_DBL)<=0) {
-//														// 如果差额小于等于零，说明是最后一次，直接将剩余金额 拿过来。
-//														tz_mny = xx_mny;
-//														xx_mny = null;	// 调整完毕，将 调整总额 置空。
-//														xx_num = null;	// 调整完毕，将 调整数量 置空。
-//													}
-//												}
 											}
 											
 											if( tz_mny==null ) continue;	// 如果本次调整金额 为空，则跳过。
