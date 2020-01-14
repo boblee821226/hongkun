@@ -266,7 +266,8 @@ public class PuGenBodyAction extends NCAction {
 			}
 			
 			// 计算租金的天数 = 合同终止日期 - 合同开始日期 + 1 (包含 头 和 尾)
-			Integer days = date_end.getDaysAfter(date_begin) + 1;
+//			Integer days = date_end.getDaysAfter(date_begin) + 1;
+			Integer days = 365;
 			
 			// 先计算出 每次涨租期间的合同总额。
 			// 合同总金额 ntotalorigmny
