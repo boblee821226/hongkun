@@ -15,38 +15,43 @@ public class QueryHtVO extends SuperVO {
 	 */
 	private static final long serialVersionUID = -8402875174487316565L;
 
-	public UFDate ksrq;			// 合同明细-开始日期		开始日期
-	public UFDate jsrq;			// 合同明细-结束日期		结束日期
-	public UFDouble danjia;		// 合同明细-单价		单价
-	public UFDouble mianji;		// 合同明细-面积		面积
-	public String pk_customer;	// 合同表头-客户		对方pk
-	public String pk_room;		// 合同表头-房间号
-	public String pk_srxm;		// 合同明细-收入项目		支出项目
-	public String pk_quyu;		// 合同表头-区域
+	private UFDate ksrq;			// 合同明细-开始日期		开始日期
+	private UFDate jsrq;			// 合同明细-结束日期		结束日期
+	private UFDouble danjia;		// 合同明细-单价		单价
+	private UFDouble mianji;		// 合同明细-面积		面积
+	private String pk_customer;	// 合同表头-客户		对方pk
+	private String pk_room;		// 合同表头-房间号
+	private String pk_srxm;		// 合同明细-收入项目		支出项目
+	private String pk_quyu;		// 合同表头-区域
 	
-	public UFDate zzrq;			// 合同表头-终止日期（退租日期）
+	private UFDate zzrq;			// 合同表头-终止日期（退租日期）
 	
-	public UFDate yb_ksrq;		// 月报-开始日期		开始日期
-	public UFDate yb_jsrq;		// 月报-结束日期		结束日期
-	public Integer yb_days;		// 月报-计费天数		费用天数
-	public UFDouble yb_mny;		// 月报-收入金额		费用
+	private UFDate yb_ksrq;		// 月报-开始日期		开始日期
+	private UFDate yb_jsrq;		// 月报-结束日期		结束日期
+	private Integer yb_days;		// 月报-计费天数		费用天数
+	private UFDouble yb_mny;		// 月报-收入金额		费用
 	
-	public String vdef01;	// 客户-名称			对方名称
-	public String vdef02;	// 房间号-名称			发票类型-名称
-	public String vdef03;	// 收入项目-名称		支出项目-名称
-	public String vdef04;	// 区域-名称			部门名称
-	public String vdef05;	// 部门pk				部门pk
-	public String vdef06;
-	public String vdef07;	// 实际合同金额			合同总额
-	public String vdef08;	//					整体合同开始日期
-	public String vdef09;	//					整体合同结束日期
-	public String vdef10;	// 合同号				合同号
+	private String vdef01;	// 客户-名称			对方名称
+	private String vdef02;	// 房间号-名称			发票类型-名称
+	private String vdef03;	// 收入项目-名称		支出项目-名称
+	private String vdef04;	// 区域-名称			部门名称
+	private String vdef05;	// 部门pk				部门pk
+	private String vdef06;
+	private String vdef07;	// 实际合同金额			合同总额
+	private String vdef08;	//					整体合同开始日期
+	private String vdef09;	//					整体合同结束日期
+	private String vdef10;	// 合同号				合同号
+	private String vdef21;
+	private String vdef22;
+	private String vdef23;
+	private String vdef24;
+	private String vdef25;
 	
-	public UFDouble vdef11;	//					无税金额
-	public UFDouble vdef12;	//					含税金额
-	public UFDouble vdef13;
-	public UFDouble vdef14;
-	public UFDouble vdef15;
+	private UFDouble vdef11;	//					无税金额
+	private UFDouble vdef12;	//					含税金额
+	private UFDouble vdef13;	//					计算单价
+	private UFDouble vdef14;	//					税率
+	private UFDouble vdef15;
 	
 	public String getPk_customer() {
 		return pk_customer;
@@ -215,6 +220,36 @@ public class QueryHtVO extends SuperVO {
 	}
 	public void setZzrq(UFDate zzrq) {
 		this.zzrq = zzrq;
+	}
+	public String getVdef21() {
+		return vdef21;
+	}
+	public void setVdef21(String vdef21) {
+		this.vdef21 = vdef21;
+	}
+	public String getVdef22() {
+		return vdef22;
+	}
+	public void setVdef22(String vdef22) {
+		this.vdef22 = vdef22;
+	}
+	public String getVdef23() {
+		return vdef23;
+	}
+	public void setVdef23(String vdef23) {
+		this.vdef23 = vdef23;
+	}
+	public String getVdef24() {
+		return vdef24;
+	}
+	public void setVdef24(String vdef24) {
+		this.vdef24 = vdef24;
+	}
+	public String getVdef25() {
+		return vdef25;
+	}
+	public void setVdef25(String vdef25) {
+		this.vdef25 = vdef25;
 	}
 	
 }
