@@ -101,14 +101,17 @@ public class QushuAction extends NCAction {
 				.append(",ht.cvendorid pk_customer ")	// 对方pk
 				.append(",gys.name vdef01 ")			// 对方name
 				.append(",ht.ntotalorigmny vdef07 ")	// 合同总额
-				.append(",substr(ht.valdate,1,10) vdef08 ")		// 整体合同开始日期	valdate
-				.append(",substr(ht.invallidate,1,10) vdef09 ")	// 整体合同结束日期	invallidate
-				.append(" from ct_pu ht ")
-				.append(" inner join ct_pu_b htb on ht.pk_ct_pu = htb.pk_ct_pu ")
-				.append(" left join bd_defdoc fplx on ht.vdef3 = fplx.pk_defdoc ")
-				.append(" left join bd_inoutbusiclass szxm on htb.vbdef1 = szxm.pk_inoutbusiclass ")
-				.append(" left join org_dept dept on ht.depid = dept.pk_dept ")
-				.append(" left join bd_supplier gys on ht.cvendorid = gys.pk_supplier ")
+				.append(",substr(ht.valdate,1,10) vdef08 ")			// 整体合同开始日期	valdate
+				.append(",substr(ht.invallidate,1,10) vdef09 ")		// 整体合同结束日期	invallidate
+				.append(",to_number(nvl(replace(htb.vbdef5,'~',''),'0.0')) vdef13 ")	// 计算单价
+				.append(",to_number(nvl(replace(replace(sl.name,'~',''),'%',''),'0.0')) vdef14 ")		// 税率
+				.append(" from ct_pu ht ")		// 合同表头
+				.append(" inner join ct_pu_b htb on ht.pk_ct_pu = htb.pk_ct_pu ")	// 合同表体
+				.append(" left join bd_defdoc fplx on ht.vdef3 = fplx.pk_defdoc ")	// 发票类型
+				.append(" left join bd_inoutbusiclass szxm on htb.vbdef1 = szxm.pk_inoutbusiclass ")	// 收支项目
+				.append(" left join org_dept dept on ht.depid = dept.pk_dept ")		// 部门
+				.append(" left join bd_supplier gys on ht.cvendorid = gys.pk_supplier ")	// 供应商
+				.append(" left join bd_defdoc sl on ht.vdef4 = sl.pk_defdoc ")		// 税率
 				.append(" where ht.dr = 0 and htb.dr = 0 ")
 				.append(" and ht.vtrantypecode = '").append(IPub_data.BKHT_type_code).append("' ")
 				// 不取保证金
@@ -121,7 +124,7 @@ public class QushuAction extends NCAction {
 				.append(" 	or ")
 				.append("  	'").append(str_yb_jsrq).append("' between substr(htb.vbdef3,1,10) and substr(htb.vbdef4,1,10) ")
 				.append(" ) ")
-//				.append(" and ht.vbillcode like 'Z22020010900000007%' ")
+//				.append(" and ht.vbillcode like 'aaabbb%' ")	// 测试
 		;
 		
 		IUAPQueryBS iUAPQueryBS = (IUAPQueryBS)NCLocator.getInstance().lookup(IUAPQueryBS.class.getName()); 
@@ -146,10 +149,24 @@ public class QushuAction extends NCAction {
 			UFDate ht_ksrq = htVO.getKsrq();	// 合同明细-开始日期
 			UFDate ht_jsrq = htVO.getJsrq();	// 合同明细-结束日期
 			Integer ht_days = ht_jsrq.getDaysAfter(ht_ksrq) + 1;	// 合同天数
+			UFDouble ht_mianji = htVO.getMianji();	// 面积
+			/**
+			 *  判断一下：
+			 *  1、如果计算单价 为空，则用之前的模式。
+			 *  2、如果计算单价 不为空、则用新模式。
+			 */
 			UFDouble ht_danjia = ht_mny.div(ht_days);	// 每天的单价 = 合同金额 / 合同天数
+			UFDouble ht_jsdj = PuPubVO.getUFDouble_ZeroAsNull(htVO.getVdef13());	// 计算单价
+			UFDouble ht_sl 	= htVO.getVdef14();		// 税率
+			if ( ht_jsdj != null) {
+				ht_danjia = ht_jsdj.multiply(ht_mianji);// 每天的单价 = 计算单价 * 面积
+				if ("专用发票".equals(fplx)) {				// 专票 用无税
+					ht_danjia = ht_danjia.div( UFDouble.ONE_DBL.add(ht_sl.div(100.00)) );	// 去掉税
+				}
+			}
 			
 //			UFDate ht_zzrq = htVO.getZzrq();	// 合同表头-终止日期
-			UFDouble ht_mianji = htVO.getMianji();	// 面积
+			
 			
 			String ht_pk_customer = htVO.getPk_customer();	// 对方pk
 			
@@ -249,8 +266,6 @@ public class QushuAction extends NCAction {
 					yuebaoBVO.setVbdef10(htVO.getVdef10());		// 合同号
 					yuebaoBVO.setVbdef09(zthtTs.toString());	// 整体合同天数
 					
-//					yuebaoBVO.setVbmemo(htVO.getVdef10());		// 备注存放合同号
-//					yuebaoBVO.setVbdef06( ht_zzrq!=null ? ht_zzrq.toString().substring(0,10) : null );	// 合同终止日期  （HK 2018年12月26日17:39:31）
 				}
 				else
 				{
@@ -434,21 +449,6 @@ public class QushuAction extends NCAction {
 //						yuebaoBVO.setRoomno(roomno);				// 房间
 						yuebaoBVO.setQcyskye(qcye);					// 期初余额
 						
-						/**
-						 *  .append(",max(yb.vbdef01) ")	// vbdef01 客户名称	3
-							.append(",max(yb.vbdef02) ")	// vbdef02 房间号		4
-							.append(",max(yb.vbdef03) ")	// vbdef03 收入项目	5
-							.append(",max(yb.vbdef04) ")	// vbdef04 区域名称	6
-							
-							.append(",max(yb.vbdef05) ")	// vbdef05 部门pk		7
-							.append(",max(yb.vbdef07) ")	// vbdef07 实际合同金额	8
-							.append(",max(yb.quyu) ")		// 区域pk			9
-							.append(",max(yb.mianji) ")		// 面积				10
-							.append(",max(yb.danjia) ")		// 单价				11
-							.append(",max(yb.srxm) ")		// 收入项目pk			12
-															// 未摊销天数			13
-						 */
-						
 						yuebaoBVO.setMianji(PuPubVO.getUFDouble_NullAsZero(obj[10]));			// 面积
 						yuebaoBVO.setDanjia(PuPubVO.getUFDouble_NullAsZero(obj[11]));			// 单价
 						yuebaoBVO.setSrxm(PuPubVO.getString_TrimZeroLenAsNull(obj[12]));		// 收入项目pk
@@ -551,28 +551,10 @@ public class QushuAction extends NCAction {
 			}
 			
 			// 计算本次的历史未摊销天数
-			Integer byWtsts =  PuPubVO.getInteger_NullAs(bvo.getVbdef09(), 0) - bvo.getDysrqrts().intValue();
+			Integer byWtsts =  PuPubVO.getInteger_NullAs(bvo.getVbdef09(), 0) - 
+					PuPubVO.getInteger_NullAs(bvo.getDysrqrts(), 0)
+					;
 			bvo.setVbdef09(byWtsts.toString());
-			
-//			/**
-//			 * 调差处理
-//			 * 如果 截止日期不为空,计算结束日期不为空,并且期末余额不为0,并且 计算结束日期 = 截止日期， 则 将差额 加到 当月收入确认金额。
-//			 */
-//			if( bvo.getVbdef06()!=null
-//			 && bvo.getJsjsrq()!=null
-//			 && qmye.compareTo(UFDouble.ZERO_DBL)!=0
-//			 && bvo.getVbdef06().equals(bvo.getJsjsrq().toString().substring(0,10))
-//			)
-//			{
-//				if(
-//					qmye.compareTo( PuPubVO.getUFDouble_NullAsZero(-1.0) ) >= 0
-//				 && qmye.compareTo( PuPubVO.getUFDouble_NullAsZero( 1.0) ) <= 0
-//				)
-//				{// 差额在 -1 到 1 期间， 就自动调整。（HK-2019年1月27日17:25:30）
-//					bvo.setDysrqrje( PuPubVO.getUFDouble_NullAsZero(bvo.getDysrqrje()).add(qmye) );
-//					bvo.setQmyskye(UFDouble.ZERO_DBL);
-//				}
-//			}
 			
 		}
 		/***END***/
