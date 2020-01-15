@@ -105,6 +105,9 @@ public class PuGenBodyAction extends NCAction {
 		UFDouble area_down = PuPubVO.getUFDouble_NullAsZero(
 			this.getEditor().getBillCardPanel().getHeadItem("vdef11").getValueObject());
 		
+		// 总面积
+		UFDouble area_all = area_up.add(area_down);
+		
 		// 付款方式
 		UIRefPane fk_type_ref = (UIRefPane)this.getEditor().getBillCardPanel().getHeadItem("vdef5").getComponent();
 		String fk_type = fk_type_ref.getRefName();
@@ -266,8 +269,10 @@ public class PuGenBodyAction extends NCAction {
 			}
 			
 			// 计算租金的天数 = 合同终止日期 - 合同开始日期 + 1 (包含 头 和 尾)
-//			Integer days = date_end.getDaysAfter(date_begin) + 1;
-			Integer days = 365;
+			Integer days = date_end.getDaysAfter(date_begin) + 1;
+			if (time_i == 0) {
+				days = 365;
+			}
 			
 			// 先计算出 每次涨租期间的合同总额。
 			// 合同总金额 ntotalorigmny
@@ -372,9 +377,10 @@ public class PuGenBodyAction extends NCAction {
 				this.getEditor().getBillCardPanel().getBillModel().setValueAt(body_mny, rowNo, "ncalcostmny");
 				this.getEditor().getBillCardPanel().getBillModel().setValueAt(body_mny, rowNo, "nmny");
 				this.getEditor().getBillCardPanel().getBillModel().setValueAt(body_mny, rowNo, "norigmny");
-				
+				// 计算单价（每天、每平米）
+				UFDouble js_price = day_money.div(area_all).setScale(2, UFDouble.ROUND_HALF_UP);
+				this.getEditor().getBillCardPanel().getBillModel().setValueAt(js_price, rowNo, "vbdef5");
 			}
-			
 		}
 		
 		// 将 参照翻译过来
