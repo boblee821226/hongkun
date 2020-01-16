@@ -304,6 +304,9 @@ public class HkjtReportImpl implements HkjtReportITF {
 		
 	}
 
+	/**
+	 * 采购发票审核，生成出库调整单
+	 */
 	@Override
 	public Object genCktzdByPoInvoice(InvoiceVO[] poInvoiceVOs, Object ohter)
 			throws BusinessException {
@@ -495,6 +498,54 @@ public class HkjtReportImpl implements HkjtReportITF {
 									.append(",ia_detailledger.cstockorgid ")	// 9、库存组织id
 									.append(",ia_detailledger.cstockorgvid ")	//10、库存组织vid
 									.append(",ia_detailledger.cstordocid ")		//11、仓库id
+									.append(",ia_detailledger.ctrantypeid ")	//12、出入库类型
+									
+									.append(",ia_detailledger.vdef1 ")	//13、表头自定义-1
+									.append(",ia_detailledger.vdef2 ")	//14、表头自定义-2
+									.append(",ia_detailledger.vdef3 ")	//15、表头自定义-3
+									.append(",ia_detailledger.vdef4 ")	//16、表头自定义-4
+									.append(",ia_detailledger.vdef5 ")	//17、表头自定义-5
+									.append(",ia_detailledger.vdef6 ")	//18、表头自定义-6
+									.append(",ia_detailledger.vdef7 ")	//19、表头自定义-7
+									.append(",ia_detailledger.vdef8 ")	//20、表头自定义-8
+									.append(",ia_detailledger.vdef9 ")	//21、表头自定义-9
+									.append(",ia_detailledger.vdef10 ")	//22、表头自定义-10
+									.append(",ia_detailledger.vdef11 ")	//23、表头自定义-11
+									.append(",ia_detailledger.vdef12 ")	//24、表头自定义-12
+									.append(",ia_detailledger.vdef13 ")	//25、表头自定义-13
+									.append(",ia_detailledger.vdef14 ")	//26、表头自定义-14
+									.append(",ia_detailledger.vdef15 ")	//27、表头自定义-15
+									.append(",ia_detailledger.vdef16 ")	//28、表头自定义-16
+									.append(",ia_detailledger.vdef17 ")	//29、表头自定义-17
+									.append(",ia_detailledger.vdef18 ")	//30、表头自定义-18
+									.append(",ia_detailledger.vdef19 ")	//31、表头自定义-19
+									.append(",ia_detailledger.vdef20 ")	//32、表头自定义-20
+									
+									.append(",ia_detailledger.vbdef1 ")	//33、表体自定义-1
+									.append(",ia_detailledger.vbdef2 ")	//34、表体自定义-2
+									.append(",ia_detailledger.vbdef3 ")	//35、表体自定义-3
+									.append(",ia_detailledger.vbdef4 ")	//36、表体自定义-4
+									.append(",ia_detailledger.vbdef5 ")	//37、表体自定义-5
+									.append(",ia_detailledger.vbdef6 ")	//38、表体自定义-6
+									.append(",ia_detailledger.vbdef7 ")	//39、表体自定义-7
+									.append(",ia_detailledger.vbdef8 ")	//40、表体自定义-8
+									.append(",ia_detailledger.vbdef9 ")	//41、表体自定义-9
+									.append(",ia_detailledger.vbdef10 ")//42、表体自定义-10
+									.append(",ia_detailledger.vbdef11 ")//43、表体自定义-11
+									.append(",ia_detailledger.vbdef12 ")//44、表体自定义-12
+									.append(",ia_detailledger.vbdef13 ")//45、表体自定义-13
+									.append(",ia_detailledger.vbdef14 ")//46、表体自定义-14
+									.append(",ia_detailledger.vbdef15 ")//47、表体自定义-15
+									.append(",ia_detailledger.vbdef16 ")//48、表体自定义-16
+									.append(",ia_detailledger.vbdef17 ")//49、表体自定义-17
+									.append(",ia_detailledger.vbdef18 ")//50、表体自定义-18
+									.append(",ia_detailledger.vbdef19 ")//51、表体自定义-19
+									.append(",ia_detailledger.vbdef20 ")//52、表体自定义-20
+									
+//									.append(",ia_detailledger.vbdef1 ")			//13、餐饮类型
+//									.append(",ia_detailledger.vbdef3 ")			//14、出库类别
+//									.append(",ia_detailledger.vbdef3 ")			//15、需求部门
+									
 									.append(" from ia_detailledger ")
 									.append(" inner join ia_calcrange on ia_detailledger.ccalcrangeid = ia_calcrange.ccalcrangeid ")
 									.append(" where ")
@@ -531,6 +582,8 @@ public class HkjtReportImpl implements HkjtReportITF {
 								String cstockorgid 	 = PuPubVO.getString_TrimZeroLenAsNull(value[9]);
 								String cstockorgvid  = PuPubVO.getString_TrimZeroLenAsNull(value[10]);
 								String cstordocid	 = PuPubVO.getString_TrimZeroLenAsNull(value[11]);
+								
+								String ctrantypeid	= PuPubVO.getString_TrimZeroLenAsNull(value[12]);
 								
 								/**
 								 * a、如果定位到 发票对应的采购入库单。
@@ -629,6 +682,20 @@ public class HkjtReportImpl implements HkjtReportITF {
 											iaHVO.setPk_group(pk_group);
 											iaHVO.setPk_org(pk_org);
 											iaHVO.setVnote("调整【"+vbillcode+"】的成本");
+											/**
+											 * HK 2020年1月16日13:58:54
+											 * 增加赋值，
+											 * 表头：出入库类型
+											 * 表头：20个自定义项
+											 */
+											iaHVO.setCtrantypeid(ctrantypeid);	// 表头：出入库类型
+											for (int col = 1; col <= 20; col++) {
+												Integer value_index = col + 12;
+												String col_value = PuPubVO.getString_TrimZeroLenAsNull(value[value_index]);
+												String col_key = "vdef" + col;
+												iaHVO.setAttributeValue(col_key, col_value);
+											}
+											/***END***/
 											// 表体
 											IAItemVO iaBVO = new IAItemVO();
 											iaBVO.setBreworkflag(UFBoolean.FALSE);
@@ -646,6 +713,18 @@ public class HkjtReportImpl implements HkjtReportITF {
 											iaBVO.setPk_group(pk_group);
 											iaBVO.setPk_org(pk_org);
 											iaBVO.setAttributeValue("pseudocolumn", 0);
+											/**
+											 * HK 2020年1月16日13:58:54
+											 * 增加赋值，
+											 * 表体：20个自定义项
+											 */
+											for (int col = 1; col <= 20; col++) {
+												Integer value_index = col + 32;
+												String col_value = PuPubVO.getString_TrimZeroLenAsNull(value[value_index]);
+												String col_key = "vbdef" + col;
+												iaBVO.setAttributeValue(col_key, col_value);
+											}
+											/***END***/
 											// 来源信息
 											iaBVO.setVsrctype("27");		// 来源单据类型  = 结算单
 											iaBVO.setVsrcrowno(jsRowno);	// 来源行号
