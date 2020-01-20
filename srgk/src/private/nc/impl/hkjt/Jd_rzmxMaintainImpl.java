@@ -204,7 +204,10 @@ public class Jd_rzmxMaintainImpl extends AceJd_rzmxPubServiceImpl
 						spflId = spfl_info[0];
 						bmId = spfl_info[1];
 						bmFid = spfl_info[2];
-					} 
+					}
+					if (bmFid == null || "~".equals(bmFid)) {
+						bmFid = bmId; 
+					}
 					bVO.setPk_hk_srgk_jd_rzmx(_0309_billId);
 					bVO.setSpfl_id(spflId);
 					bVO.setBm_id(bmId);
