@@ -268,8 +268,8 @@ public class Hk_fp_billMaintainImpl extends AceHk_fp_billPubServiceImpl
 		/**
 		 * 账单测试
 		 */
-//		ImpZhangDanBill bb = new ImpZhangDanBill();
-//		Object result = bb.executeTest(obj);
+		ImpZhangDanBill bb = new ImpZhangDanBill();
+		Object result = bb.executeTest(obj);
 		
 		/**
 		 * 会员测试
@@ -292,8 +292,8 @@ public class Hk_fp_billMaintainImpl extends AceHk_fp_billPubServiceImpl
 		/**
 		 * 滞纳金
 		 */
-		ZnjjsPlugin znj = new ZnjjsPlugin();
-		Object result = znj.executeTest(obj);
+//		ZnjjsPlugin znj = new ZnjjsPlugin();
+//		Object result = znj.executeTest(obj);
 		
 		return result;
 	}
