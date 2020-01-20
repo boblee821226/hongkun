@@ -183,8 +183,8 @@ public class ImpZhangDanBill implements IBackgroundWorkPlugin {
 		};//西山
 		
 		String[] dateP = new String[]{
-			"2019-05-25",
-			"2019-05-25"
+			"2020-01-19",
+			"2020-01-19"
 		};
 		
 		HashMap<String,String> infoMap=getDefaultInfo(pk_orgs[0]);//得到配置表信息
@@ -362,8 +362,9 @@ public class ImpZhangDanBill implements IBackgroundWorkPlugin {
 				 * 测试 
 				 * 2019年1月9日10:58:00
 				 * 2019年5月16日11:07:50
+				 * 2020年1月20日12:10:36
 				 */
-//				 +" and aa.BillId in ('SN201905250259-06') "
+				 +" and aa.BillId in ('SN202001190152-06') "
 				 /***END***/
 				;
 			
@@ -408,8 +409,9 @@ public class ImpZhangDanBill implements IBackgroundWorkPlugin {
 				 * 2017年9月14日16:47:11
 				 * 2019年1月9日10:32:03
 				 * 2019年5月16日11:03:29
+				 * 2020年1月20日12:10:59
 				 */
-//				 +" and aa.BillId='SN201905250259-06' "
+				 +" and aa.BillId='SN202001190152-06' "
 				 /***END***/
 				 ;
 			
@@ -470,13 +472,14 @@ public class ImpZhangDanBill implements IBackgroundWorkPlugin {
 		/**
 		 * HK 2019年5月16日10:15:20
 		 * 0310转0308
+		 * TODO 
 		 */
 		map.put("pk_org_spfl", map.get("pk_org"));	// 取商品分类的组织
-		String temp_pk_org = map.get("pk_org");
-		if(HKJT_PUB.PK_ORG_HUIGUAN_xswq.equals(temp_pk_org)){
-			map.put("pk_org", HKJT_PUB.PK_ORG_JIUDIAN_llzjd);
-			map.put("pk_org_spfl", HKJT_PUB.PK_ORG_JIUDIAN_llzjd);
-		}
+//		String temp_pk_org = map.get("pk_org");
+//		if(HKJT_PUB.PK_ORG_HUIGUAN_xswq.equals(temp_pk_org)){
+//			map.put("pk_org", HKJT_PUB.PK_ORG_JIUDIAN_llzjd);
+//			map.put("pk_org_spfl", HKJT_PUB.PK_ORG_JIUDIAN_llzjd);
+//		}
 		/***END***/
 		
 		return map;
