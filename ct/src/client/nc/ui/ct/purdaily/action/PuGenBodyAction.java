@@ -380,9 +380,11 @@ public class PuGenBodyAction extends NCAction {
 				/**
 				 * 计算单价（每天、每平米）
 				 * 计算单价 = 本涨租期间的合同总额 / 实际天数 / 面积  (2020年1月19日10:46:49)
+				 * 计算单价 = 本涨租期间的合同总额 / （365*（6/12）） / 面积  (2020年1月20日10:02:31)
 				 */
 //				UFDouble js_price = day_money.div(area_all).setScale(8, UFDouble.ROUND_HALF_UP);
-				UFDouble js_price = ht_money.div(days).div(area_all).setScale(8, UFDouble.ROUND_HALF_UP);
+				UFDouble js_days = new UFDouble(time_month).div(12.00).multiply(365);
+				UFDouble js_price = ht_money.div(js_days).div(area_all).setScale(8, UFDouble.ROUND_HALF_UP);
 				this.getEditor().getBillCardPanel().getBillModel().setValueAt(js_price, rowNo, "vbdef5");
 			}
 		}
