@@ -35,7 +35,10 @@ public class HKJT_PUB {
 	{
 		PK_ORG_HUIGUAN_MAP = new HashMap<String,String>();	// 会馆
 		PK_ORG_HUIGUAN_MAP.put("base", PK_ORG_HUIGUAN);			// 会馆基础
-		PK_ORG_HUIGUAN_MAP.put("llzjd", PK_ORG_JIUDIAN_llzjd);	// 西山温泉 转移给 朗丽兹酒店
+		// TODO
+//		PK_ORG_HUIGUAN_MAP.put("llzjd", PK_ORG_JIUDIAN_llzjd);	// 西山温泉 转移给 朗丽兹酒店（2019年5月）
+		PK_ORG_HUIGUAN_MAP.put("xswq", PK_ORG_HUIGUAN_xswq);	// 朗丽兹 转移回 西山温泉（2020年1月20日11:06:27）
+		/***END***/
 		PK_ORG_HUIGUAN_MAP.put("gjhg", PK_ORG_HUIGUAN_gjhg);	// 国际会馆
 		PK_ORG_HUIGUAN_MAP.put("gbl", PK_ORG_HUIGUAN_gbl);		// 贵宾楼
 		
