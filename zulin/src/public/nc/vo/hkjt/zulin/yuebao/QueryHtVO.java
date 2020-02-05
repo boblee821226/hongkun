@@ -50,7 +50,7 @@ public class QueryHtVO extends SuperVO {
 	private UFDouble vdef11;	//					无税金额
 	private UFDouble vdef12;	//					含税金额
 	private UFDouble vdef13;	//					计算单价
-	private UFDouble vdef14;	//					税率
+	private UFDouble vdef14;	//					税率（印花税率）
 	private UFDouble vdef15;
 	
 	public String getPk_customer() {
