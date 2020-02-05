@@ -21,7 +21,7 @@ import nc.vo.arap.gathering.GatheringBillVO;
 import nc.vo.sm.funcreg.FuncRegisterVO;
 
 /**
- * 月报 取数
+ * 收款开票登记
  *
  */
 public class SkKaipiaoAction extends NCAction {
