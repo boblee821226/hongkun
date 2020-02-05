@@ -17,6 +17,8 @@ import nc.ui.pubapp.uif2app.view.ShowUpableBillListView;
 import nc.ui.uif2.NCAction;
 import nc.vo.hkjt.zulin.yuebao.QueryHtVO;
 import nc.vo.hkjt.zulin.yuebao.YuebaoBVO;
+import nc.vo.pub.BusinessException;
+import nc.vo.pub.lang.UFBoolean;
 import nc.vo.pub.lang.UFDate;
 import nc.vo.pub.lang.UFDouble;
 
@@ -84,7 +86,17 @@ public class QushuAction extends NCAction {
 		String pk_org = PuPubVO.getString_TrimZeroLenAsNull(
 				this.getEditor().getBillCardPanel().getHeadItem("pk_org").getValueObject()
 		);
-			
+		// 是否 印花税
+		UFBoolean isYhs = PuPubVO.getUFBoolean_NullAs(
+				this.getEditor().getBillCardPanel().getHeadItem("vdef02").getValueObject()
+				, UFBoolean.FALSE
+		);
+		// 印花税的处理
+		if (isYhs.booleanValue()) {
+			this.handleYhs(pk_org, str_yb_ksrq, str_yb_jsrq);
+			return;
+		}
+		
 		StringBuffer querySQL = 
 		new StringBuffer("select ")
 				.append(" htb.vbdef1 pk_srxm ")	// 支出项目pk
@@ -410,6 +422,7 @@ public class QushuAction extends NCAction {
 						.append(" inner join hk_zulin_yuebao_b yb on y.pk_hk_zulin_yuebao = yb.pk_hk_zulin_yuebao ")
 						.append(" where y.dr=0 and yb.dr=0 ")
 						.append(" and y.vbilltypecode = 'HK43' ")
+						.append(" and nvl(y.vdef02, 'N') in ('~', 'N', 'n') ")	// 只取 非印花税的
 						.append(" and y.yearmonth = '"+syqj+"' ")
 						.append(" and y.pk_org = '"+pk_org+"' ")
 						.append(" group by yb.pk_cutomer, yb.vbdef10 ")	// Group By  客户+房号
@@ -561,6 +574,103 @@ public class QushuAction extends NCAction {
 		
 		this.getEditor().getBillCardPanel().getBillModel().setBodyDataVO(bodyVOs);
 		
+	}
+	
+	/**
+	 * 印花税的处理
+	 * @throws BusinessException 
+	 */
+	private void handleYhs(String pk_org, String str_yb_ksrq, String str_yb_jsrq) throws BusinessException {
+		
+		StringBuffer querySQL = 
+		new StringBuffer("select ")
+				.append(" max(yhs.pk_inoutbusiclass) pk_srxm ")		// 印花税-支出项目pk
+				.append(",max(yhs.name) vdef03 ")			// 印花税-支出项目name
+				.append(",sum(htb.norigtaxmny) vdef12 ")	// 含税金额
+				.append(",max(ht.depid) vdef05 ")			// 部门pk
+				.append(",max(dept.name) vdef04 ")			// 部门name
+				.append(",max(ht.vbillcode) vdef10 ")		// 合同号
+				.append(",max(ht.cvendorid) pk_customer ")	// 对方pk
+				.append(",max(gys.name) vdef01 ")			// 对方name
+				.append(",max(to_number(nvl(replace(ht.vdef20,'~',''),'0.0'))) vdef14 ")// 印花税率
+				.append(" from ct_pu ht ")		// 合同表头
+				.append(" inner join ct_pu_b htb on ht.pk_ct_pu = htb.pk_ct_pu ")		// 合同表体
+				.append(" left join bd_inoutbusiclass szxm on htb.vbdef1 = szxm.pk_inoutbusiclass ")	// 收支项目
+				.append(" left join org_dept dept on ht.depid = dept.pk_dept ")				// 部门
+				.append(" left join bd_supplier gys on ht.cvendorid = gys.pk_supplier ")	// 供应商
+				.append(" left join bd_inoutbusiclass yhs on yhs.name = '印花税' and yhs.dr = 0 ")	// 印花税
+				.append(" where ht.dr = 0 and htb.dr = 0 ")
+				.append(" and ht.vtrantypecode = '").append(IPub_data.BKHT_type_code).append("' ")
+				// 不取保证金
+				.append(" and szxm.code not in ('2005', '2022') ")
+				.append(" and ht.pk_org = '").append(pk_org).append("' ")
+				// 只取最新版
+				.append(" and ht.blatest = 'Y' ")
+				// 只取第一版
+				.append(" and ht.version = 1.0 ")
+				// 合同开始日期
+				.append(" and ht.valdate between '")
+				.append(str_yb_ksrq).append("' and '")
+				.append(str_yb_jsrq).append("' ")
+				// 按合同号汇总
+				.append(" group by ht.vbillcode ")
+		;
+		
+		IUAPQueryBS iUAPQueryBS = (IUAPQueryBS)NCLocator.getInstance().lookup(IUAPQueryBS.class.getName()); 
+		ArrayList<QueryHtVO> list = (ArrayList<QueryHtVO>)iUAPQueryBS.executeQuery(
+				 querySQL.toString()
+				,new BeanListProcessor(QueryHtVO.class)
+		);
+		
+		HashMap<String,YuebaoBVO> MAP_yuebaoBVO = new HashMap<String,YuebaoBVO>();
+		
+		for(int i=0;i<list.size();i++)
+		{
+			QueryHtVO htVO = list.get(i);
+			
+			UFDouble ht_mny = htVO.getVdef12();	// 合同金额（不含保证金）
+			UFDouble yhsl = htVO.getVdef14();	// 印花税率
+			
+			UFDouble yhs = ht_mny.multiply(yhsl).div(100.00).setScale(2, UFDouble.ROUND_HALF_UP); // 印花税
+			
+			if (yhs.compareTo(UFDouble.ZERO_DBL) == 0){
+				continue;
+			}
+			
+			String ht_code = htVO.getVdef10();	// 合同号	
+			String ht_pk_customer = htVO.getPk_customer();	// 对方pk
+//			String srxm_name = htVO.getVdef03();	// 支出项目-名称
+			
+			// 同时 对 YuebaoBVO 进行封装处理
+			// 按 对方##合同号  汇总
+			{
+				String key = ht_pk_customer + "##" + ht_code;
+
+				YuebaoBVO yuebaoBVO = new YuebaoBVO();
+				yuebaoBVO.setPk_cutomer(ht_pk_customer);	// 对方pk
+//					yuebaoBVO.setJsksrq(js_ksrq);				// 计算开始日期
+//					yuebaoBVO.setJsjsrq(js_jsrq);				// 计算结束日期
+//					yuebaoBVO.setDysrqrts(PuPubVO.getUFDouble_NullAsZero(yb_days));	// 当月费用确认天数
+				yuebaoBVO.setDysrqrje(yhs);				// 当月费用确认金额（印花税）
+//					yuebaoBVO.setMianji(ht_mianji);				// 面积
+//					yuebaoBVO.setDanjia(ht_danjia);				// 单价
+				
+				yuebaoBVO.setSrxm(htVO.getPk_srxm());		// 收入项目
+				yuebaoBVO.setVbdef01(htVO.getVdef01());		// 对方名称
+				yuebaoBVO.setVbdef02(htVO.getVdef02());		// 发票类型-名称
+				yuebaoBVO.setVbdef03(htVO.getVdef03());		// 支出项目-名称
+				yuebaoBVO.setVbdef04(htVO.getVdef04());		// 部门名称
+				yuebaoBVO.setVbdef05(htVO.getVdef05());		// 部门pk
+				yuebaoBVO.setVbdef07(htVO.getVdef07());		// 实际合同金额
+				yuebaoBVO.setVbdef10(htVO.getVdef10());		// 合同号
+//					yuebaoBVO.setVbdef09(zthtTs.toString());	// 整体合同天数
+
+				MAP_yuebaoBVO.put(key, yuebaoBVO);
+			}
+		}
+		
+		YuebaoBVO[] bodyVOs = MAP_yuebaoBVO.values().toArray(new YuebaoBVO[0]);
+		this.getEditor().getBillCardPanel().getBillModel().setBodyDataVO(bodyVOs);
 	}
 	
 	/**
