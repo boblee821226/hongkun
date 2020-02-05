@@ -189,7 +189,7 @@
 	
 	<!-- HK 2018年10月24日16:58:25 -->
 	<!-- 开票明细  按钮 -->
-	<bean id="kpQueryActionReal" class="nc.ui.arap.actions.KpQueryAction">
+	<bean id="fkKpQueryAction" class="nc.ui.arap.actions.KpQueryAction">
 		<property name="editor" ref="billFormEditor" />
 		<property name="model" ref="ManageAppModel" />
 		<property name="listView" ref="listView" />
