@@ -14,7 +14,9 @@ import nc.ui.uif2.model.AbstractAppModel;
 import nc.vo.arap.gathering.AggGatheringBillVO;
 import nc.vo.arap.gathering.GatheringBillVO;
 import nc.vo.hkjt.fapiao_sk.bill.BillSkFpBVO;
-
+/**
+ * 收款开票明细
+ */
 public class KpQueryAction extends NCAction {
 
 	/**
