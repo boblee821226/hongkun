@@ -606,9 +606,9 @@ public class QushuAction extends NCAction {
 				.append(" and ht.pk_org = '").append(pk_org).append("' ")
 				// 只取最新版
 				.append(" and ht.blatest = 'Y' ")
-				// 只取第一版
-				.append(" and ht.version = 1.0 ")
-				// 合同开始日期
+				// 只取第一版(存在着 有变更，但是还没取过数的情况，所以不能限定于只取第一版)
+//				.append(" and ht.version = 1.0 ")
+				// 合同开始日期（只按 合同开始日期 在期间范围内，就可以确保唯一取值）
 				.append(" and ht.valdate between '")
 				.append(str_yb_ksrq).append("' and '")
 				.append(str_yb_jsrq).append("' ")
