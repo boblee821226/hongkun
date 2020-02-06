@@ -42,7 +42,7 @@ public class HKJT_PUB {
 		PK_ORG_HUIGUAN_MAP.put("gjhg", PK_ORG_HUIGUAN_gjhg);	// 国际会馆
 		PK_ORG_HUIGUAN_MAP.put("gbl", PK_ORG_HUIGUAN_gbl);		// 贵宾楼
 		
-		PK_ORG_JIUDIAN_MAP = new HashMap<String,String>();	// 酒店
+		PK_ORG_JIUDIAN_MAP = new HashMap<String,String>();		// 酒店
 		PK_ORG_JIUDIAN_MAP.put("base", PK_ORG_JIUDIAN);				// 酒店基础
 		PK_ORG_JIUDIAN_MAP.put("gjhg", PK_ORG_HUIGUAN_gjhg);		// 康西 转移给 国际会馆
 		PK_ORG_JIUDIAN_MAP.put("kfrxyld", PK_ORG_JIUDIAN_kfrxyld);	// 康福瑞酒店
@@ -55,9 +55,9 @@ public class HKJT_PUB {
 		MAP_corp_dianCode.put(PK_ORG_HUIGUAN_gjhg    , "0302");	// 国际
 		MAP_corp_dianCode.put(PK_ORG_HUIGUAN_gbl     , "0303");	// 贵宾楼
 		MAP_corp_dianCode.put(PK_ORG_JIUDIAN_kfrxyld , "0305");	// 康福瑞酒店
-		MAP_corp_dianCode.put(PK_ORG_JIUDIAN_llzjd   , "0308");	// 朗丽兹酒店
+		MAP_corp_dianCode.put(PK_ORG_JIUDIAN_llzjd   , "0308");	// 朗丽兹酒店 0308改成0701了
 		MAP_corp_dianCode.put(PK_ORG_JIUDIAN_kfrxsd  , "0309");	// 康福瑞西山店
-		MAP_corp_dianCode.put(PK_ORG_HUIGUAN_xswq    , "0310");	// 西山温泉
+		MAP_corp_dianCode.put(PK_ORG_HUIGUAN_xswq    , "0310");	// 西山温泉  0310改成0801了
 		
 	}
 	
