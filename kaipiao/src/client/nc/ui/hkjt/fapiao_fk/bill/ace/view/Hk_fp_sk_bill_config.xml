@@ -166,7 +166,9 @@
 				<ref bean="outputAction" />
 				<ref bean="separatorAction" />
 				<ref bean="pFApproveStatusInfoAction" />
-
+				<!--设置数据  2020年2月6日12:17:14-->
+				<ref bean="separatorAction" />
+				<ref bean="setDataAction" />
 			</list>
 		</property>
 		
@@ -174,7 +176,9 @@
 			<list>
 				<ref bean="saveScriptAction" />
 				<ref bean="cancelAction" />
-				
+				<!--设置数据  2020年2月6日12:17:14-->
+				<ref bean="separatorAction" />
+				<ref bean="setDataAction" />
 			</list>
 		</property>
 
@@ -226,6 +230,18 @@
 						<bean class="nc.ui.hkjt.fapiao_fk.bill.ace.handler.AceAddHandler" />
 					</property>
 				</bean>
+				
+				<!--表体编辑后事件  HK 2020年2月5日20:05:38-->
+				<bean class="nc.ui.pubapp.uif2app.event.EventHandlerGroup">
+					<property name="event" value="nc.ui.pubapp.uif2app.event.card.CardBodyAfterEditEvent" />
+					<property name="handler">
+						<bean class="nc.ui.hkjt.fapiao_fk.bill.ace.handler.FkFpCardBodyAfterEditEvent" >
+							<property name="cardForm" ref="billForm" />
+							<property name="model" ref="bmModel" />
+						</bean>
+					</property>
+				</bean>
+				
 			</list>
 		</property>
 	</bean>
@@ -432,6 +448,14 @@
 		<property name="context"><ref bean="context" /></property>
 	</bean>
 	
-	
 	<!-- 批量保存校验服务类 -->
+	
+	<!-- HK 2020年2月5日20:03:02 -->
+	<!-- 设置数据 -->
+	<bean id="setDataAction" class="nc.ui.hkjt.fapiao.bill.ace.action.SetDataAction">
+		<property name="model"><ref bean="bmModel"/></property>
+		<property name="editor"><ref bean="billForm"/></property>
+		<property name="listview"><ref bean="billListView"/></property>
+		<property name="exceptionHandler"><ref bean="exceptionHandler" /></property>
+	</bean>
 </beans>

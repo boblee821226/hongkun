@@ -1,25 +1,20 @@
-package nc.ui.hkjt.fapiao_sk.bill.ace.handler;
+package nc.ui.hkjt.fapiao_fk.bill.ace.handler;
+
+import hd.vo.pub.tools.PuPubVO;
 
 import java.util.ArrayList;
 
-import hd.vo.pub.tools.PuPubVO;
 import nc.bs.framework.common.NCLocator;
-import nc.desktop.ui.WorkbenchEnvironment;
-import nc.itf.hkjt.IHk_fp_billMaintain;
 import nc.itf.uap.IUAPQueryBS;
 import nc.jdbc.framework.processor.ArrayListProcessor;
-import nc.ui.hkjt.pub.Pub_Param;
 import nc.ui.pub.beans.MessageDialog;
 import nc.ui.pubapp.uif2app.event.IAppEventHandler;
 import nc.ui.pubapp.uif2app.event.card.CardBodyAfterEditEvent;
 import nc.ui.pubapp.uif2app.view.ShowUpableBillForm;
 import nc.ui.uif2.model.AbstractUIAppModel;
-import nc.vo.hkjt.srgk.huiguan.zhangdan.ZhangdanBillVO;
-import nc.vo.hkjt.srgk.huiguan.zhangdan.ZhangdanHVO;
-import nc.vo.pub.lang.UFDate;
 import nc.vo.pub.lang.UFDouble;
 
-public class SkFpCardBodyAfterEditEvent implements IAppEventHandler<CardBodyAfterEditEvent> {
+public class FkFpCardBodyAfterEditEvent implements IAppEventHandler<CardBodyAfterEditEvent> {
 
 	private AbstractUIAppModel model;		// model
 	private ShowUpableBillForm cardForm;	// 卡片界面
@@ -29,7 +24,7 @@ public class SkFpCardBodyAfterEditEvent implements IAppEventHandler<CardBodyAfte
 		
 		try
 		{
-			if( "sk_code".equals( e.getKey() ) )	// 收款单号
+			if( "sk_code".equals( e.getKey() ) )	// 付款单号
 			{
 				String sk_code = PuPubVO.getString_TrimZeroLenAsNull( e.getValue() );
 				
@@ -57,7 +52,7 @@ public class SkFpCardBodyAfterEditEvent implements IAppEventHandler<CardBodyAfte
 						
 						if( sk_code.equalsIgnoreCase(sk_code_temp) )
 						{// 不区分大小写
-							MessageDialog.showErrorDlg(cardForm, "", "收款单号不能重复");
+							MessageDialog.showErrorDlg(cardForm, "", "付款单号不能重复");
 							cardForm.getBillCardPanel().getBillModel().setValueAt(null,e.getRow(),"sk_code");
 							return;
 						}
@@ -67,15 +62,15 @@ public class SkFpCardBodyAfterEditEvent implements IAppEventHandler<CardBodyAfte
 					
 					StringBuffer querySQL_sk = 
 						new StringBuffer(" select ")
-								.append(" sk.pk_gatherbill ")	// 收款单pk
-								.append(",max(sk.billno) ")		// 收款单号
-								.append(",max(skb.customer) ")	// 客户
-								.append(",sum(skb.money_cr) ")	// 收款金额
-								.append(" from ar_gatherbill sk ")
-								.append(" inner join ar_gatheritem skb on sk.pk_gatherbill = skb.pk_gatherbill ")
+								.append(" sk.pk_paybill ")		// 付款单pk
+								.append(",max(sk.billno) ")		// 付款单号
+								.append(",max(skb.customer) ")	// 对方
+								.append(",sum(skb.money_de) ")	// 付款金额
+								.append(" from ap_paybill sk ")
+								.append(" inner join ap_payitem skb on sk.pk_paybill = skb.pk_paybill ")
 								.append(" where sk.dr=0 and skb.dr=0 ")
 								.append(" and NLS_UPPER(sk.billno) = '"+sk_code+"' ")
-								.append(" group by sk.pk_gatherbill ")
+								.append(" group by sk.pk_paybill ")
 					;
 					
 					ArrayList list_sk = (ArrayList)iUAPQueryBS.executeQuery(querySQL_sk.toString(), new ArrayListProcessor());
@@ -100,7 +95,7 @@ public class SkFpCardBodyAfterEditEvent implements IAppEventHandler<CardBodyAfte
 										.append(" from hk_fapiao_sk_bill fp ")
 										.append(" inner join hk_fapiao_sk_bill_b fpb on fp.pk_hk_fapiao_sk_bill = fpb.pk_hk_fapiao_sk_bill ")
 										.append(" where fp.dr=0 and fpb.dr=0 ")
-										.append(" and fp.vbilltypecode = 'HK36' ")
+										.append(" and fp.vbilltypecode = 'HK45' ")
 										.append(" and NLS_UPPER(fpb.sk_code) = '"+sk_code+"' ")
 //										.append(" and fp.pk_org = '"+pk_org+"' ")
 						;
@@ -111,7 +106,7 @@ public class SkFpCardBodyAfterEditEvent implements IAppEventHandler<CardBodyAfte
 							ykpje = PuPubVO.getUFDouble_NullAsZero( ((Object[])list_ykp.get(0))[0] );
 						}
 						
-						UFDouble bckpje = skJe.sub(ykpje);	// 本次开票金额（剩余开票金额）  = 账单金额 - 已开票金额
+						UFDouble bckpje = skJe.sub(ykpje);	// 本次开票金额（剩余开票金额）  = 付款金额 - 已开票金额
 						
 						/**END*/
 						
@@ -127,7 +122,7 @@ public class SkFpCardBodyAfterEditEvent implements IAppEventHandler<CardBodyAfte
 							  , e.getRow()
 							  , "vbdef03"
 						);
-						// 收款单金额
+						// 付款单金额
 						cardForm.getBillCardPanel().getBillModel().setValueAt(
 								skJe
 							  , e.getRow()
@@ -139,20 +134,20 @@ public class SkFpCardBodyAfterEditEvent implements IAppEventHandler<CardBodyAfte
 							  , e.getRow()
 							  , "vbdef02"
 						);
-						// 回写上 正确的收款单号
+						// 回写上 正确的付款单号
 						cardForm.getBillCardPanel().getBillModel().setValueAt(	
 								skCode
 							  , e.getRow()
 							  , "sk_code"
 						);
-						// 回写上 收款单pk
+						// 回写上 付款单pk
 						cardForm.getBillCardPanel().getBillModel().setValueAt(	
 								skPk
 							  , e.getRow()
 							  , "sk_pk"
 						);
-						// 回写上 表头客户
-						cardForm.getBillCardPanel().getHeadItem("pk_customer").setValue(kh);
+						// 回写上 表头对方
+						cardForm.getBillCardPanel().getHeadItem("vdef01").setValue(kh);
 					}
 					else
 					{
@@ -161,7 +156,7 @@ public class SkFpCardBodyAfterEditEvent implements IAppEventHandler<CardBodyAfte
 							  , e.getRow()
 							  , "sk_money"
 						);
-						MessageDialog.showErrorDlg(cardForm, "", "没有该帐单，请检查 收款单号是否正确。");
+						MessageDialog.showErrorDlg(cardForm, "", "请检查 付款单号是否正确。");
 						return;
 					}
 					

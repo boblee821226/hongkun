@@ -95,6 +95,7 @@ public class AceAddHandler implements IAppEventHandler<AddEvent> {
 								.append("   from hk_fapiao_sk_bill_b fpb ")
 								.append("   inner join hk_fapiao_sk_bill fp on fpb.pk_hk_fapiao_sk_bill = fp.pk_hk_fapiao_sk_bill ")
 								.append("   where fpb.dr=0 and fp.dr=0 ")
+								.append("	and fp.vbilltypecode = 'HK36' ")
 								.append("   and fpb.sk_pk = '"+pk_gatherbill[i]+"' ")
 								.append("   group by fpb.sk_pk ")
 								.append(" ) fp on g.pk_gatherbill = fp.sk_pk ")
