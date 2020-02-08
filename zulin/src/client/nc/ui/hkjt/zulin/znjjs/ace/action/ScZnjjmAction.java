@@ -101,7 +101,8 @@ public class ScZnjjmAction extends NCAction {
 		}
 		
 		ZnjjmHVO znjjmHVO = new ZnjjmHVO();
-		ZnjjmBVO[] znjjmBVOs = new ZnjjmBVO[selectRows.length];
+//		ZnjjmBVO[] znjjmBVOs = new ZnjjmBVO[selectRows.length];
+		ArrayList<ZnjjmBVO> znjjmBVOs = new ArrayList<ZnjjmBVO>(selectRows.length);
 		
 		for(int i=0;i<selectRows.length;i++){
 			
@@ -117,9 +118,17 @@ public class ScZnjjmAction extends NCAction {
 			UFDouble yq_num = PuPubVO.getUFDouble_ValueAsValue( getEditor().getBillCardPanel().getBodyValueAt(row, "yq_num") );
 			UFDouble yq_bl  = PuPubVO.getUFDouble_ValueAsValue( getEditor().getBillCardPanel().getBodyValueAt(row, "yq_bl") );
 			UFDouble yq_mny = PuPubVO.getUFDouble_ValueAsValue( getEditor().getBillCardPanel().getBodyValueAt(row, "yq_mny") );
+			// 应收金额
+			UFDouble ys_mny = PuPubVO.getUFDouble_ValueAsValue( getEditor().getBillCardPanel().getBodyValueAt(row, "vbdef02") );
+			// 实际逾期金额 = 逾期金额 - 应收金额
+			yq_mny = yq_mny.sub(ys_mny).setScale(2, UFDouble.ROUND_HALF_UP);
+			
+			if (yq_mny.compareTo(UFDouble.ZERO_DBL) == 0) {
+				continue;
+			}
 			
 			ZnjjmBVO bvo = new ZnjjmBVO();
-			bvo.setVrowno( ""+((i+1)*10) );
+			bvo.setVrowno( ""+((znjjmBVOs.size()+1)*10) );
 			bvo.setPk_cust(pk_cust);
 			bvo.setPk_area(pk_area);
 			bvo.setPk_room(pk_room);
@@ -136,8 +145,12 @@ public class ScZnjjmAction extends NCAction {
 			bvo.setCsourcetypecode( PuPubVO.getString_TrimZeroLenAsNull( getEditor().getBillCardPanel().getHeadItem("vbilltypecode").getValueObject() ) );
 			bvo.setVsourcebillcode( PuPubVO.getString_TrimZeroLenAsNull( getEditor().getBillCardPanel().getHeadItem("vbillcode").getValueObject() ) );
 					
-			znjjmBVOs[i] = bvo;
-			
+			znjjmBVOs.add(bvo);
+		}
+		
+		if (znjjmBVOs.size() == 0) {
+			MessageDialog.showErrorDlg(this.getEditor(), "", "没有要生成的数据。");
+			return;
 		}
 		
 		String pk_group = PuPubVO.getString_TrimZeroLenAsNull(
@@ -159,7 +172,7 @@ public class ScZnjjmAction extends NCAction {
 		
 		ZnjjmBillVO znjjmBillVO = new ZnjjmBillVO();
 		znjjmBillVO.setParentVO(znjjmHVO);
-		znjjmBillVO.setChildrenVO(znjjmBVOs);
+		znjjmBillVO.setChildrenVO(znjjmBVOs.toArray(new ZnjjmBVO[0]));
 		
 		// 进行保存
 		IHk_zulin_znjjmMaintain itf = (IHk_zulin_znjjmMaintain)NCLocator.getInstance().lookup(IHk_zulin_znjjmMaintain.class.getName());
