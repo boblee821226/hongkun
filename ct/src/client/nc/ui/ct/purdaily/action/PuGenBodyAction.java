@@ -148,9 +148,9 @@ public class PuGenBodyAction extends NCAction {
 //			}
 //		}
 		String lybzj_szxm = zcxm_bzj;
-		UFDouble lybzj_mny = UFDouble.ZERO_DBL;
+		UFDouble lybzj_mny = null;
 		try {
-			lybzj_mny = PuPubVO.getUFDouble_NullAsZero(lybzj);
+			lybzj_mny = PuPubVO.getUFDouble_ZeroAsNull(lybzj);
 		} catch (Exception ex) {
 			Logger.error(ex.getMessage());
 		}
@@ -195,7 +195,7 @@ public class PuGenBodyAction extends NCAction {
 		Integer ftaxtypeflag = 0;	// 0：应税内含		1：应税外加
 		
 		// 判断，是否需要生成 履约金行
-		if (lybzj_szxm != null || lybzj_mny != null) {
+		if (lybzj_szxm != null && lybzj_mny != null) {
 			this.getEditor().getBillCardPanel().getBillModel().addLine();
 			Integer rowNo = this.getEditor().getBillCardPanel().getBillModel().getRowCount() - 1;	// 当前操作的行
 			String body_rowno = "" + ((rowNo+1) * 10);
