@@ -592,15 +592,30 @@ public class QushuAction extends NCAction {
 				.append(",max(ht.vbillcode) vdef10 ")		// 合同号
 				.append(",max(ht.cvendorid) pk_customer ")	// 对方pk
 				.append(",max(gys.name) vdef01 ")			// 对方name
-				.append(",max(to_number(nvl(replace(ht.vdef20,'~',''),'0.0'))) vdef14 ")// 印花税率
+//				.append(",max(to_number(nvl(replace(ht.vdef20,'~',''),'0.0'))) vdef14 ")// 印花税率
+				.append(",max(to_number(nvl(replace(yhssl.name,'‰',''),'0.0'))) vdef14 ")// 印花税率
 				.append(" from ct_pu ht ")		// 合同表头
 				.append(" inner join ct_pu_b htb on ht.pk_ct_pu = htb.pk_ct_pu ")		// 合同表体
 				.append(" left join bd_inoutbusiclass szxm on htb.vbdef1 = szxm.pk_inoutbusiclass ")	// 收支项目
 				.append(" left join org_dept dept on ht.depid = dept.pk_dept ")				// 部门
 				.append(" left join bd_supplier gys on ht.cvendorid = gys.pk_supplier ")	// 供应商
+				.append(" left join bd_defdoc yhssl on ht.vdef20 = yhssl.pk_defdoc ") 	// 印花税-税率
 				.append(" left join bd_inoutbusiclass yhs on yhs.name = '印花税' and yhs.dr = 0 ")	// 印花税
+				.append(" left join (")
+					.append(" select distinct ")
+					.append(" yb.pk_cutomer df ")	// 对方pk
+					.append(",yb.vbdef10 hth ")		// 合同号
+					.append(" from hk_zulin_yuebao y ")
+					.append(" inner join hk_zulin_yuebao_b yb on y.pk_hk_zulin_yuebao = yb.pk_hk_zulin_yuebao ")
+					.append(" where y.dr=0 and yb.dr=0 ")
+					.append(" and y.vbilltypecode = 'HK43' ")
+					.append(" and nvl(y.vdef02, 'N') in ('Y', 'y') ")	// 只取 印花税的
+					.append(" and y.pk_org = '").append(pk_org).append("' ")
+				.append(" ) yb on (ht.cvendorid = yb.df and ht.vbillcode = yb.hth) ")
 				.append(" where ht.dr = 0 and htb.dr = 0 ")
 				.append(" and ht.vtrantypecode = '").append(IPub_data.BKHT_type_code).append("' ")
+				// 不取之前已经做过的数据
+				.append(" and yb.hth is null ")
 				// 不取保证金
 				.append(" and szxm.code not in ('2005', '2022') ")
 				.append(" and ht.pk_org = '").append(pk_org).append("' ")
@@ -609,7 +624,9 @@ public class QushuAction extends NCAction {
 				// 只取第一版(存在着 有变更，但是还没取过数的情况，所以不能限定于只取第一版)
 //				.append(" and ht.version = 1.0 ")
 				// 合同开始日期（只按 合同开始日期 在期间范围内，就可以确保唯一取值）
-				.append(" and ht.valdate between '")
+//				.append(" and ht.valdate between '")
+				// 用合同生效日期 去判断
+				.append(" and ht.actualvalidate between '")
 				.append(str_yb_ksrq).append("' and '")
 				.append(str_yb_jsrq).append("' ")
 				// 按合同号汇总
@@ -629,9 +646,9 @@ public class QushuAction extends NCAction {
 			QueryHtVO htVO = list.get(i);
 			
 			UFDouble ht_mny = htVO.getVdef12();	// 合同金额（不含保证金）
-			UFDouble yhsl = htVO.getVdef14();	// 印花税率
+			UFDouble yhsl = htVO.getVdef14();	// 印花税率(千分之)
 			
-			UFDouble yhs = ht_mny.multiply(yhsl).div(100.00).setScale(2, UFDouble.ROUND_HALF_UP); // 印花税
+			UFDouble yhs = ht_mny.multiply(yhsl).div(1000.00).setScale(2, UFDouble.ROUND_HALF_UP); // 印花税
 			
 			if (yhs.compareTo(UFDouble.ZERO_DBL) == 0){
 				continue;
