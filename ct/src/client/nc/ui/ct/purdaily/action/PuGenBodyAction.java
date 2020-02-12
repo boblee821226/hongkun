@@ -384,6 +384,9 @@ public class PuGenBodyAction extends NCAction {
 				 */
 //				UFDouble js_price = day_money.div(area_all).setScale(8, UFDouble.ROUND_HALF_UP);
 				UFDouble js_days = new UFDouble(time_month).div(12.00).multiply(365);
+				if (PuPubVO.getUFDouble_ZeroAsNull(area_all) == null ) {
+					area_all = UFDouble.ONE_DBL;
+				}
 				UFDouble js_price = ht_money.div(js_days).div(area_all).setScale(8, UFDouble.ROUND_HALF_UP);
 				this.getEditor().getBillCardPanel().getBillModel().setValueAt(js_price, rowNo, "vbdef5");
 			}
