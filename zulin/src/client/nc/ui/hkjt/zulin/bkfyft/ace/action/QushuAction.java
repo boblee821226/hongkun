@@ -162,6 +162,10 @@ public class QushuAction extends NCAction {
 			UFDate ht_jsrq = htVO.getJsrq();	// 合同明细-结束日期
 			Integer ht_days = ht_jsrq.getDaysAfter(ht_ksrq) + 1;	// 合同天数
 			UFDouble ht_mianji = htVO.getMianji();	// 面积
+			UFDouble ht_mianji_js = UFDouble.ONE_DBL;	// 计算用到的面积
+			if (PuPubVO.getUFDouble_ZeroAsNull(ht_mianji) != null) {
+				ht_mianji_js = ht_mianji;
+			}
 			/**
 			 *  判断一下：
 			 *  1、如果计算单价 为空，则用之前的模式。
@@ -171,7 +175,7 @@ public class QushuAction extends NCAction {
 			UFDouble ht_jsdj = PuPubVO.getUFDouble_ZeroAsNull(htVO.getVdef13());	// 计算单价
 			UFDouble ht_sl 	= htVO.getVdef14();		// 税率
 			if ( ht_jsdj != null) {
-				ht_danjia = ht_jsdj.multiply(ht_mianji);// 每天的单价 = 计算单价 * 面积
+				ht_danjia = ht_jsdj.multiply(ht_mianji_js);// 每天的单价 = 计算单价 * 面积
 				if ("专用发票".equals(fplx)) {				// 专票 用无税
 					ht_danjia = ht_danjia.div( UFDouble.ONE_DBL.add(ht_sl.div(100.00)) );	// 去掉税
 				}
@@ -547,17 +551,22 @@ public class QushuAction extends NCAction {
 				.sub(PuPubVO.getUFDouble_NullAsZero(bvo.getVbdef08()))
 			;
 			bvo.setQmyskye(qmye);
-			
+			UFDouble mianji = PuPubVO.getUFDouble_ZeroAsNull(bvo.getMianji());
+			if (mianji == null) {
+				mianji = UFDouble.ONE_DBL;
+			}
 			// 反算单价 = 总额/天/面积/
-			if(bvo.getDysrqrje() != null && bvo.getMianji() != null && bvo.getDysrqrts() != null
+			if(bvo.getDysrqrje() != null 
+//			&& bvo.getMianji() != null 
+			&& bvo.getDysrqrts() != null
 			&& !UFDouble.ZERO_DBL.equals(bvo.getDysrqrts())	
-			&& !UFDouble.ZERO_DBL.equals(bvo.getMianji())	
+//			&& !UFDouble.ZERO_DBL.equals(bvo.getMianji())	
 			)
 			{
 				UFDouble danjia = // 当月确认费用/天数/面积
 						  bvo.getDysrqrje()
 					.div( bvo.getDysrqrts() )
-					.div( bvo.getMianji() )
+					.div( mianji )
 					.setScale(8, UFDouble.ROUND_HALF_UP)
 				;
 				bvo.setDanjia(danjia);
