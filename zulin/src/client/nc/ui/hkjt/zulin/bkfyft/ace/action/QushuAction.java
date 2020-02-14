@@ -112,7 +112,8 @@ public class QushuAction extends NCAction {
 				.append(",to_number(nvl(replace(ht.vdef8,'~',''),'0.0')) + to_number(nvl(replace(ht.vdef11,'~',''),'0.0')) mianji ")// 面积
 				.append(",ht.cvendorid pk_customer ")	// 对方pk
 				.append(",gys.name vdef01 ")			// 对方name
-				.append(",ht.ntotalorigmny vdef07 ")	// 合同总额
+//				.append(",ht.ntotalorigmny vdef07 ")	// 合同总额
+				.append(",htze.htze vdef07 ")	// 合同总额
 				.append(",substr(ht.valdate,1,10) vdef08 ")			// 整体合同开始日期	valdate
 				.append(",substr(ht.invallidate,1,10) vdef09 ")		// 整体合同结束日期	invallidate
 				.append(",to_number(nvl(replace(htb.vbdef5,'~',''),'0.0')) vdef13 ")	// 计算单价
@@ -124,6 +125,22 @@ public class QushuAction extends NCAction {
 				.append(" left join org_dept dept on ht.depid = dept.pk_dept ")		// 部门
 				.append(" left join bd_supplier gys on ht.cvendorid = gys.pk_supplier ")	// 供应商
 				.append(" left join bd_defdoc sl on ht.vdef4 = sl.pk_defdoc ")		// 税率
+				// 关联 合同信息，不取 质保金的 合同总额
+				.append(" left join (")
+				.append("	select ")
+				.append("	 sum(htb.norigtaxmny) htze ")
+				.append("	,ht.pk_ct_pu ")
+				.append("	from ct_pu ht ")
+				.append("	inner join ct_pu_b htb on ht.pk_ct_pu = htb.pk_ct_pu ")
+				.append(" 	left join bd_inoutbusiclass szxm on htb.vbdef1 = szxm.pk_inoutbusiclass ")
+				.append("	where ht.dr = 0 and htb.dr = 0 ")
+				.append(" 	and ht.vtrantypecode = '").append(IPub_data.BKHT_type_code).append("' ")
+				.append(" 	and szxm.code not in ('2005', '2022') ")
+				.append(" 	and ht.pk_org = '").append(pk_org).append("' ")
+				.append(" 	and ht.blatest = 'Y' ")
+				.append("	group by ht.pk_ct_pu ")
+				.append(" ) htze on (htze.pk_ct_pu = ht.pk_ct_pu)")
+				
 				.append(" where ht.dr = 0 and htb.dr = 0 ")
 				.append(" and ht.vtrantypecode = '").append(IPub_data.BKHT_type_code).append("' ")
 				// 不取保证金
