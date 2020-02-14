@@ -148,6 +148,7 @@
 		<property name="actions">
 			<list>
 				<ref bean="addAction" />
+				<ref bean="editAction" />
 				<ref bean="deleteScriptAction" />
 				<ref bean="defaultQueryAction" />
 				<ref bean="separatorAction" />
