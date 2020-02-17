@@ -1,5 +1,7 @@
 package nc.ui.hkjt.zulin.bkfyft.ace.action;
 
+import hd.vo.pub.tools.PuPubVO;
+
 import java.awt.event.ActionEvent;
 
 import nc.ui.pub.link.FipBillLinkQueryCenter;
@@ -51,11 +53,14 @@ public class LinkNCVoucherAction extends NCAction {
 		
 		AggregatedValueObject aggVO = null;
 		aggVO = (AggregatedValueObject) getModel().getSelectedData();
-
 		CircularlyAccessibleValueObject hvo = aggVO.getParentVO();
-
+		// HK43
+		String billType = PuPubVO.getString_TrimZeroLenAsNull(hvo.getAttributeValue("vbilltypecode"));
+		if (billType == null) {
+			return;
+		}
 		FipRelationInfoVO infovo = new FipRelationInfoVO();
-		infovo.setPk_billtype("HK37");
+		infovo.setPk_billtype(billType);
 		infovo.setRelationID(hvo.getPrimaryKey());
 
 		FipBillLinkQueryCenter.queryDesBillBySrcInfoInDlg(getModel()
