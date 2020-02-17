@@ -81,16 +81,24 @@ public class Hk_zulin_yuebaoMaintainImpl extends AceHk_zulin_yuebaoPubServiceImp
 			throws Exception {
 		
 		if (ybBillvo != null) {
-			
 			YuebaoHVO ybhvo = ybBillvo.getParentVO();
 			
 			String qijian = ybhvo.getVdef01();	// 期间
 			String pk_org = ybhvo.getPk_org();	// 组织
+			String billType = ybhvo.getVbilltypecode();	// 单据类型
+			String zhaiyao_tiaozheng = "调整收入";
+			/**
+			 * 租赁月报HK37  与  成本月报HK43，公用，信息来区分
+			 */
+			if ("HK43".equals(billType)) {
+				zhaiyao_tiaozheng = "调整成本";
+			}
+			/***END***/
 			
 			// 组织+期间 要进行加锁处理
 			PKLock pklock = PKLock.getInstance();
 			if (!pklock.addBatchDynamicLock(new String[] { pk_org
-					+ qijian })) {
+					+ qijian + billType })) {
 				throw new BusinessException("该组织+期间已经加锁处理，请稍后再试!");
 			}
 
@@ -120,15 +128,29 @@ public class Hk_zulin_yuebaoMaintainImpl extends AceHk_zulin_yuebaoPubServiceImp
 					continue;
 				}
 				
-				String zhaiyao = "【"+bvo.getVbdef02()+"】"+
-				(
-					bvo.getDysrqrts()==null
-					?
-					"调整收入"
-					:
-					((int)bvo.getDysrqrts().getDouble())+"天"+bvo.getVbdef03()
-				)
-				;
+				String zhaiyao = "";
+				if ("HK37".equals(billType)) {
+					zhaiyao = "【"+bvo.getVbdef02()+"】"+
+						(
+							bvo.getDysrqrts()==null
+							?
+							zhaiyao_tiaozheng
+							:
+							((int)bvo.getDysrqrts().getDouble())+"天"+bvo.getVbdef03()
+						)
+					;
+				} else if ("HK43".equals(billType)) {
+					zhaiyao = "【"+bvo.getVbdef01()+"】"+
+						(
+							bvo.getDysrqrts()==null
+							?
+							zhaiyao_tiaozheng
+							:
+							bvo.getVbdef03() + ((int)bvo.getDysrqrts().getDouble()) + "天"
+						)
+					;
+				}
+				
 				
 				bvo.setVbdef06(zhaiyao);	// 用自定义项6 存放摘要
 				
@@ -219,7 +241,7 @@ public class Hk_zulin_yuebaoMaintainImpl extends AceHk_zulin_yuebaoPubServiceImp
 		//填充消息VO		
 		FipRelationInfoVO relation=new FipRelationInfoVO();
 		
-		String sbilltype="HK37";
+		String sbilltype = billVo.getParentVO().getVbilltypecode();
 		BilltypeVO billType = PfDataCache.getBillType(sbilltype);
 		
 		relation.setPk_group( billVo.getParentVO().getPk_group() );	// 集团
