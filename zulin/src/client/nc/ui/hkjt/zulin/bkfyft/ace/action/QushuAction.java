@@ -170,7 +170,7 @@ public class QushuAction extends NCAction {
 			
 			String fplx = htVO.getVdef02();		// 发票
 			UFDouble ht_mny = htVO.getVdef12();	// 含税
-			if ("专用发票".equals(fplx)) {			// 专票 用无税
+			if ("专用发票".equals(fplx)) {		// 专票 用无税
 				ht_mny = htVO.getVdef11();
 			}
 			
@@ -278,7 +278,17 @@ public class QushuAction extends NCAction {
 			{
 				String key = ht_pk_customer + "##" + ht_code;
 				YuebaoBVO yuebaoBVO = MAP_yuebaoBVO.get(key);
-				if(yuebaoBVO==null)
+				
+				/**
+				 * HK 2020年2月17日17:19:12
+				 * 进行 天数的取反，如果金额为负数， 说明为 退款，需要扣减天数
+				 */
+				if (yb_mny.compareTo(UFDouble.ZERO_DBL) < 0) {
+					yb_days = 0 - yb_days;
+				}
+				/***END***/
+				
+				if(yuebaoBVO == null)
 				{
 					yuebaoBVO = new YuebaoBVO();
 					yuebaoBVO.setPk_cutomer(ht_pk_customer);	// 客户
