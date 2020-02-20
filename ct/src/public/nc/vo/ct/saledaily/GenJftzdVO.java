@@ -21,9 +21,9 @@ public class GenJftzdVO extends SuperVO {
 	public String jflx;			// 交费类型
 	public String vbillcode2;	// 去掉#之后的合同号
 	
-	public String vdef01;
-	public String vdef02;
-	public String vdef03;
+	public String vdef01;	// 房间号
+	public String vdef02;	// 开始日期
+	public String vdef03;	// 截止日期
 	public String vdef04;
 	public String vdef05;
 	
