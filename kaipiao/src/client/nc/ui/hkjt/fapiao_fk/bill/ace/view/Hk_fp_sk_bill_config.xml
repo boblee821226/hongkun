@@ -342,7 +342,7 @@
 	</bean>
 
 	<!--======= 动作：[newActions] [提交] ===========-->
-	<bean id="commitScriptAction" class="nc.ui.pubapp.uif2app.actions.pflow.CommitScriptAction">
+	<bean id="commitScriptAction" class="nc.ui.hkjt.fapiao_fk.bill.ace.action.CommitScriptAction">
 		<property name="model"><ref bean="bmModel"/></property>
 		<property name="editor"><ref bean="billForm"/></property>
 		<property name="billType" value="HK45" />
