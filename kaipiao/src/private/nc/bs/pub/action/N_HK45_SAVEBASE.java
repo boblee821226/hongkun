@@ -1,5 +1,7 @@
 package nc.bs.pub.action;
 
+import java.util.HashMap;
+
 import nc.bs.framework.common.NCLocator;
 import nc.bs.pubapp.pf.action.AbstractPfAction;
 import nc.impl.pubapp.pattern.rule.IRule;
@@ -10,6 +12,7 @@ import nc.vo.pubapp.pattern.exception.ExceptionUtils;
 
 import nc.bs.hkjt.fapiao_fk.bill.plugin.bpplugin.Hk_fp_sk_billPluginPoint;
 import nc.vo.hkjt.fapiao_sk.bill.BillSkFpBillVO;
+import nc.vo.hkjt.fapiao_sk.bill.BillSkFpHVO;
 import nc.itf.hkjt.IHk_fp_sk_billMaintain;
 
 public class N_HK45_SAVEBASE extends AbstractPfAction<BillSkFpBillVO> {
@@ -39,6 +42,34 @@ public class N_HK45_SAVEBASE extends AbstractPfAction<BillSkFpBillVO> {
 
 		BillSkFpBillVO[] bills = null;
 		try {
+			
+			/**
+			 * 2020年2月25日16:17:19
+			 * 保存前校验，发票号码的长度  与  参数的长度 是否一致
+			 * 发票号的参数 会存 多个长度的。用逗号分隔。
+			 */
+			for(BillSkFpBillVO billVO : clientFullVOs)
+			{
+				BillSkFpHVO hVO = billVO.getParentVO();
+				String fphm = hVO.getFphm();
+				
+				String[] str_fpLength = hVO.getVdef10().split(",");
+				HashMap<String,String> MAP_fpLength = new HashMap<String,String>();
+				for(int i=0;i<str_fpLength.length;i++)
+				{
+					MAP_fpLength.put(str_fpLength[i], str_fpLength[i]);
+				}
+				
+				String fpLength = ""+fphm.length();
+				
+				if( !MAP_fpLength.containsKey(fpLength) )
+				{
+					throw new BusinessException("发票号码的长度必须为【"+hVO.getVdef10()+"】位。");
+				}
+				
+			}
+			/***END***/
+			
 			IHk_fp_sk_billMaintain operator = NCLocator.getInstance()
 					.lookup(IHk_fp_sk_billMaintain.class);
 			if (!StringUtil.isEmptyWithTrim(clientFullVOs[0].getParentVO()
