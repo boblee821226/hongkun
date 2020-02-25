@@ -388,6 +388,7 @@ public class PuGenBodyAction extends NCAction {
 					area_all = UFDouble.ONE_DBL;
 				}
 				UFDouble js_price = ht_money.div(js_days).div(area_all).setScale(8, UFDouble.ROUND_HALF_UP);
+				js_price = PuPubVO.getUFDouble_ZeroAsNull(js_price);	// 如果为0 则赋值为 空（用于前台手工填写20200225问题文档）
 				this.getEditor().getBillCardPanel().getBillModel().setValueAt(js_price, rowNo, "vbdef5");
 			}
 		}

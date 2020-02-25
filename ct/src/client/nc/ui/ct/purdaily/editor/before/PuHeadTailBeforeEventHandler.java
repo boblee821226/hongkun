@@ -76,7 +76,8 @@ public class PuHeadTailBeforeEventHandler extends
      * 18 为 保证金项目
      */
     listenerMap.put(CtAbstractVO.VDEF13, new PuVdef13());
-    listenerMap.put(CtAbstractVO.VDEF17, new PuVdef17());
+    // 20200225问题文档
+//    listenerMap.put(CtAbstractVO.VDEF17, new PuVdef17());
     listenerMap.put(CtAbstractVO.VDEF18, new PuVdef18());
     /***END***/
   }
