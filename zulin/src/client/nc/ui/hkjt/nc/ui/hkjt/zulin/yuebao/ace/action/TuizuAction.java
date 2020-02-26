@@ -474,6 +474,7 @@ public class TuizuAction extends NCAction {
 						.append(" from hk_zulin_yuebao y ")
 						.append(" inner join hk_zulin_yuebao_b yb on y.pk_hk_zulin_yuebao = yb.pk_hk_zulin_yuebao ")
 						.append(" where y.dr=0 and yb.dr=0 ")
+						.append(" and y.vbilltypecode = 'HK37' ")
 						.append(" and y.yearmonth = '"+syqj+"' ")
 						.append(" and y.pk_org = '"+pk_org+"' ")
 						.append(" group by yb.pk_cutomer,yb.roomno ")	// Group By  ¿Í»§+·¿ºÅ

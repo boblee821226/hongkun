@@ -502,10 +502,11 @@ public class QushuAction extends NCAction {
 						.append(" from hk_zulin_yuebao y ")
 						.append(" inner join hk_zulin_yuebao_b yb on y.pk_hk_zulin_yuebao = yb.pk_hk_zulin_yuebao ")
 						.append(" where y.dr=0 and yb.dr=0 ")
+						.append(" and y.vbilltypecode = 'HK37' ")
 						.append(" and y.yearmonth = '"+syqj+"' ")
 						.append(" and y.pk_org = '"+pk_org+"' ")
 						.append(" group by yb.pk_cutomer,yb.roomno ")	// Group By  客户+房号
-						.append(" having sum(yb.qmyskye)<>0.00 ")		// 取 余额不为0的
+						.append(" having sum(yb.qmyskye) <> 0.00 ")		// 取 余额不为0的
 			;
 			ArrayList list_QC = (ArrayList)iUAPQueryBS.executeQuery(
 					querySQL_QC.toString()
