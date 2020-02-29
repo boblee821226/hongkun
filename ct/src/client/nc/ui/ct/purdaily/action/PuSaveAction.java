@@ -363,8 +363,8 @@ public class PuSaveAction extends CtScriptPFlowAction {
    private String checkZulin() throws Exception {
 	   String errorMsg = null;
 	   Map<String, String> mustFieldMap = new HashMap<>();
-	   mustFieldMap.put("vdef6", "免租开始日期");
-	   mustFieldMap.put("vdef14", "免租截止日期");
+//	   mustFieldMap.put("vdef6", "免租开始日期");
+//	   mustFieldMap.put("vdef14", "免租截止日期");
 	   mustFieldMap.put("vdef8", "地上建筑面积");
 	   mustFieldMap.put("vdef9", "地上单价（每天每平米）");
 	   mustFieldMap.put("vdef10", "地上楼层数");
