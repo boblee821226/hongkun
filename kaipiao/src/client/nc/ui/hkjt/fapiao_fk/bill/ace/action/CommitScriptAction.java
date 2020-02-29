@@ -25,14 +25,15 @@ public class CommitScriptAction extends
 		if(vo != null){
 			BillSkFpBillVO billVO=(BillSkFpBillVO)vo;
 			// 表体行数
-			Integer count = billVO.getChildrenVO().length;
+//			Integer count = billVO.getChildrenVO().length;
+			Integer count = 1;
 			// 检查附件数量
 			if (!checkFujian(billVO.getParentVO().getPk_hk_fapiao_sk_bill(), count)) {
 			  MessageDialog.showErrorDlg(
 			        this.getModel().getContext().getEntranceUI(),
 			        "附件检查",
-			    "请上传附件，附件数量不能小于表体行数");
-			  throw new BusinessExceptionAdapter(new BusinessException("请上传附件，附件数量不能小于表体行数"));
+			    "请上传附件，附件数量不能小于1");
+			  throw new BusinessExceptionAdapter(new BusinessException("请上传附件，附件数量不能小于1"));
 	        }
 		}
 	}
