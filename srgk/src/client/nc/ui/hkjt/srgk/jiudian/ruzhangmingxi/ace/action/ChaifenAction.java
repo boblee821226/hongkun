@@ -3,21 +3,15 @@ package nc.ui.hkjt.srgk.jiudian.ruzhangmingxi.ace.action;
 import hd.vo.pub.tools.PuPubVO;
 
 import java.awt.event.ActionEvent;
-import java.util.ArrayList;
-import java.util.HashMap;
 
 import nc.bs.framework.common.NCLocator;
 import nc.itf.hkjt.IJd_rzmxMaintain;
-import nc.itf.uap.IUAPQueryBS;
-import nc.jdbc.framework.processor.ArrayListProcessor;
 import nc.ui.pub.beans.MessageDialog;
 import nc.ui.pubapp.uif2app.model.BillManageModel;
 import nc.ui.pubapp.uif2app.view.ShowUpableBillForm;
 import nc.ui.pubapp.uif2app.view.ShowUpableBillListView;
 import nc.ui.uif2.NCAction;
-import nc.vo.hkjt.srgk.jiudian.ruzhangmingxi.RzmxBVO;
 import nc.vo.hkjt.srgk.jiudian.ruzhangmingxi.RzmxBillVO;
-import nc.vo.hkjt.srgk.jiudian.ruzhangmingxi.RzmxHVO;
 
 public class ChaifenAction extends NCAction {
 	
