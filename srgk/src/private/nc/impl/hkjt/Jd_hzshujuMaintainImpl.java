@@ -1833,6 +1833,9 @@ public class Jd_hzshujuMaintainImpl implements IJd_hzshujuMaintain {
 		}else if(HKJT_PUB.PK_ORG_JIUDIAN_MAP.containsValue(pk_org)){
 			pk_org = HKJT_PUB.PK_ORG_JIUDIAN;
 		}
+		// TODO test
+		pk_org = HKJT_PUB.PK_ORG_HUIGUAN;
+		
 		String sql = "select * from hk_srgk_hg_jzfs " 
 				+ " where nvl(pk_kjkm,'~')<>'~' " 
 				+ " and pk_org='"+ pk_org + "' "
@@ -1861,6 +1864,9 @@ public class Jd_hzshujuMaintainImpl implements IJd_hzshujuMaintain {
 		}else if(HKJT_PUB.PK_ORG_JIUDIAN_MAP.containsValue(pk_org)){
 			pk_org = HKJT_PUB.PK_ORG_JIUDIAN;
 		}
+		// TODO test
+		pk_org = HKJT_PUB.PK_ORG_HUIGUAN;
+		
 		String sql = "select * from hk_srgk_hg_srxm " 
 				+ " where nvl(pk_kjkm,'~')<>'~'"
 				+ " and pk_org='"+ pk_org + "'"
