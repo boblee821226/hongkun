@@ -273,6 +273,10 @@ public class PuGenBodyAction extends NCAction {
 			if (time_i == 0) {
 				days = 365;
 			}
+			// 如果是年总价，解决不涨租的 366天的情况，设置为 365天（2020年2月29日17:14:43）
+			if ("年总价".equals(dz_type) && days == 366) {
+				days = 365;
+			}
 			
 			// 先计算出 每次涨租期间的合同总额。
 			// 合同总金额 ntotalorigmny
@@ -280,7 +284,7 @@ public class PuGenBodyAction extends NCAction {
 			UFDouble ht_money = day_money.multiply(days).setScale(2, UFDouble.ROUND_HALF_UP);
 			
 			// 记录第一年的 年租金
-			if (time_i==0) {
+			if (time_i == 0) {
 				FirstYearMny = ht_money;
 			}
 			
