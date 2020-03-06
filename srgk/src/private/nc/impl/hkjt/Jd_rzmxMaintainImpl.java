@@ -214,6 +214,15 @@ public class Jd_rzmxMaintainImpl extends AceJd_rzmxPubServiceImpl
 					bVO.setBm_fid(bmFid);
 					bVO.setDirty(false);
 					bVO.setAttributeValue("dr", 0);
+					/**
+					 * HK 2020年1月20日20:10:36
+					 * 解决，结账方式 的 部门为空的情况， 默认赋值为 财务部
+					 */
+					if (bVO.getJzfs_id() != null && bVO.getBm_id() == null) {
+						bVO.setBm_id("1001N510000000000FK5");
+						bVO.setBm_fid("1001N510000000000FK5");
+					}
+					
 				}
 				int update_res = dao.updateVOArray(bVOList.toArray(new RzmxBVO[0]));
 				
