@@ -2,10 +2,7 @@ package nc.vo.hkjt.srgk.huiguan.jzfs;
 
 import nc.vo.pub.IVOMeta;
 import nc.vo.pub.SuperVO;
-import nc.vo.pub.lang.UFBoolean;
-import nc.vo.pub.lang.UFDate;
 import nc.vo.pub.lang.UFDateTime;
-import nc.vo.pub.lang.UFDouble;
 import nc.vo.pubapp.pattern.model.meta.entity.vo.VOMetaFactory;
 
 public class JzfsHVO extends SuperVO {
