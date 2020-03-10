@@ -18,6 +18,7 @@ public class JDBCUtils {
 
 	public static final String SQLSERVER_DRIVER = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
 	public static final String SYBASE_DRIVER = "com.sybase.jdbc3.jdbc.SybDriver";
+	public static final String MYSQL_DRIVER = "com.mysql.cj.jdbc.Driver";
 	// 会馆公共库名称
 	public static String HKJT_HG_URL = "127.0.0.1";
 	public static String HKJT_HG_HOST = "1433";
@@ -27,6 +28,8 @@ public class JDBCUtils {
 
 	public static String HKJT_HG = "HKJT_HG";// 会馆（三个会馆 同一个链接方式）
 	public static String HKJT_JD_KFRXS = "HKJT_JD_KFRXS";// 酒店-康福瑞西山店
+	
+	public static String HKJT_LY = "HKJT_LY";	// 绿云（MySQL）
 
 	String Prefix = null;
 	
@@ -72,40 +75,37 @@ public class JDBCUtils {
 		else if(HKJT_JD_KFRXS.equals(systype))
 		 {	
 			 try {
-		
-//				 Class.forName(SYBASE_DRIVER);
-//				 Properties sysProps = System.getProperties();
-//				 sysProps.put("user","sa");
-//				 sysProps.put("password","");
-//				 sysProps.put("charset","cp936");
-//				 conn = DriverManager.getConnection("jdbc:sybase:Tds:192.168.8.160:5000/foxhis",sysProps);	// C7
-//				 conn = DriverManager.getConnection("jdbc:sybase:Tds:192.168.2.89:5000/foxhis",sysProps);	// X5
-//				 url+"?user="+user+"&password="+passwd+"&charset=cp936"
-				 
 				 DriverManager.registerDriver( (Driver)Class.forName("com.sybase.jdbc3.jdbc.SybDriver").newInstance() );
-//				 conn = DriverManager.getConnection("jdbc:sybase:Tds:192.168.8.160:5000/foxhis?user=sa&password=&charset=cp850");
 				 conn = DriverManager.getConnection("jdbc:sybase:Tds:"
 							+ HKJT_HG_URL + ":" + HKJT_HG_HOST + "/"
 							+ HKJT_HG_DBNAME+"?user="+HKJT_HG_USER+"&password="+HKJT_HG_PASSWORD+"&charset=cp850");
-				 
-//				 DriverManager.registerDriver( (Driver)Class.forName("sybase.jdbc.sqlanywhere.IDriver").newInstance() );
-//				 conn = DriverManager.getConnection("jdbc:sqlanywhere:uid=sa;pwd=");
-				 //utf8、iso_1、cp1251、eucgb、big5、cp949、cp936、cp850
-				 //ascii_8、bin_cp850、cp437、nocase_cp936、big5bin、gbpinyin_cp936
-				 //
-				 
 			 }catch (ClassNotFoundException e) {
 					throw new BusinessException(e.toString());
 				} catch (SQLException e) {
 					throw new BusinessException(e.toString());
 				} catch (InstantiationException e) {
-					// TODO 自动生成的 catch 块
 					e.printStackTrace();
 				} catch (IllegalAccessException e) {
-					// TODO 自动生成的 catch 块
 					e.printStackTrace();
 				}
 		 }
+		else if(HKJT_LY.equals(systype)) { // MySQL
+			try {
+//				Class.forName(MYSQL_DRIVER);
+				DriverManager.registerDriver(
+					(Driver)Class.forName("com.mysql.jdbc.Driver").newInstance()
+				);
+				conn = DriverManager.getConnection(
+						"jdbc:mysql://" + 
+						HKJT_HG_URL + ":" + HKJT_HG_HOST + "/" + HKJT_HG_DBNAME +
+						"?useUnicode=true&characterEncoding=utf8&useSSL=false&useLegacyDatetimeCode=false&serverTimezone=Asia/Shanghai"
+						, HKJT_HG_USER
+						, HKJT_HG_PASSWORD
+				);
+			} catch (Exception e) {
+				throw new BusinessException(e.toString());
+			}
+		}
 		return conn;
 	}
 
