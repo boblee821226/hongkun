@@ -7,7 +7,6 @@ import nc.itf.hkjt.HKJT_PUB;
 import nc.itf.uap.IUAPQueryBS;
 import nc.jdbc.framework.processor.ArrayListProcessor;
 import nc.ui.hkjt.pub.ace.handler.DeptFilterUtils;
-import nc.ui.hkjt.srgk.huiguan.sgshuju.ace.handler.BeforeHandler;
 import nc.ui.pub.beans.UIRefPane;
 import nc.ui.pubapp.uif2app.event.IAppEventHandler;
 import nc.ui.pubapp.uif2app.event.card.CardHeadTailBeforeEditEvent;
@@ -33,6 +32,17 @@ IAppEventHandler<CardHeadTailBeforeEditEvent>{
 				IUAPQueryBS iUAPQueryBS = (IUAPQueryBS)NCLocator.getInstance().lookup(IUAPQueryBS.class.getName()); 
 				String pk_parent = e.getBillCardPanel().getHeadItem("pk_parent").getValue();	// 父pk
 				
+				/**
+				 * HK 2020年3月11日14:26:36
+				 * 根据编码判断，如果是LY开头，则就用本公司的收入项目档案，
+				 * 否则 用 之前的逻辑。
+				 */
+				String code = e.getBillCardPanel().getHeadItem("code").getValue();	// 编码
+				
+				if (code.startsWith("LY0")) {
+					zdref.getRefModel().setPk_org("LY0-" + pk_org);
+					return;
+				}
 				/**
 				 * 如果 组织为 国际会馆 并且 一级的商品分类 是 0-消费类  9-房间类型，则用酒店的收入项目
 				 */
