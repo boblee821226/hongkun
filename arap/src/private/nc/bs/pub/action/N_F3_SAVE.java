@@ -68,11 +68,11 @@ public class N_F3_SAVE extends N_BASE_ACTION {
 			 * 记录 单据上正确的 合同类型
 			 * 如果为 合同付款，则赋值正确的 单据类型编码
 			 */
-			String befor_type = paraVo.m_preValueVo.getParentVO().getAttributeValue("pk_tradetypeid").toString();
-			if (IPub_data.BKHT_tradetypeid.equals(befor_type)) {
-				paraVo.m_preValueVo.getParentVO().setAttributeValue("pk_tradetype", IPub_data.BKHT_tradetype);
-			}
-//			String befor_type_code = paraVo.m_preValueVo.getParentVO().getAttributeValue("pk_tradetype").toString();
+//			String befor_type = paraVo.m_preValueVo.getParentVO().getAttributeValue("pk_tradetypeid").toString();
+//			if (IPub_data.BKHT_tradetypeid.equals(befor_type)) {
+//				paraVo.m_preValueVo.getParentVO().setAttributeValue("pk_tradetype", IPub_data.BKHT_tradetype);
+//			}
+////			String befor_type_code = paraVo.m_preValueVo.getParentVO().getAttributeValue("pk_tradetype").toString();
 			/***END***/
 			
 			beforeCheck();
@@ -96,29 +96,29 @@ public class N_F3_SAVE extends N_BASE_ACTION {
 			 * HK 2019年10月31日 15点03分
 			 * 单据类型修改
 			 */
-			AggPayBillVO[] return_obj = (AggPayBillVO[])obj;
-			String after_type = return_obj[0].getParentVO().getAttributeValue("pk_tradetypeid").toString();
-			String pk = return_obj[0].getPrimaryKey();
-			
-			if(!after_type.equals(befor_type))
-			{// 如果保存前后的 类型不一致，则需要 修改
-				BaseDAO daseDAO = new BaseDAO();
-				
-				String updateSQL = 
-						" update ap_paybill " +
-						" set pk_tradetypeid = '"+befor_type+"' " +
-						" , pk_tradetype = '"+IPub_data.BKHT_tradetype+"' " +
-						" where pk_paybill = '"+pk+"' "
-				;
-//				daseDAO.setAddTimeStamp(false);
-				int flag = daseDAO.executeUpdate(updateSQL);
-//				daseDAO.setAddTimeStamp(true);
-				if(flag>0)
-				{
-					return_obj[0].getParentVO().setAttributeValue("pk_tradetypeid",befor_type);
-					return_obj[0].getParentVO().setAttributeValue("pk_tradetype",IPub_data.BKHT_tradetype);
-				}
-			}
+//			AggPayBillVO[] return_obj = (AggPayBillVO[])obj;
+//			String after_type = return_obj[0].getParentVO().getAttributeValue("pk_tradetypeid").toString();
+//			String pk = return_obj[0].getPrimaryKey();
+//			
+//			if(!after_type.equals(befor_type))
+//			{// 如果保存前后的 类型不一致，则需要 修改
+//				BaseDAO daseDAO = new BaseDAO();
+//				
+//				String updateSQL = 
+//						" update ap_paybill " +
+//						" set pk_tradetypeid = '"+befor_type+"' " +
+//						" , pk_tradetype = '"+IPub_data.BKHT_tradetype+"' " +
+//						" where pk_paybill = '"+pk+"' "
+//				;
+////				daseDAO.setAddTimeStamp(false);
+//				int flag = daseDAO.executeUpdate(updateSQL);
+////				daseDAO.setAddTimeStamp(true);
+//				if(flag>0)
+//				{
+//					return_obj[0].getParentVO().setAttributeValue("pk_tradetypeid",befor_type);
+//					return_obj[0].getParentVO().setAttributeValue("pk_tradetype",IPub_data.BKHT_tradetype);
+//				}
+//			}
 			/***END***/
 
 			return obj;
