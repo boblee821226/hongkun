@@ -5,8 +5,8 @@ public class IPub_data {
 	/**
 	 * 闭口合同 ，业务类型
 	 */
-	public static String BKHT_tradetype = "F3-Cxx-03";	// 付款合同类型code
-	public static String BKHT_tradetypeid = "1001N510000000AC9QE8";	// 付款合同类型id
+//	public static String BKHT_tradetype = "F3-Cxx-03";	// 付款合同类型code
+//	public static String BKHT_tradetypeid = "1001N510000000AC9QE8";	// 付款合同类型id
 //	public static String BKHT_type_id = "1001N510000000AC9QDQ";	// 闭口合同类型id
 	public static String BKHT_type_code = "Z2-Cxx-01";	// 闭口合同类型code
 	
