@@ -81,8 +81,8 @@ public class PurdailyPayAction extends PayAction {
 		for(AggregatedValueObject vo : resultVOs) {
 			AggPayBillVO billVO = (AggPayBillVO)vo;
 			PayBillVO hVO = billVO.getHeadVO();
-			hVO.setPk_tradetype(IPub_data.BKHT_tradetype);
-			hVO.setPk_tradetypeid(IPub_data.BKHT_tradetypeid);
+//			hVO.setPk_tradetype(IPub_data.BKHT_tradetype);
+//			hVO.setPk_tradetypeid(IPub_data.BKHT_tradetypeid);
 			PayBillItemVO[] bVOs = billVO.getBodyVOs();
 			ArrayList<String> htBidsList = new ArrayList<>(bVOs.length);
 			Map<String, PayBillItemVO> bVOsMap = new HashMap<>();
