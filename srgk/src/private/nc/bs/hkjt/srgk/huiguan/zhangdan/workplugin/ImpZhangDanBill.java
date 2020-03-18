@@ -1590,7 +1590,11 @@ public void insertVOS(ArrayList vos)throws BusinessException{
 	 */
 	public HashMap<String,SpflHVO> getAllSpfl(String pk_org_spfl) throws DAOException{
 		HashMap<String,SpflHVO> map=new HashMap<String, SpflHVO>();
-		String sql="select * from hk_srgk_hg_spfl where dr=0 and pk_org='"+pk_org_spfl+"' ";
+		String sql=" select * " +
+				" from hk_srgk_hg_spfl " +
+				" where dr=0 " +
+				" and pk_org='"+pk_org_spfl+"' " +
+				" and code not like 'LY0%' ";	// HK 2020年3月12日11:04:32 （与绿云的商品分类  进行隔离）
 		ArrayList<SpflHVO> list=(ArrayList<SpflHVO>)getBaseDAO().executeQuery(sql, new BeanListProcessor(SpflHVO.class));
 		for (SpflHVO hvo : list) {
 			map.put(hvo.getPk_org()+"@@"+hvo.getName(), hvo);//得到商品分类VO

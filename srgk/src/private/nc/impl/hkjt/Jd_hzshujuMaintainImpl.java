@@ -63,6 +63,15 @@ import nc.vo.pub.lang.UFDouble;
 
 public class Jd_hzshujuMaintainImpl implements IJd_hzshujuMaintain {
 
+	/**
+	 * HK 2020年3月17日11:01:11
+	 * 消费客户往来款、转应收，需要按客户名称 生成下级。
+	 * 原系统为 消费客户往来款，新系统为 转应收。
+	 */
+	private String ZHUANYINGSHOU = "转应收";
+	private String ZHUANYINGSHOU_POS = "POS-转应收";
+	/***END***/
+	
 	@Override
 	public HZShuJuVO[] handlerHZShuJuInfo(String pk_org, String pk_dept,
 			String begindate, String enddate) throws Exception {
@@ -203,11 +212,15 @@ public class Jd_hzshujuMaintainImpl implements IJd_hzshujuMaintain {
 				String vrowno = vo.getVrowno();
 				UFDouble jzjine = vo.getPayment();
 				UFDouble xfjine = vo.getCharge();
-				if (pk_fdept == null || pk_fdept.length() <= 0
-						|| "~".equals(pk_fdept) || pk_dept == null
-						|| pk_dept.length() <= 0 || "~".equals(pk_dept)) {
-					set.add("【单据日期：" + dbilldate + ",行号:" + vrowno
-							+ "!部门和上级部门不能为空!】\n");
+				// 2020年3月16日11:00:21
+				// 只有当 结账金额不为0 ，才必须有部门
+				if (xfjine != null && xfjine.compareTo(UFDouble.ZERO_DBL) != 0) {
+					if (pk_fdept == null || pk_fdept.length() <= 0
+					|| "~".equals(pk_fdept) || pk_dept == null
+					|| pk_dept.length() <= 0 || "~".equals(pk_dept)) {
+						set.add("【单据日期：" + dbilldate + ",行号:" + vrowno
+								+ "!部门和上级部门不能为空!】\n");
+					}
 				}
 				//2015-12-30修改  计算酒店账单 如果结账金额不为0且结账方式为空或者~ 进行控制
 				if (jzjine != null && jzjine.compareTo(UFDouble.ZERO_DBL) != 0
@@ -221,10 +234,15 @@ public class Jd_hzshujuMaintainImpl implements IJd_hzshujuMaintain {
 					set.add("【单据日期：" + dbilldate + ",行号:" + vrowno
 							+ "!收入项目不能为空!】\n");
 				}
-				if (jzfsname != null && jzfsname.equals("消费客户往来款")
+				if (jzfsname != null && jzfsname.equals(ZHUANYINGSHOU)
 						&& (khmz == null || "".equals(khmz))) {
 					set.add("【单据日期：" + dbilldate + ",行号:" + vrowno
-							+ "!结账方式为消费客户往来款时客户名称不能为空!】\n");
+							+ "!结账方式为 "+ZHUANYINGSHOU+" 时客户名称不能为空!】\n");
+				}
+				if (jzfsname != null && jzfsname.equals(ZHUANYINGSHOU_POS)
+						&& (khmz == null || "".equals(khmz))) {
+					set.add("【单据日期：" + dbilldate + ",行号:" + vrowno
+							+ "!结账方式为 "+ZHUANYINGSHOU_POS+" 时客户名称不能为空!】\n");
 				}
 			}
 			if (set.size() > 0) {
@@ -408,7 +426,7 @@ public class Jd_hzshujuMaintainImpl implements IJd_hzshujuMaintain {
 		String pk_org_v = getOrg_v(first_org);
 		// 判断是否显示部门凭证信息
 		boolean isdept = false;
-		if (isRs && "Y".equals(isShowDept) && orgs.length == 1
+		if ("Y".equals(isShowDept) && orgs.length == 1
 				&& (dept == null || "".equals(dept))) {
 			isdept = true;
 		}
@@ -436,7 +454,7 @@ public class Jd_hzshujuMaintainImpl implements IJd_hzshujuMaintain {
 		String[] hvoinfo = new String[] { first_org, pk_org_v, pk_dept,
 				begindate };
 		SrdibiaoBillVO[] srdbvos = handlerHzshujuLeftAndRight(map_hzshuju,
-				rzmxvo, sgsjvos, rstz, cctz, isdept, hvoinfo);
+				rzmxvo, sgsjvos, rstz, cctz, isdept, hvoinfo, first_org);
 		
 		/**
 		 * 对 行号  进行赋值
@@ -466,76 +484,100 @@ public class Jd_hzshujuMaintainImpl implements IJd_hzshujuMaintain {
 			boolean isRs, String isShowDept, SgsjInfoVO[] sgsjvos,
 			RsbaogaoCVO_YY[] rstz, CctzVO_YY[] cctz) throws DAOException {
 		StringBuffer sb = new StringBuffer();
-		sb.append("select * from( ");
-		sb.append("select  ");
-		sb.append("hzshuju.pk_group, ");
-		sb.append("hzshuju.pk_org, ");
-		sb.append("hzshuju.pk_org_v, ");
-		sb.append("hzshuju.pk_dept, ");
-		sb.append("hzshuju.pk_fdept, ");
-		sb.append("hzshuju.hzdate, ");
-		sb.append("hzshuju.jzfs_id lx_id, ");
-		sb.append("hzshuju.khmz, ");
-		sb.append("jzfs.pk_parent, ");
-		sb.append("jzfs.code, ");
-		sb.append("jzfs.name, ");
-		sb.append("hzshuju.payment jine, ");
-		sb.append("'jzfs' xflx ");
-		sb.append(" from hk_srgk_jd_hzshuju  hzshuju left join  ");
-		sb.append(" hk_srgk_hg_jzfs jzfs ");
-		sb.append(" on hzshuju.jzfs_id=jzfs.pk_hk_srgk_hg_jzfs ");
-		sb.append(" where payment<>0 and nvl(hzshuju.dr,0)=0 and jzfs.name<>'消费客户往来款' ");
+		sb.append("select * from ( ");
+			sb.append("select  ");
+			sb.append("hzshuju.pk_group, ");
+			sb.append("hzshuju.pk_org, ");
+			sb.append("hzshuju.pk_org_v, ");
+			sb.append("hzshuju.pk_dept, ");
+			sb.append("hzshuju.pk_fdept, ");
+			sb.append("hzshuju.hzdate, ");
+			sb.append("hzshuju.jzfs_id lx_id, ");
+			sb.append("hzshuju.khmz, ");
+			sb.append("jzfs.pk_parent, ");
+			sb.append("jzfs.code, ");
+			sb.append("jzfs.name, ");
+			sb.append("hzshuju.payment jine, ");
+			sb.append("'jzfs' xflx ");
+			sb.append(" from hk_srgk_jd_hzshuju  hzshuju left join  ");
+			sb.append(" hk_srgk_hg_jzfs jzfs ");
+			sb.append(" on hzshuju.jzfs_id=jzfs.pk_hk_srgk_hg_jzfs ");
+	//		sb.append(" where payment<>0 and nvl(hzshuju.dr,0)=0 and jzfs.name<>'" + ZHUANYINGSHOU + "' ");
+			sb.append(" where payment<>0 and nvl(hzshuju.dr,0)=0 " +
+					" and jzfs.name not in ('" + ZHUANYINGSHOU + "','" + ZHUANYINGSHOU_POS + "') ");
 		sb.append(" union all ");
-		sb.append("select  ");
-		sb.append("hzshuju.pk_group, ");
-		sb.append("hzshuju.pk_org, ");
-		sb.append("hzshuju.pk_org_v, ");
-		sb.append("hzshuju.pk_dept, ");
-		sb.append("hzshuju.pk_fdept, ");
-		sb.append("hzshuju.hzdate, ");
-		sb.append("hzshuju.srxm_id lx_id, ");
-		sb.append("hzshuju.khmz, ");
-		sb.append("srxm.pk_parent, ");
-		sb.append("srxm.code, ");
-		sb.append("srxm.name, ");
-		sb.append("hzshuju.charge jine, ");
-		sb.append("'srxm' xflx ");
-		sb.append(" from hk_srgk_jd_hzshuju  hzshuju  left join hk_srgk_hg_srxm srxm ");
-		sb.append("on hzshuju.srxm_id=srxm.pk_hk_srgk_hg_srxm ");
-		sb.append(" where charge<>0 and nvl(hzshuju.dr,0)=0  ");
+			sb.append("select  ");
+			sb.append("hzshuju.pk_group, ");
+			sb.append("hzshuju.pk_org, ");
+			sb.append("hzshuju.pk_org_v, ");
+			sb.append("hzshuju.pk_dept, ");
+			sb.append("hzshuju.pk_fdept, ");
+			sb.append("hzshuju.hzdate, ");
+			sb.append("hzshuju.srxm_id lx_id, ");
+			sb.append("hzshuju.khmz, ");
+			sb.append("srxm.pk_parent, ");
+			sb.append("srxm.code, ");
+			sb.append("srxm.name, ");
+			sb.append("hzshuju.charge jine, ");
+			sb.append("'srxm' xflx ");
+			sb.append(" from hk_srgk_jd_hzshuju  hzshuju  left join hk_srgk_hg_srxm srxm ");
+			sb.append("on hzshuju.srxm_id=srxm.pk_hk_srgk_hg_srxm ");
+			sb.append(" where charge<>0 and nvl(hzshuju.dr,0)=0  ");
 		sb.append(" union all ");
-		sb.append(" select  ");
-		sb.append("hzshuju.pk_group, ");
-		sb.append("hzshuju.pk_org, ");
-		sb.append("hzshuju.pk_org_v, ");
-		sb.append("hzshuju.pk_dept, ");
-		sb.append("hzshuju.pk_fdept, ");
-		sb.append("hzshuju.hzdate, ");
-		sb.append("hzshuju.jzfs_id lx_id, ");
-		sb.append("hzshuju.khmz, ");
-		sb.append("jzfs.pk_parent, ");
-		sb.append("jzfs.code, ");
-		sb.append("jzfs.name, ");
-		sb.append("hzshuju.payment jine, ");
-		sb.append("'xfwlk' xflx ");
-		sb.append(" from hk_srgk_jd_hzshuju  hzshuju left join  ");
-		sb.append(" hk_srgk_hg_jzfs jzfs ");
-		sb.append(" on hzshuju.jzfs_id=jzfs.pk_hk_srgk_hg_jzfs ");
-		sb.append(" where payment<>0 and nvl(hzshuju.dr,0)=0 and jzfs.name='消费客户往来款') xfinfo  ");
-		sb.append(" where xfinfo.pk_org in (" + pk_org + ") ");
-		sb.append(" and to_date(xfinfo.hzdate,'yyyy-mm-dd hh24:mi:ss')>=to_date('"
-				+ begindate.substring(0, 10) + "','yyyy-mm-dd hh24:mi:ss') ");
-		sb.append("  and to_date(xfinfo.hzdate,'yyyy-mm-dd hh24:mi:ss')<=to_date('"
-				+ enddate.substring(0, 10) + "','yyyy-mm-dd hh24:mi:ss') ");
-		if (pk_dept != null && !"".equals(pk_dept)) {
-			sb.append("and (xfinfo.pk_dept in ");
-			sb.append("(select dept.pk_dept ");
-			sb.append(" from org_dept dept  where dept.def1 is not null and dept.def1 <> '~' ");
-			sb.append(" connect by dept.pk_fatherorg = prior dept.pk_dept ");
-			sb.append(" start with dept.pk_dept in ('" + pk_dept
-					+ "')) or xfinfo.pk_dept in ('" + pk_dept + "')) ");
-		}
-		sb.append(" order by xfinfo.xflx,xfinfo.code ");
+			sb.append(" select  ");
+			sb.append("hzshuju.pk_group, ");
+			sb.append("hzshuju.pk_org, ");
+			sb.append("hzshuju.pk_org_v, ");
+			sb.append("hzshuju.pk_dept, ");
+			sb.append("hzshuju.pk_fdept, ");
+			sb.append("hzshuju.hzdate, ");
+			sb.append("hzshuju.jzfs_id lx_id, ");
+			sb.append("hzshuju.khmz, ");
+			sb.append("jzfs.pk_parent, ");
+			sb.append("jzfs.code, ");
+			sb.append("jzfs.name, ");
+			sb.append("hzshuju.payment jine, ");
+			sb.append("'xfwlk' xflx ");
+			sb.append(" from hk_srgk_jd_hzshuju hzshuju left join ");
+			sb.append(" hk_srgk_hg_jzfs jzfs ");
+			sb.append(" on hzshuju.jzfs_id=jzfs.pk_hk_srgk_hg_jzfs ");
+			sb.append(" where payment<>0 and nvl(hzshuju.dr,0)=0 and jzfs.name='" + ZHUANYINGSHOU + "' ");
+			// POS-转应收
+		sb.append(" union all ");
+			sb.append(" select  ");
+			sb.append("hzshuju.pk_group, ");
+			sb.append("hzshuju.pk_org, ");
+			sb.append("hzshuju.pk_org_v, ");
+			sb.append("hzshuju.pk_dept, ");
+			sb.append("hzshuju.pk_fdept, ");
+			sb.append("hzshuju.hzdate, ");
+			sb.append("hzshuju.jzfs_id lx_id, ");
+			sb.append("hzshuju.khmz, ");
+			sb.append("jzfs.pk_parent, ");
+			sb.append("jzfs.code, ");
+			sb.append("jzfs.name, ");
+			sb.append("hzshuju.payment jine, ");
+			sb.append("'xfwlk-pos' xflx ");
+			sb.append(" from hk_srgk_jd_hzshuju hzshuju left join ");
+			sb.append(" hk_srgk_hg_jzfs jzfs ");
+			sb.append(" on hzshuju.jzfs_id=jzfs.pk_hk_srgk_hg_jzfs ");
+			sb.append(" where payment<>0 and nvl(hzshuju.dr,0)=0 and jzfs.name='" + ZHUANYINGSHOU_POS + "' ");
+			
+			sb.append(" ) xfinfo ");
+			sb.append(" where xfinfo.pk_org in (" + pk_org + ") ");
+			sb.append(" and to_date(xfinfo.hzdate,'yyyy-mm-dd hh24:mi:ss')>=to_date('"
+					+ begindate.substring(0, 10) + "','yyyy-mm-dd hh24:mi:ss') ");
+			sb.append("  and to_date(xfinfo.hzdate,'yyyy-mm-dd hh24:mi:ss')<=to_date('"
+					+ enddate.substring(0, 10) + "','yyyy-mm-dd hh24:mi:ss') ");
+			if (pk_dept != null && !"".equals(pk_dept)) {
+				sb.append("and (xfinfo.pk_dept in ");
+				sb.append("(select dept.pk_dept ");
+				sb.append(" from org_dept dept  where dept.def1 is not null and dept.def1 <> '~' ");
+				sb.append(" connect by dept.pk_fatherorg = prior dept.pk_dept ");
+				sb.append(" start with dept.pk_dept in ('" + pk_dept
+						+ "')) or xfinfo.pk_dept in ('" + pk_dept + "')) ");
+			}
+			sb.append(" order by xfinfo.xflx,xfinfo.code ");
 
 		List<HZShuJuVO> list = (List<HZShuJuVO>) getBD().executeQuery(
 				sb.toString(), new BeanListProcessor(HZShuJuVO.class));
@@ -543,6 +585,8 @@ public class Jd_hzshujuMaintainImpl implements IJd_hzshujuMaintain {
 		if (list != null && list.size() > 0) {
 			for (int i = 0; i < list.size(); i++) {
 				HZShuJuVO hzshuju = list.get(i);
+				// 可以支持多种汇总方式，根据sql所返回的数据 来定。
+				// 目前有 xfwlk（转应收）、xfwlk-pos（POS-转应收）
 				String xflx = hzshuju.getXflx();
 				if (!map.containsKey(xflx)) {
 					List<HZShuJuVO> list_hz = new ArrayList<HZShuJuVO>();
@@ -640,7 +684,7 @@ public class Jd_hzshujuMaintainImpl implements IJd_hzshujuMaintain {
 		String srxm2 = getNull_Str(sgsjInfoVO.getAttributeValue("Tz_km_srxm_2"));
 		String srxm_jine2 = getNull_Str(sgsjInfoVO
 				.getAttributeValue("Tz_km_data_2"));
-		// 往来款
+		// 往来款 (需要判断  是 转应收  还是  POS-转应收)
 		if (jzfs1 != null && !"".equals(jzfs1) && info1 != null
 				&& !"".equals(info1)) {
 			HZShuJuVO hzsj = new HZShuJuVO();
@@ -653,14 +697,32 @@ public class Jd_hzshujuMaintainImpl implements IJd_hzshujuMaintain {
 			hzsj.setLx_id(jzfs1);
 			hzsj.setKhmz(info1);
 			hzsj.setJine(new UFDouble(info_jine1));
-			if (!map.containsKey("xfwlk")) {
-				List<HZShuJuVO> list = new ArrayList<HZShuJuVO>();
-				list.add(hzsj);
-				map.put("xfwlk", list);
+			/**
+			 * 1001ZZ10000000AOWSYR POS-转应收
+			 * 1001ZZ10000000AOWSZI 转应收
+			 */
+			if ("1001ZZ10000000AOWSZI".equals(jzfs1)) {
+				if (!map.containsKey("xfwlk")) {
+					List<HZShuJuVO> list = new ArrayList<HZShuJuVO>();
+					list.add(hzsj);
+					map.put("xfwlk", list);
+				} else {
+					List<HZShuJuVO> list = map.get("xfwlk");
+					list.add(hzsj);
+					map.put("xfwlk", list);
+				}
 			} else {
-				List<HZShuJuVO> list = map.get("xfwlk");
-				list.add(hzsj);
-				map.put("xfwlk", list);
+				// POS-转应收
+				String key_xfwlk_pos = "xfwlk-pos";
+				if (!map.containsKey(key_xfwlk_pos)) {
+					List<HZShuJuVO> list = new ArrayList<HZShuJuVO>();
+					list.add(hzsj);
+					map.put(key_xfwlk_pos, list);
+				} else {
+					List<HZShuJuVO> list = map.get(key_xfwlk_pos);
+					list.add(hzsj);
+					map.put(key_xfwlk_pos, list);
+				}
 			}
 		}
 		if (jzfs2 != null && !"".equals(jzfs2) && info2 != null
@@ -676,14 +738,28 @@ public class Jd_hzshujuMaintainImpl implements IJd_hzshujuMaintain {
 			hzsj.setLx_id(jzfs2);
 			hzsj.setKhmz(info2);
 			hzsj.setJine(new UFDouble(info_jine2));
-			if (!map.containsKey("xfwlk")) {
-				List<HZShuJuVO> list = new ArrayList<HZShuJuVO>();
-				list.add(hzsj);
-				map.put("xfwlk", list);
+			if ("1001ZZ10000000AOWSZI".equals(jzfs1)) {
+				if (!map.containsKey("xfwlk")) {
+					List<HZShuJuVO> list = new ArrayList<HZShuJuVO>();
+					list.add(hzsj);
+					map.put("xfwlk", list);
+				} else {
+					List<HZShuJuVO> list = map.get("xfwlk");
+					list.add(hzsj);
+					map.put("xfwlk", list);
+				}
 			} else {
-				List<HZShuJuVO> list = map.get("xfwlk");
-				list.add(hzsj);
-				map.put("xfwlk", list);
+				// POS-转应收
+				String key_xfwlk_pos = "xfwlk-pos";
+				if (!map.containsKey(key_xfwlk_pos)) {
+					List<HZShuJuVO> list = new ArrayList<HZShuJuVO>();
+					list.add(hzsj);
+					map.put(key_xfwlk_pos, list);
+				} else {
+					List<HZShuJuVO> list = map.get(key_xfwlk_pos);
+					list.add(hzsj);
+					map.put(key_xfwlk_pos, list);
+				}
 			}
 		}
 		// 结账方式
@@ -784,12 +860,13 @@ public class Jd_hzshujuMaintainImpl implements IJd_hzshujuMaintain {
 	private SrdibiaoBillVO[] handlerHzshujuLeftAndRight(
 			Map<String, List<HZShuJuVO>> map_hzshuju, RzmxHVO rzmxvo,
 			SgsjInfoVO[] sgsjvos, RsbaogaoCVO_YY[] rstz, CctzVO_YY[] cctz,
-			boolean isdept, String[] hvoinfo) throws DAOException {
+			boolean isdept, String[] hvoinfo, 
+			String pk_org) throws DAOException {
 		if (map_hzshuju.size() > 0) {
 			// 获取结账方式
-			List<JzfsHVO> list_jzfs = getJzfsInfo();
+			List<JzfsHVO> list_jzfs = getJzfsInfo(pk_org);
 			// 获取收入项目
-			List<SrxmHVO> list_srxm = getSrxmInfo();
+			List<SrxmHVO> list_srxm = getSrxmInfo(pk_org);
 
 			// 收入项目主键与详细信息对应关系
 			Map<String, SrxmHVO> map_pk_srxm = new HashMap<String, SrxmHVO>();
@@ -802,13 +879,19 @@ public class Jd_hzshujuMaintainImpl implements IJd_hzshujuMaintain {
 			List<HZShuJuVO> list_jzfsvo = map_hzshuju.get("jzfs");
 			// 处理收入项目
 			List<HZShuJuVO> list_srxmvo = map_hzshuju.get("srxm");
-			// 处理客户消费客户往来款
+			// 处理客户消费客户往来款\转应收
 			List<HZShuJuVO> list_xfwlk = map_hzshuju.get("xfwlk");
+			// 处理客户消费客户往来款\POS-转应收
+			List<HZShuJuVO> list_xfwlk_pos = map_hzshuju.get("xfwlk-pos");
 			// 计算散客押金
 			UFDouble skyj = computeSKYJJine(map_hzshuju);
 			// 构造左半部分信息
-			List<SrdibiaoBVO> jzfsvos = handlerLeftJzfsInfo(list_jzfs,
-					list_jzfsvo, list_xfwlk, skyj);
+			List<SrdibiaoBVO> jzfsvos = handlerLeftJzfsInfo(
+					list_jzfs,
+					list_jzfsvo, 
+					list_xfwlk, 
+					list_xfwlk_pos, 
+					skyj);
 			Map<String, UFDouble> map_jine = new HashMap<String, UFDouble>();
 			Map<String, String> map_dept_vdef = new HashMap<String, String>();
 			Map<String, DeptVO> map_deptinfo = new HashMap<String, DeptVO>();
@@ -1157,7 +1240,10 @@ public class Jd_hzshujuMaintainImpl implements IJd_hzshujuMaintain {
 					// 如果来源不是账单的就不计算
 					if (!"N".equals(iszd)) {
 						// 结账方式和客户消费往来款
-						if (key.equals("jzfs") || key.equals("xfwlk")) {
+						if (key.equals("jzfs") 
+						|| key.equals("xfwlk")
+						|| key.equals("xfwlk-pos")
+						) {
 							jzfsjine = jzfsjine.add(jine);
 						} else if (key.equals("srxm")) {
 							// 收入项目金额
@@ -1175,6 +1261,7 @@ public class Jd_hzshujuMaintainImpl implements IJd_hzshujuMaintain {
 	 * */
 	private List<SrdibiaoBVO> handlerLeftJzfsInfo(List<JzfsHVO> list_jzfs,
 			List<HZShuJuVO> list_jzfsvo, List<HZShuJuVO> list_xfwlk,
+			List<HZShuJuVO> list_xfwlk_pos,
 			UFDouble skyj) {
 		List<SrdibiaoBVO> list_srbvo = new ArrayList<SrdibiaoBVO>();
 		if (list_jzfs != null && list_jzfs.size() > 0) {
@@ -1188,7 +1275,7 @@ public class Jd_hzshujuMaintainImpl implements IJd_hzshujuMaintain {
 				map_pk_jzfs.put(pk_jzfs, jzfs_vo);
 			}
 
-			// 处理消费往来款金额
+			// 处理消费往来款金额：转应收
 			if (list_xfwlk != null && list_xfwlk.size() > 0) {
 				for (int i = 0; i < list_xfwlk.size(); i++) {
 					HZShuJuVO xfwlk = list_xfwlk.get(i);
@@ -1205,6 +1292,28 @@ public class Jd_hzshujuMaintainImpl implements IJd_hzshujuMaintain {
 					}
 					// 处理上级结账方式信息
 					handlerUpJzfsJine(money, jzfs_id, map_jzfs_jine,
+							map_pk_jzfs);
+				}
+			}
+			
+			// 处理消费往来款金额：POS-转应收
+			if (list_xfwlk_pos != null && list_xfwlk_pos.size() > 0) {
+				for (int i = 0; i < list_xfwlk_pos.size(); i++) {
+					HZShuJuVO xfwlk_pos = list_xfwlk_pos.get(i);
+					String jzfs_id_pos = xfwlk_pos.getLx_id();
+					UFDouble money_pos = getNull_Zero(xfwlk_pos.getJine());
+					// 处理合计信息
+					setTotalMoney(map_jzfs_jine, money_pos);
+
+					if (!map_jzfs_jine.containsKey(jzfs_id_pos)) {
+						map_jzfs_jine.put(jzfs_id_pos, money_pos);
+					} else {
+						map_jzfs_jine.put(jzfs_id_pos, 
+								map_jzfs_jine.get(jzfs_id_pos).add(money_pos)
+								);
+					}
+					// 处理上级结账方式信息
+					handlerUpJzfsJine(money_pos, jzfs_id_pos, map_jzfs_jine,
 							map_pk_jzfs);
 				}
 			}
@@ -1259,8 +1368,8 @@ public class Jd_hzshujuMaintainImpl implements IJd_hzshujuMaintain {
 				srdibiaobvo.setJine(getNull_Zero(map_jzfs_jine.get(jzfs_vo
 						.getPk_hk_srgk_hg_jzfs())));
 				list_srbvo.add(srdibiaobvo);
-				// 如果是消费客户往来款进行新增行
-				if ("消费客户往来款".equals(jzfs_vo.getName())) {
+				// 如果是消费客户往来款、转应收 进行新增行
+				if (ZHUANYINGSHOU.equals(jzfs_vo.getName())){
 					if (list_xfwlk != null && list_xfwlk.size() > 0) {
 						for (int j = 0; j < list_xfwlk.size(); j++) {
 							HZShuJuVO xfwlk = list_xfwlk.get(j);
@@ -1269,7 +1378,6 @@ public class Jd_hzshujuMaintainImpl implements IJd_hzshujuMaintain {
 							int levelno1 = levelno + 1;
 							for (int k = 0; k < levelno1; k++) {
 								khmz = "   " + khmz;
-
 							}
 							srdibiaobvo.setJzfs_name(khmz);
 							srdibiaobvo.setJine(xfwlk.getJine());
@@ -1279,7 +1387,26 @@ public class Jd_hzshujuMaintainImpl implements IJd_hzshujuMaintain {
 							list_srbvo.add(srdibiaobvo);
 						}
 					}
-
+				}
+				// 如果是消费客户往来款、POS-转应收 ，进行新增行
+				if (ZHUANYINGSHOU_POS.equals(jzfs_vo.getName())){
+					if (list_xfwlk_pos != null && list_xfwlk_pos.size() > 0) {
+						for (int j = 0; j < list_xfwlk_pos.size(); j++) {
+							HZShuJuVO xfwlk = list_xfwlk_pos.get(j);
+							srdibiaobvo = new SrdibiaoBVO();
+							String khmz = xfwlk.getKhmz();
+							int levelno1 = levelno + 1;
+							for (int k = 0; k < levelno1; k++) {
+								khmz = "   " + khmz;
+							}
+							srdibiaobvo.setJzfs_name(khmz);
+							srdibiaobvo.setJine(xfwlk.getJine());
+							// 自动增加的这几行为了生成凭证还需要赋值几个字段
+							srdibiaobvo.setPk_fjzfs(xfwlk.getLx_id());
+							srdibiaobvo.setIswanglai("Y");
+							list_srbvo.add(srdibiaobvo);
+						}
+					}
 				}
 			}
 			// 最后增加行合计
@@ -1491,10 +1618,10 @@ public class Jd_hzshujuMaintainImpl implements IJd_hzshujuMaintain {
 	 * @throws DAOException
 	 * */
 	@SuppressWarnings("unchecked")
-	private List<JzfsHVO> getJzfsInfo() throws DAOException {
+	private List<JzfsHVO> getJzfsInfo(String pk_org) throws DAOException {
 		// 结账方式根据康复瑞西山店组织过滤
 		String sql = "select jzfs.*,jzfs_f.name vdef5 from hk_srgk_hg_jzfs jzfs left join hk_srgk_hg_jzfs jzfs_f on jzfs.pk_parent=jzfs_f.pk_hk_srgk_hg_jzfs where nvl(jzfs.dr,0)=0 and jzfs.pk_org='"
-				+ HKJT_PUB.PK_ORG_JIUDIAN + "' order by jzfs.code";
+				+ "0001N510000000001SY3" + "' order by jzfs.code";
 		List<JzfsHVO> list = (List<JzfsHVO>) getBD().executeQuery(sql,
 				new BeanListProcessor(JzfsHVO.class));
 		return list;
@@ -1506,10 +1633,10 @@ public class Jd_hzshujuMaintainImpl implements IJd_hzshujuMaintain {
 	 * @throws DAOException
 	 * */
 	@SuppressWarnings("unchecked")
-	private List<SrxmHVO> getSrxmInfo() throws DAOException {
+	private List<SrxmHVO> getSrxmInfo(String pk_org) throws DAOException {
 		// 结账方式根据康复瑞西山店组织过滤
 		String sql = "select * from hk_srgk_hg_srxm where nvl(dr,0)=0 and pk_org='"
-				+ HKJT_PUB.PK_ORG_JIUDIAN + "' order by code";
+				+ pk_org + "' order by code";
 		List<SrxmHVO> list = (List<SrxmHVO>) getBD().executeQuery(sql,
 				new BeanListProcessor(SrxmHVO.class));
 		return list;
@@ -1827,14 +1954,16 @@ public class Jd_hzshujuMaintainImpl implements IJd_hzshujuMaintain {
 			throws DAOException, InstantiationException, IllegalAccessException {
 		// 判断 是 酒店 还是 会馆，然后 赋值为  酒店 或 会馆  默认的那个pk_org
 		if(isJd.booleanValue()){
-			pk_org = HKJT_PUB.PK_ORG_JIUDIAN;
-		}else if(HKJT_PUB.PK_ORG_HUIGUAN_MAP.containsValue(pk_org)){
-			pk_org = HKJT_PUB.PK_ORG_HUIGUAN;
-		}else if(HKJT_PUB.PK_ORG_JIUDIAN_MAP.containsValue(pk_org)){
-			pk_org = HKJT_PUB.PK_ORG_JIUDIAN;
+			pk_org = "0001N510000000001SY3";
 		}
-		// TODO test
-		pk_org = HKJT_PUB.PK_ORG_HUIGUAN;
+//		else if(HKJT_PUB.PK_ORG_HUIGUAN_MAP.containsValue(pk_org)){
+//			pk_org = HKJT_PUB.PK_ORG_HUIGUAN;
+//		}else if(HKJT_PUB.PK_ORG_JIUDIAN_MAP.containsValue(pk_org)){
+//			pk_org = HKJT_PUB.PK_ORG_JIUDIAN;
+//		}
+		else {
+			pk_org = HKJT_PUB.PK_ORG_HUIGUAN;
+		}
 		
 		String sql = "select * from hk_srgk_hg_jzfs " 
 				+ " where nvl(pk_kjkm,'~')<>'~' " 
@@ -1858,14 +1987,16 @@ public class Jd_hzshujuMaintainImpl implements IJd_hzshujuMaintain {
 			throws Exception {
 		// 判断 是 酒店 还是 会馆，然后 赋值为  酒店 或 会馆  默认的那个pk_org
 		if(isJd.booleanValue()){
-			pk_org = HKJT_PUB.PK_ORG_JIUDIAN;
-		}else if(HKJT_PUB.PK_ORG_HUIGUAN_MAP.containsValue(pk_org)){
-			pk_org = HKJT_PUB.PK_ORG_HUIGUAN;
-		}else if(HKJT_PUB.PK_ORG_JIUDIAN_MAP.containsValue(pk_org)){
-			pk_org = HKJT_PUB.PK_ORG_JIUDIAN;
+//			pk_org = pk_org;
 		}
-		// TODO test
-		pk_org = HKJT_PUB.PK_ORG_HUIGUAN;
+//		else if(HKJT_PUB.PK_ORG_HUIGUAN_MAP.containsValue(pk_org)){
+//			pk_org = HKJT_PUB.PK_ORG_HUIGUAN;
+//		}else if(HKJT_PUB.PK_ORG_JIUDIAN_MAP.containsValue(pk_org)){
+//			pk_org = HKJT_PUB.PK_ORG_JIUDIAN;
+//		}
+		else {
+			pk_org = HKJT_PUB.PK_ORG_HUIGUAN;
+		}
 		
 		String sql = "select * from hk_srgk_hg_srxm " 
 				+ " where nvl(pk_kjkm,'~')<>'~'"
