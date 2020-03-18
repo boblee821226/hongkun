@@ -71,15 +71,25 @@ public class ComputeAction extends NCAction {
 			// 校验如果即选择了会馆又选了酒店那么不能计算
 			checkHaveJdAndHgInfo(pk_org);
 			// 计算收入底表
-			if("Y".equals(isjd) && HKJT_PUB.PK_ORG_HUIGUAN_JIUDIAN_MAP.containsValue(pk_org.split(",")[0])){	// 是否酒店 （HK 2018年11月5日20:46:42）（朗丽兹 也会用HK 2019年5月16日16:32:13）
+//			if("Y".equals(isjd) && HKJT_PUB.PK_ORG_HUIGUAN_JIUDIAN_MAP.containsValue(pk_org.split(",")[0])){	// 是否酒店 （HK 2018年11月5日20:46:42）（朗丽兹 也会用HK 2019年5月16日16:32:13）
+//				computeJiuDianSrdbInfo(pk_org, pk_dept, hzdate);
+//			}
+//			else if (HKJT_PUB.PK_ORG_HUIGUAN_MAP.containsValue(pk_org.split(",")[0])) {
+//				computeSrdbInfo(pk_org, pk_dept, hzdate);
+//			}
+//			else if(HKJT_PUB.PK_ORG_JIUDIAN_MAP.containsValue(pk_org.split(",")[0])) {
+//				computeJiuDianSrdbInfo(pk_org, pk_dept, hzdate);
+//			}
+			/**
+			 * 2020年3月16日17:25:05
+			 * 明确的指出 酒店，不指明 就是会馆
+			 */
+			if("Y".equals(isjd)) {	
 				computeJiuDianSrdbInfo(pk_org, pk_dept, hzdate);
-			}
-			else if (HKJT_PUB.PK_ORG_HUIGUAN_MAP.containsValue(pk_org.split(",")[0])) {
+			} else {
 				computeSrdbInfo(pk_org, pk_dept, hzdate);
 			}
-			else if(HKJT_PUB.PK_ORG_JIUDIAN_MAP.containsValue(pk_org.split(",")[0])) {
-				computeJiuDianSrdbInfo(pk_org, pk_dept, hzdate);
-			}
+			
 			// 提示信息
 			MessageDialog.showHintDlg(editor, "提示", "计算成功！");
 		}

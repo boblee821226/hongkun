@@ -34,13 +34,17 @@ public class JZFSRef extends AbstractRefTreeModel {
 
 		String pk_org = this.getPk_org();
 		String pk_org_ref = "";
-		if(HKJT_PUB.PK_ORG_HUIGUAN_MAP.containsValue(pk_org))
-		{
-			pk_org_ref = HKJT_PUB.PK_ORG_HUIGUAN;
-		}
-		else if(HKJT_PUB.PK_ORG_JIUDIAN_MAP.containsValue(pk_org))
-		{
-			pk_org_ref = HKJT_PUB.PK_ORG_JIUDIAN;
+		if (pk_org.startsWith("LY0-")) {
+			pk_org_ref = "0001N510000000001SY3";
+		} else {
+			if(HKJT_PUB.PK_ORG_HUIGUAN_MAP.containsValue(pk_org))
+			{
+				pk_org_ref = HKJT_PUB.PK_ORG_HUIGUAN;
+			}
+			else if(HKJT_PUB.PK_ORG_JIUDIAN_MAP.containsValue(pk_org))
+			{
+				pk_org_ref = HKJT_PUB.PK_ORG_JIUDIAN;
+			}
 		}
 		
 		this.addWherePart(

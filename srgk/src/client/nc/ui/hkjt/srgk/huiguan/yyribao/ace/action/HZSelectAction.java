@@ -104,14 +104,24 @@ public class HZSelectAction extends NCAction {
 			// 开始时间结束时间判断处理
 			handlerDate(hzdate);
 			checkHaveJdAndHgInfo(pk_org);
-			if("Y".equals(isjd)&&HKJT_PUB.PK_ORG_HUIGUAN_JIUDIAN_MAP.containsValue(pk_org.split(",")[0])){	// 是否酒店 （HK 2018年11月6日20:35:05）（目前的设计  只有国际店 才会选Y）（朗丽兹）
+			
+//			if("Y".equals(isjd)&&HKJT_PUB.PK_ORG_HUIGUAN_JIUDIAN_MAP.containsValue(pk_org.split(",")[0])){	// 是否酒店 （HK 2018年11月6日20:35:05）（目前的设计  只有国际店 才会选Y）（朗丽兹）
+//				handlerJiuDian(pk_org, pk_dept, hzdate, isshowdept, pk_group,pk_user,UFBoolean.TRUE);
+//			}else if (HKJT_PUB.PK_ORG_HUIGUAN_MAP.containsValue(pk_org.split(",")[0])) {
+//				handlerHuiGuan(pk_org, pk_dept, hzdate, isshowdept, pk_group,pk_user);
+//			}else if (HKJT_PUB.PK_ORG_JIUDIAN_MAP.containsValue(pk_org.split(",")[0])) {
+//				handlerJiuDian(pk_org, pk_dept, hzdate, isshowdept, pk_group,pk_user,UFBoolean.FALSE);
+//			} else {
+//				throw new BusinessException("组织主键信息有误!");
+//			}
+			/**
+			 * 2020年3月16日17:25:05
+			 * 明确的指出 酒店，不指明 就是会馆
+			 */
+			if ("Y".equals(isjd)) {
 				handlerJiuDian(pk_org, pk_dept, hzdate, isshowdept, pk_group,pk_user,UFBoolean.TRUE);
-			}else if (HKJT_PUB.PK_ORG_HUIGUAN_MAP.containsValue(pk_org.split(",")[0])) {
-				handlerHuiGuan(pk_org, pk_dept, hzdate, isshowdept, pk_group,pk_user);
-			}else if (HKJT_PUB.PK_ORG_JIUDIAN_MAP.containsValue(pk_org.split(",")[0])) {
-				handlerJiuDian(pk_org, pk_dept, hzdate, isshowdept, pk_group,pk_user,UFBoolean.FALSE);
 			} else {
-				throw new BusinessException("组织主键信息有误!");
+				handlerHuiGuan(pk_org, pk_dept, hzdate, isshowdept, pk_group,pk_user);
 			}
 			
 			// 这里只能通过这种设置把列表的表体字段排序功能去掉

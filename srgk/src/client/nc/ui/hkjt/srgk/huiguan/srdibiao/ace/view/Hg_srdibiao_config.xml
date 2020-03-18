@@ -442,6 +442,17 @@
 		<property name="model"><ref bean="bmModel"/></property>
 		<property name="editor"><ref bean="billForm"/></property>
 		<property name="listview"><ref bean="billListView"/></property>
+		<property name="interceptor">
+			<bean class="nc.ui.pubapp.uif2app.actions.interceptor.CompositeActionInterceptor">
+				<property name="interceptors">
+					<list>
+						<bean class="nc.ui.pubapp.uif2app.actions.interceptor.ShowUpComponentInterceptor">
+							<property name="showUpComponent" ref="billForm" />
+						</bean>
+					</list>
+				</property>
+			</bean>
+		</property>
 		<property name="exceptionHandler"><ref bean="exceptionHandler" /></property>
 	</bean>
 	<!--·Ö¸ô°´Å¥-->

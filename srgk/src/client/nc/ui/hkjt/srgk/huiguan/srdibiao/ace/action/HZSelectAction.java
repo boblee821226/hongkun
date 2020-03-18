@@ -27,6 +27,7 @@ import nc.ui.uif2.ShowStatusBarMsgUtil;
 import nc.vo.hkjt.srgk.huiguan.hzshuju.HZShuJuVO;
 import nc.vo.hkjt.srgk.huiguan.srdibiao.SrdibiaoBillVO;
 import nc.vo.hkjt.srgk.huiguan.srdibiao.SrdibiaoHVO;
+import nc.vo.hkjt.srgk.huiguan.yyribao.YyribaoHVO;
 import nc.vo.pub.BusinessException;
 import nc.vo.pub.lang.UFBoolean;
 import nc.vo.pub.lang.UFDate;
@@ -84,25 +85,41 @@ public class HZSelectAction extends NCAction {
 			String pk_org = getValueForColumn(dlg, "pk_org", true, false);
 			String pk_dept = getValueForColumn(dlg, "pk_dept", true, false);
 			String hzdate = getValueForColumn(dlg, "hzdate", true, true);
+			String isshowdept = getValueForColumn(dlg, "isshowdept", true,
+					false);
 			String isjd    = getValueForColumn(dlg, "isjd", false, false);	// 是否酒店 （HK 2018年11月5日20:46:42）
 			// 获取当前登录信息
 			String pk_group = getModel().getContext().getPk_group();
 			String pk_user = getModel().getContext().getPk_loginUser();
+			// 是否按部门展开
+			if (pk_dept != null && !"".equals(pk_dept)) {
+				isshowdept = "N";
+			}
 			// 开始时间结束时间判断处理
 			handlerDate(hzdate);
 			checkHaveJdAndHgInfo(pk_org);
 			
-			if("Y".equals(isjd) && HKJT_PUB.PK_ORG_HUIGUAN_JIUDIAN_MAP.containsValue(pk_org.split(",")[0])){	// 是否酒店 （HK 2018年11月5日20:46:42）（目前的设计  只有国际店 才会选Y）
-				handlerJiuDian(pk_org, pk_dept, hzdate, pk_group, pk_user,UFBoolean.TRUE);
-			}
-			else if (HKJT_PUB.PK_ORG_HUIGUAN_MAP.containsValue(pk_org.split(",")[0])) {
-				handlerHuiGuan(pk_org, pk_dept, hzdate, pk_group, pk_user);
-			} 
-			else if (HKJT_PUB.PK_ORG_JIUDIAN_MAP.containsValue(pk_org.split(",")[0])) {
-				handlerJiuDian(pk_org, pk_dept, hzdate, pk_group, pk_user,UFBoolean.FALSE);
+//			if("Y".equals(isjd) && HKJT_PUB.PK_ORG_HUIGUAN_JIUDIAN_MAP.containsValue(pk_org.split(",")[0])){	// 是否酒店 （HK 2018年11月5日20:46:42）（目前的设计  只有国际店 才会选Y）
+//				handlerJiuDian(pk_org, pk_dept, hzdate, isshowdept, pk_group, pk_user,UFBoolean.TRUE);
+//			}
+//			else if (HKJT_PUB.PK_ORG_HUIGUAN_MAP.containsValue(pk_org.split(",")[0])) {
+//				handlerHuiGuan(pk_org, pk_dept, hzdate, pk_group, pk_user);
+//			} 
+//			else if (HKJT_PUB.PK_ORG_JIUDIAN_MAP.containsValue(pk_org.split(",")[0])) {
+//				handlerJiuDian(pk_org, pk_dept, hzdate, isshowdept, pk_group, pk_user,UFBoolean.FALSE);
+//			} else {
+//				throw new BusinessException("组织主键信息有误!");
+//			}
+			/**
+			 * 2020年3月16日17:25:05
+			 * 明确的指出 酒店，不指明 就是会馆
+			 */
+			if ("Y".equals(isjd)) {
+				handlerJiuDian(pk_org, pk_dept, hzdate, isshowdept, pk_group, pk_user,UFBoolean.TRUE);
 			} else {
-				throw new BusinessException("组织主键信息有误!");
+				handlerHuiGuan(pk_org, pk_dept, hzdate, pk_group, pk_user);
 			}
+			
 			// 这里只能通过这种设置把列表的表体字段排序功能去掉
 			getListview().getBillListPanel().getBodyTable()
 					.setSortEnabled(false);
@@ -182,16 +199,17 @@ public class HZSelectAction extends NCAction {
 	 * */
 
 	private SrdibiaoBillVO[] getJiuDianHZShuJuInfo(String pk_org,
-			String pk_dept, String hzdate, Map<String, String[]> map,UFBoolean isjd)
+			String pk_dept, String hzdate, Map<String, String[]> map,
+			String isShowDept, UFBoolean isjd)
 			throws Exception {
 		String[] hzdates = hzdate.split(",");
 		SrdibiaoBillVO[] srvos = null;
 		if (hzdates.length > 1) {
 			srvos = getJiuDianMaintain().selectHZShuJuInfo(pk_org, pk_dept,
-					hzdates[0], hzdates[1], map, false, "N",isjd);
+					hzdates[0], hzdates[1], map, false, isShowDept, isjd);
 		} else {
 			srvos = getJiuDianMaintain().selectHZShuJuInfo(pk_org, pk_dept,
-					hzdates[0], hzdates[0], map, false, "N",isjd);
+					hzdates[0], hzdates[0], map, false, isShowDept, isjd);
 		}
 
 		return srvos;
@@ -402,13 +420,14 @@ public class HZSelectAction extends NCAction {
 
 	// 酒店的收入底表处理
 	private void handlerJiuDian(String pk_org, String pk_dept, String hzdate,
+			String isShowDept,
 			String pk_group, String pk_user,UFBoolean isjd) throws Exception {
 		Map<String, String[]> map = null;
 		// if (pk_dept != null && !"".equals(pk_dept)) {
 		// map = getHzsjmaintain().getDept_Vdef(pk_dept);
 		// }
 		// 查询汇总表
-		SrdibiaoBillVO[] vos = getJiuDianHZShuJuInfo(pk_org, pk_dept, hzdate,map,isjd);
+		SrdibiaoBillVO[] vos = getJiuDianHZShuJuInfo(pk_org, pk_dept, hzdate,map, isShowDept, isjd);
 		// 赋值默认值处理
 		if (vos != null && vos.length > 0) {
 			for (int i = 0; i < vos.length; i++) {
@@ -460,21 +479,69 @@ public class HZSelectAction extends NCAction {
 		// .setName(deptname);
 		// }
 		// } else {
+		/**
+		 * HK 2020年3月16日14:35:50
+		 * 暂时 注释掉
+		 */
 		// 暂时先定义部门动态部门为20个
-		for (int i = 1; i <= 20; i++) {
-			String bh = "";
-			if (i < 10) {
-				bh = "0" + i;
-			} else {
-				bh = "" + i;
-			}
-			BillItem billetem = getEditor().getBillCardPanel().getBodyItem(
-					"shouru_bm" + bh);
-			if (billetem != null) {
-				billetem.setShow(false);
-			}
+//		for (int i = 1; i <= 20; i++) {
+//			String bh = "";
+//			if (i < 10) {
+//				bh = "0" + i;
+//			} else {
+//				bh = "" + i;
+//			}
+//			BillItem billetem = getEditor().getBillCardPanel().getBodyItem(
+//					"shouru_bm" + bh);
+//			if (billetem != null) {
+//				billetem.setShow(false);
+//			}
+//
+//		}
+		/***END***/
+		
+		/**
+		 * 按部门展开
+		 */
+		if (!"Y".equals(isShowDept)) {
+			// 暂时先定义部门动态部门为20个
+			for (int i = 1; i <= 50; i++) {
+				String bh = "";
+				if (i < 10) {
+					bh = "0" + i;
+				} else {
+					bh = "" + i;
+				}
+				BillItem billetem = getEditor().getBillCardPanel().getBodyItem(
+						"shouru_bm" + bh);
+				if (billetem != null) {
+					billetem.setShow(false);
+				}
 
+			}
+		} else {
+			if (vos != null && vos.length > 0 && vos[0].getChildrenVO() != null
+					&& vos[0].getChildrenVO().length > 0) {
+				SrdibiaoHVO hvo = vos[0].getParentVO();
+				Map<String, String[]> vdefdeptinfo = hvo.getVdefdeptinfo();
+				Set<String> set = vdefdeptinfo.keySet();
+				Iterator<String> it = set.iterator();
+				while (it.hasNext()) {
+					String key = it.next();
+					String[] str = vdefdeptinfo.get(key);
+					String vdef = str[0];
+					String name = str[1];
+					BillItem billetem = getEditor().getBillCardPanel()
+							.getBodyItem(vdef);
+					if (billetem != null) {
+						billetem.setShow(true);
+						billetem.setName(name);
+					}
+				}
+			}
 		}
+		/***END***/
+		
 		// }
 		getEditor().getBillCardPanel().setBillData(
 				getEditor().getBillCardPanel().getBillData());
