@@ -200,7 +200,6 @@ public class QushuAction extends NCAction {
 			
 //			UFDate ht_zzrq = htVO.getZzrq();	// 合同表头-终止日期
 			
-			
 			String ht_pk_customer = htVO.getPk_customer();	// 对方pk
 			
 			String srxm_name = htVO.getVdef03();	// 支出项目-名称
@@ -355,74 +354,75 @@ public class QushuAction extends NCAction {
 			}
 		}
 		
-//		/**
-//		 * 查询 本期付款金额。
-//		 */
-//		{
-//			StringBuffer querySQL_FK = 
-//			new StringBuffer(" select ")
-//					.append(" a.pk_customer ")				// 客户pk
-//					.append(",a.vdef10 ")					// 房间pk
-//					.append(",sum(a.skje) fkje ")			// 付款金额
-////					.append(",max(a.pk_dept) pk_dept ")		// 部门pk
-////					.append(",max(cust.name) vdef01 ")		// 对方-name
-//					.append(" from (")
-//					// 蓝字收款单
-//						.append(" select ")
-//						.append(" ht.cvendorid pk_customer ")	// 对方pk
-//						.append(",ht.vbillcode vdef10 ")		// 合同号
-//						.append(",sum(fkb.money_de) fkje ")		// 付款金额
-//						.append(" from ap_paybill fk ")
-//						.append(" inner join ap_payitem fkb on fk.pk_paybill = fkb.pk_paybill ")
-//						.append(" inner join ct_pu ht on fkb.top_billid = ht.pk_ct_pu ")
-//						.append(" inner join ct_payplan fkjh on fkb.top_itemid = fkjh.pk_ct_payplan ")
-//						.append(" left join ct_pu_b htb on (ht.pk_ct_pu = htb.pk_ct_pu and htb.dr = 0 and fkjh.crowno = htb.crowno) ")
-//						.append(" where fk.dr = 0 and fkb.dr = 0 ")
-//						.append(" and ht.dr = 0 and fkjh.dr = 0 ")
-//						.append(" and ht.pk_org = '").append(pk_org).append("' ")
-//						.append(" and fk.billyear || '-' ||fk.billperiod = '").append(yearMonth).append("' ")
-//						.append(" group by ht.cvendorid, ht.vbillcode ")
-//					.append(" ) ")
-//			;
-//			// 
-//			ArrayList list_FK = (ArrayList)iUAPQueryBS.executeQuery(
-//					querySQL_FK.toString()
-//					,new ArrayListProcessor()
-//			);
-//			if(list_FK!=null&&list_FK.size()>0)
-//			{
-//				for( int i=0;i<list_FK.size();i++ )
-//				{
-//					Object[] obj = (Object[])list_FK.get(i);
-//					// 对方##合同号
-//					String key = obj[0]+"##"+obj[1];
-//					
-//					UFDouble skje = PuPubVO.getUFDouble_NullAsZero(obj[2]);		// 付款金额
-//					
-//					YuebaoBVO yuebaoBVO = MAP_yuebaoBVO.get(key);
-//					if(yuebaoBVO!=null)
-//					{
-//						yuebaoBVO.setBqskje(skje);
-//					}
-//					else
-//					{ /**
-//					   * HK
-//					   * 2019年11月14日11点15分
-//					   * 将 无当期收入数据的 收款单，插入到表体。
-//					   */
-//						yuebaoBVO = new YuebaoBVO();
-//						yuebaoBVO.setBqskje(skje);		// 本期收款金额
-//						yuebaoBVO.setQmyskye(skje);		// 期末预收款余额 = 本期收款金额
-//						
-//						yuebaoBVO.setPk_cutomer(PuPubVO.getString_TrimZeroLenAsNull(obj[0]));	// 客户pk
-//						yuebaoBVO.setVbdef10(PuPubVO.getString_TrimZeroLenAsNull(obj[1]));		// 合同号
-//						
-//						MAP_yuebaoBVO.put(key, yuebaoBVO);	// 放到缓存里
-//					}
-//				}
-//			}
-//		}
-//		/***END***/
+		/**
+		 * 查询 本期付款金额。
+		 */
+		{
+			StringBuffer querySQL_FK = 
+			new StringBuffer(" select ")
+					.append(" a.pk_customer ")				// 客户pk
+					.append(",a.vdef10 ")					// 房间pk
+					.append(",sum(a.fkje) fkje ")			// 付款金额
+//					.append(",max(a.pk_dept) pk_dept ")		// 部门pk
+//					.append(",max(cust.name) vdef01 ")		// 对方-name
+					.append(" from (")
+					// 蓝字收款单
+						.append(" select ")
+						.append(" ht.cvendorid pk_customer ")	// 对方pk
+						.append(",ht.vbillcode vdef10 ")		// 合同号
+						.append(",sum(fkb.money_de) fkje ")		// 付款金额
+						.append(" from ap_paybill fk ")
+						.append(" inner join ap_payitem fkb on fk.pk_paybill = fkb.pk_paybill ")
+						.append(" inner join ct_pu ht on fkb.top_billid = ht.pk_ct_pu ")
+						.append(" inner join ct_payplan fkjh on fkb.top_itemid = fkjh.pk_ct_payplan ")
+						.append(" left join ct_pu_b htb on (ht.pk_ct_pu = htb.pk_ct_pu and htb.dr = 0 and fkjh.crowno = htb.crowno) ")
+						.append(" where fk.dr = 0 and fkb.dr = 0 ")
+						.append(" and ht.dr = 0 and fkjh.dr = 0 ")
+						.append(" and ht.pk_org = '").append(pk_org).append("' ")
+						.append(" and fk.billyear || '-' || fk.billperiod = '").append(yearMonth).append("' ")
+						.append(" group by ht.cvendorid, ht.vbillcode ")
+					.append(" ) a ")
+					.append(" group by a.pk_customer, a.vdef10 ")
+			;
+			// 
+			ArrayList list_FK = (ArrayList)iUAPQueryBS.executeQuery(
+					querySQL_FK.toString()
+					,new ArrayListProcessor()
+			);
+			if(list_FK!=null&&list_FK.size()>0)
+			{
+				for( int i=0;i<list_FK.size();i++ )
+				{
+					Object[] obj = (Object[])list_FK.get(i);
+					// 对方##合同号
+					String key = obj[0]+"##"+obj[1];
+					
+					UFDouble skje = PuPubVO.getUFDouble_NullAsZero(obj[2]);		// 付款金额
+					
+					YuebaoBVO yuebaoBVO = MAP_yuebaoBVO.get(key);
+					if(yuebaoBVO!=null)
+					{
+						yuebaoBVO.setBqskje(skje);
+					}
+					else
+					{ /**
+					   * HK
+					   * 2020年3月19日13:40:26
+					   * 将 无当期收入数据的 付款单，插入到表体。
+					   */
+						yuebaoBVO = new YuebaoBVO();
+						yuebaoBVO.setBqskje(skje);		// 本期收款金额
+						yuebaoBVO.setQmyskye(skje);		// 期末预收款余额 = 本期收款金额
+						
+						yuebaoBVO.setPk_cutomer(PuPubVO.getString_TrimZeroLenAsNull(obj[0]));	// 客户pk
+						yuebaoBVO.setVbdef10(PuPubVO.getString_TrimZeroLenAsNull(obj[1]));		// 合同号
+						
+						MAP_yuebaoBVO.put(key, yuebaoBVO);	// 放到缓存里
+					}
+				}
+			}
+		}
+		/***END***/
 		
 		/**
 		 * 查询 上期的期末余额,当做本期的期初余额
