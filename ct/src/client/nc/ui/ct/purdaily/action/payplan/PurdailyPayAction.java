@@ -122,7 +122,9 @@ public class PurdailyPayAction extends PayAction {
 					String id = entry.getKey();
 					String zy = zyMap.get(id);
 					PayBillItemVO bVO = entry.getValue();
-					bVO.setScomment(zy);
+//					bVO.setScomment(zy);
+//					bVO.setScomment("1001N510000000BEE45X");
+					bVO.setDef30(zy);
 				}
 			}
 		}
