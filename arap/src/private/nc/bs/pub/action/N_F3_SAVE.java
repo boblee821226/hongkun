@@ -9,10 +9,9 @@ import java.util.Hashtable;
 
 import nc.bs.arap.actions.N_BASE_ACTION;
 import nc.bs.arap.paybp.PayBillBO;
-import nc.bs.dao.BaseDAO;
 import nc.itf.arap.fieldmap.IBillFieldGet;
-import nc.itf.hkjt.IPub_data;
 import nc.vo.arap.pay.AggPayBillVO;
+import nc.vo.arap.pay.PayBillItemVO;
 import nc.vo.arap.pub.BillEnumCollection;
 import nc.vo.fipub.exception.ExceptionHandler;
 import nc.vo.pub.BusinessException;
@@ -77,6 +76,23 @@ public class N_F3_SAVE extends N_BASE_ACTION {
 			
 			beforeCheck();
 
+			/**
+			 * 2020年3月19日14:59:56
+			 * 将def30 更新到 备注
+			 */
+			{
+				PayBillItemVO[] bVOs = (PayBillItemVO[])paraVo.m_preValueVo.getChildrenVO();
+				for(PayBillItemVO bVO : bVOs)
+	        	{
+	        		String def30 = bVO.getDef30();
+	        		if(def30!=null && !"~".equals(def30))
+	        		{
+	        			bVO.setScomment(def30);
+	        		}
+	        	}
+			}
+			/***END***/
+			
 			String primaryKey = paraVo.m_preValueVos[0].getParentVO().getPrimaryKey();
 			
 			if(hasBill(primaryKey)){
@@ -118,6 +134,34 @@ public class N_F3_SAVE extends N_BASE_ACTION {
 //					return_obj[0].getParentVO().setAttributeValue("pk_tradetypeid",befor_type);
 //					return_obj[0].getParentVO().setAttributeValue("pk_tradetype",IPub_data.BKHT_tradetype);
 //				}
+//			}
+			/***END***/
+			
+			/**
+			 * HK 2020年3月19日14:52:50
+			 * 将自定义30的摘要 赋值给 摘要字段
+			 */
+//			AggPayBillVO[] return_obj = (AggPayBillVO[])obj;
+//			String pk = return_obj[0].getPrimaryKey();
+//			
+//			BaseDAO daseDAO = new BaseDAO();
+//			
+//			String updateSQL = 
+//					" update ap_payitem " +
+//					" set scomment = def30 " +
+//					" , def30 = '~' " +
+//					" where pk_paybill = '"+pk+"' " +
+//					" and nvl(def30, '~') <> '~' " +
+//					" and dr = 0 "
+//					
+//			;
+////				daseDAO.setAddTimeStamp(false);
+//			int flag = daseDAO.executeUpdate(updateSQL);
+////				daseDAO.setAddTimeStamp(true);
+//			if(flag>0)
+//			{
+//				return_obj[0].getParentVO().setAttributeValue("pk_tradetypeid",befor_type);
+//				return_obj[0].getParentVO().setAttributeValue("pk_tradetype",IPub_data.BKHT_tradetype);
 //			}
 			/***END***/
 
