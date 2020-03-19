@@ -96,6 +96,7 @@ public class PurdailyPayAction extends PayAction {
 			new StringBuffer("select ")
 				.append(" htp.pk_ct_payplan ")
 				.append(",gys.name ||  '¡¾' || substr(htb.vbdef3,1,10) || 'ÖÁ' || substr(htb.vbdef4,1,10) || '¡¿' || szxm.name ")
+				.append(",htb.vbdef1 ")
 				.append(" from ct_payplan htp ")
 				.append(" inner join ct_pu_b htb on htp.pk_ct_pu = htb.pk_ct_pu and htp.crowno = htb.crowno ")
 				.append(" inner join ct_pu ht on htp.pk_ct_pu = ht.pk_ct_pu ")
@@ -111,20 +112,25 @@ public class PurdailyPayAction extends PayAction {
 				e.printStackTrace();
 			}
 			if (list != null && list.size() > 0) {
-				Map<String, String> zyMap = new HashMap<>(list.size());
+				Map<String, String[]> zyMap = new HashMap<>(list.size());
 				for (Object obj : list) {
 					Object[] row = (Object[])obj;
 					String pk = PuPubVO.getString_TrimZeroLenAsNull(row[0]);
 					String zy = PuPubVO.getString_TrimZeroLenAsNull(row[1]);
-					zyMap.put(pk, zy);
+					String szxm = PuPubVO.getString_TrimZeroLenAsNull(row[2]);
+					zyMap.put(pk, new String[]{zy,szxm});
 				}
 				for (java.util.Map.Entry<String, PayBillItemVO> entry : bVOsMap.entrySet()) {
 					String id = entry.getKey();
-					String zy = zyMap.get(id);
+					String[] value = zyMap.get(id);
+					String zy = value[0];
+					String szxm = value[1];
 					PayBillItemVO bVO = entry.getValue();
 //					bVO.setScomment(zy);
 //					bVO.setScomment("1001N510000000BEE45X");
 					bVO.setDef30(zy);
+					bVO.setDef13(szxm);
+					bVO.setPk_subjcode(szxm);
 				}
 			}
 		}
