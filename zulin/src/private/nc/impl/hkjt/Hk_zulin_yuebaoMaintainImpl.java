@@ -214,7 +214,7 @@ public class Hk_zulin_yuebaoMaintainImpl extends AceHk_zulin_yuebaoPubServiceImp
 			
 		FipMessageVO[] messageVOs=new FipMessageVO[billVos.length];
 		for (int i=0;i<billVos.length;i++ ){
-			FipMessageVO fipmessagevo=new FipMessageVO();	
+			FipMessageVO fipmessagevo = new FipMessageVO();	
 			FipRelationInfoVO reVO =constructFipRalactionInfo(billVos[i]);
 			
 			//0表示新增,若不赋值，默认为0
@@ -229,6 +229,7 @@ public class Hk_zulin_yuebaoMaintainImpl extends AceHk_zulin_yuebaoPubServiceImp
 			fipmessagevo.setBillVO(billVos[i]);
 			//填充FipRelationInfoVO
 			fipmessagevo.setMessageinfo(reVO);
+			
 			messageVOs[i]=fipmessagevo;			
 		}
 		
@@ -239,7 +240,7 @@ public class Hk_zulin_yuebaoMaintainImpl extends AceHk_zulin_yuebaoPubServiceImp
 	public static FipRelationInfoVO constructFipRalactionInfo(YuebaoBillVO billVo) {	
 	
 		//填充消息VO		
-		FipRelationInfoVO relation=new FipRelationInfoVO();
+		FipRelationInfoVO relation = new FipRelationInfoVO();
 		
 		String sbilltype = billVo.getParentVO().getVbilltypecode();
 		BilltypeVO billType = PfDataCache.getBillType(sbilltype);
