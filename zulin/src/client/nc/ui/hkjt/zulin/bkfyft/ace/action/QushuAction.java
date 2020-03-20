@@ -358,6 +358,8 @@ public class QushuAction extends NCAction {
 		 * 查询 本期付款金额。
 		 */
 		{
+			// 本期付款金额加个条件，如果合同上面是专票且有税率的情况下，本期付款金额根据税率换算成不含 税的金额：
+			// 也就是59621.4/1.05=56782.29
 			StringBuffer querySQL_FK = 
 			new StringBuffer(" select ")
 					.append(" a.pk_customer ")				// 客户pk
@@ -365,17 +367,23 @@ public class QushuAction extends NCAction {
 					.append(",sum(a.fkje) fkje ")			// 付款金额
 //					.append(",max(a.pk_dept) pk_dept ")		// 部门pk
 //					.append(",max(cust.name) vdef01 ")		// 对方-name
+					.append(",max(a.fplx) ")	// 发票类型
+					.append(",max(a.sl) ") 		// 税率
 					.append(" from (")
 					// 蓝字收款单
 						.append(" select ")
 						.append(" ht.cvendorid pk_customer ")	// 对方pk
 						.append(",ht.vbillcode vdef10 ")		// 合同号
 						.append(",sum(fkb.money_de) fkje ")		// 付款金额
+						.append(",max(fplx.name) fplx ")				// 发票类型name
+						.append(",max(to_number(nvl(replace(replace(sl.name,'~',''),'%',''),'0.0'))) sl ")		// 税率
 						.append(" from ap_paybill fk ")
 						.append(" inner join ap_payitem fkb on fk.pk_paybill = fkb.pk_paybill ")
 						.append(" inner join ct_pu ht on fkb.top_billid = ht.pk_ct_pu ")
 						.append(" inner join ct_payplan fkjh on fkb.top_itemid = fkjh.pk_ct_payplan ")
 						.append(" left join ct_pu_b htb on (ht.pk_ct_pu = htb.pk_ct_pu and htb.dr = 0 and fkjh.crowno = htb.crowno) ")
+						.append(" left join bd_defdoc fplx on ht.vdef3 = fplx.pk_defdoc ")	// 发票类型
+						.append(" left join bd_defdoc sl on ht.vdef4 = sl.pk_defdoc ")		// 税率
 						.append(" where fk.dr = 0 and fkb.dr = 0 ")
 						.append(" and ht.dr = 0 and fkjh.dr = 0 ")
 						.append(" and ht.pk_org = '").append(pk_org).append("' ")
@@ -383,7 +391,7 @@ public class QushuAction extends NCAction {
 						.append(" group by ht.cvendorid, ht.vbillcode ")
 					.append(" ) a ")
 					.append(" group by a.pk_customer, a.vdef10 ")
-			;
+			;			
 			// 
 			ArrayList list_FK = (ArrayList)iUAPQueryBS.executeQuery(
 					querySQL_FK.toString()
@@ -398,6 +406,12 @@ public class QushuAction extends NCAction {
 					String key = obj[0]+"##"+obj[1];
 					
 					UFDouble skje = PuPubVO.getUFDouble_NullAsZero(obj[2]);		// 付款金额
+					
+					String fplx = PuPubVO.getString_TrimZeroLenAsNull(obj[3]);	// 发票类型
+					UFDouble ht_sl = PuPubVO.getUFDouble_NullAsZero(obj[4]);	// 合同税率
+					if ("专用发票".equals(fplx)) {// 专票 要去掉税
+						skje = skje.div(UFDouble.ONE_DBL.add(ht_sl.div(100.00))).setScale(2, UFDouble.ROUND_HALF_UP);	// 去掉税
+					}
 					
 					YuebaoBVO yuebaoBVO = MAP_yuebaoBVO.get(key);
 					if(yuebaoBVO!=null)
