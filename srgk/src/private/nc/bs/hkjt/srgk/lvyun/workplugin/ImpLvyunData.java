@@ -71,12 +71,15 @@ public class ImpLvyunData implements IBackgroundWorkPlugin {
 			edate = bdate;
 		}
 		
+		ArrayList<String> day_list = new ArrayList<String>();
+		Integer days = edate.getDaysAfter(bdate);
+		for (int i = 0; i <= days; i++) {
+			day_list.add(bdate.getDateAfter(i).toString().substring(0, 10));
+		}
+		
 		HashMap<String, Object> param = new HashMap<String, Object>();
 		param.put("pk_org", pk_orgs);
-		param.put("date", new String[]{
-			bdate.toString().substring(0, 10),
-			edate.toString().substring(0, 10),
-		});
+		param.put("date", day_list.toArray(new String[0]));
 		
 		if (isQudao.booleanValue()) {
 			this.tongbu_qudao(param, null);		// 渠道（集团）
@@ -110,17 +113,23 @@ public class ImpLvyunData implements IBackgroundWorkPlugin {
 		
 		String[] pk_org_list = new String[]{
 				"0001N510000000001SY3", // 朗丽兹 9
-	//			"0001N510000000001SY5", // 康西 11
-//				"0001N510000000001SY7", // 西山温泉 10
+				"0001N510000000001SY5", // 康西 11
+				"0001N510000000001SY7", // 西山温泉 10
 		};
 		String[] date_list = new String[]{
 //			"2020-03-10",
 //			"2020-03-11",
+//			"2020-03-12",
 //			"2020-03-14",
 //			"2020-03-15",
 //			"2020-03-16",
-			"2020-03-17",
+//			"2020-03-17",
+//			"2020-03-18",
+//			"2020-03-19",
+			"2020-03-20",
+//			"2020-03-21",
 //			"2020-02-26",
+//			"2020-02-29",
 		};
 		
 		param.put("pk_org", pk_org_list);
@@ -141,7 +150,7 @@ public class ImpLvyunData implements IBackgroundWorkPlugin {
 	public Object import_bill(HashMap<String, Object> param, Object other) throws BusinessException {
 //		String[] pk_org_list = new String[]{
 //			"0001N510000000001SY3", // 朗丽兹
-////				"0001N510000000001SY5", // 康西
+//				"0001N510000000001SY5", // 康西
 ////				"0001N510000000001SY7", // 西山温泉
 //		};
 //		String[] date_list = new String[]{
@@ -332,7 +341,8 @@ public class ImpLvyunData implements IBackgroundWorkPlugin {
 						.append(" trans_accnt as vbdef10,")
 						.append(" ta_remark as vbmemo,")
 						.append(" create_user as syy_code,")
-						.append(" card_account_type as csourcetypecode ")
+						.append(" card_account_type as csourcetypecode, ")
+						.append(" modu_code as vsourcebillcode ")
 						.append(" from account_pms ")
 						.append(" where (1=1) ")
 //							.append(" and (charge != 0 or pay != 0)")	// 消费金额 或 结账金额 至少有一个不为0
@@ -365,7 +375,8 @@ public class ImpLvyunData implements IBackgroundWorkPlugin {
 						.append(" null as vbdef10,")
 						.append(" null as vbmemo,")
 						.append(" close_user as syy_code,")
-						.append(" null as csourcetypecode ")
+						.append(" null as csourcetypecode, ")
+						.append(" null as vsourcebillcode ")
 						.append(" from account_pos ")
 						.append(" where (1=1) ")
 //							.append(" and (charge != 0 or credit != 0)")	// 消费金额 或 结账金额 至少有一个不为0
@@ -388,6 +399,126 @@ public class ImpLvyunData implements IBackgroundWorkPlugin {
 					session.closeAll();
 					JDBCUtils.closeConn(hkjt_jd_conn);
 				}
+				
+				/**
+				 *  select 
+					 id as accid,
+					 DATE_FORMAT(biz_date, '%Y-%m-%d %H:%i:%s') as transdate,
+					 '财务' as bm_name,
+					 accnt as vbdef04,
+					 foliono as rmno,
+					 DATE_FORMAT( create_datetime, '%Y-%m-%d %H:%i:%s') as vbdef06,
+					 pccode as item_code,
+					 descript as item_name,
+					 credit as payment,
+					 cardcode as vbdef07,
+					 sta as vbdef08,
+					 info1 as vbmemo,
+					 create_user as syy_code
+					 from pos_pay
+				 */
+				StringBuffer querySQL_bill_2 = 
+					new StringBuffer("")
+						.append(" select ")
+						.append(" id as accid, ")
+						.append(" DATE_FORMAT(biz_date, '%Y-%m-%d %H:%i:%s') as transdate, ")
+						.append(" '财务' as bm_name, ")
+						.append(" accnt as vbdef04, ")
+						.append(" foliono as rmno, ")
+						.append(" DATE_FORMAT( create_datetime, '%Y-%m-%d %H:%i:%s') as vbdef06, ")
+						.append(" pccode as item_code, ")
+						.append(" descript as item_name, ")
+						.append(" credit as payment, ")
+						.append(" 0.0 as charge, ")
+						.append(" cardcode as vbdef07, ")
+						.append(" sta as vbdef08, ")
+						.append(" info1 as vbmemo, ")
+						.append(" create_user as syy_code ")
+						.append(" from pos_pay ")
+						.append(" where (1=1) ")
+						.append(" and hotel_id = ").append(hotel_id).append(" ")
+						.append(" and biz_date = '").append(date).append("' ")
+						.append(" and sta not in ('X') ")
+				;
+				ArrayList<RzmxBVO> list_2 = null;
+				hkjt_jd_conn = new JDBCUtils(db_name + "_bd").getConn(JDBCUtils.HKJT_LY);
+				session = new JdbcSession(hkjt_jd_conn);
+				try {	
+					list_2 = (ArrayList)session.executeQuery(querySQL_bill_2.toString(), new BeanListProcessor(RzmxBVO.class));					
+				} catch (Exception ex) {
+					System.out.println(ex);
+				} finally{
+					session.closeAll();
+					JDBCUtils.closeConn(hkjt_jd_conn);
+				}
+				if (list_2 != null && list_2.size() > 0) {
+					if (list == null) {
+						list = new ArrayList<RzmxBVO>();
+					}
+					for (RzmxBVO bVO : list_2) {
+						list.add(bVO);
+					}
+				}
+				
+				/**
+				 * 如果是 连锁的数据库，需要再连一次 集团库，进行取 充值卡的数据
+				 */
+				if ("hkjt_ly_liansuo".equals(db_name)) {
+					StringBuffer querySQL_bill_3 = 
+					new StringBuffer("")
+						// PMS
+						.append(" select ")
+						.append(" id as accid,")
+						.append(" DATE_FORMAT(biz_date, '%Y-%m-%d %H:%i:%s') as transdate,")
+						.append(" dept as bm_name,")
+						.append(" accnt as vbdef04,")
+						.append(" rmno as rmno,")
+						.append(" room_type_des as rmtype_name,")
+						.append(" package as vbdef05,")
+						.append(" market_des as vbdef01,")
+						.append(" channel_des as vbdef02,")
+						.append(" source_des as vbdef03,")
+						.append(" DATE_FORMAT(create_datetime, '%Y-%m-%d %H:%i:%s') as vbdef06,")
+						.append(" ta_code as item_code,")
+						.append(" ta_descript as item_name,")
+						.append(" charge as charge,")
+						.append(" pay as payment,")
+						.append(" ar_name as khmz,")
+						.append(" card_no as vbdef07,")
+						.append(" act_flag as vbdef08,")
+						.append(" trans_flag as vbdef09,")
+						.append(" trans_accnt as vbdef10,")
+						.append(" ta_remark as vbmemo,")
+						.append(" create_user as syy_code,")
+						.append(" card_account_type as csourcetypecode, ")
+						.append(" modu_code as vsourcebillcode ")
+						.append(" from account_pms ")
+						.append(" where (1=1) ")
+//										.append(" and (charge != 0 or pay != 0)")	// 消费金额 或 结账金额 至少有一个不为0
+						.append(" and hotel_id = ").append(hotel_id).append(" ")
+						.append(" and biz_date = '").append(date).append("' ")
+					;
+					ArrayList<RzmxBVO> list_3 = null;
+					hkjt_jd_conn = new JDBCUtils("hkjt_ly_feiliansuo_bill").getConn(JDBCUtils.HKJT_LY);
+					session = new JdbcSession(hkjt_jd_conn);
+					try {	
+						list_3 = (ArrayList)session.executeQuery(querySQL_bill_3.toString(), new BeanListProcessor(RzmxBVO.class));					
+					} catch (Exception ex) {
+						System.out.println(ex);
+					} finally{
+						session.closeAll();
+						JDBCUtils.closeConn(hkjt_jd_conn);
+					}
+					if (list_3 != null && list_3.size() > 0) {
+						if (list == null) {
+							list = new ArrayList<RzmxBVO>();
+						}
+						for (RzmxBVO bVO : list_3) {
+							list.add(bVO);
+						}
+					}
+				}
+				/***END***/
 				
 				if (list != null && list.size() > 0) {
 					IJd_rzmxMaintain itf = NCLocator.getInstance().lookup(IJd_rzmxMaintain.class);
@@ -442,13 +573,14 @@ public class ImpLvyunData implements IBackgroundWorkPlugin {
 						String vbdef09 = PuPubVO.getString_TrimZeroLenAsNull(bVO.getVbdef09()); // TO FM
 						String csourcetypecode = PuPubVO.getString_TrimZeroLenAsNull(bVO.getCsourcetypecode()); // 卡类型
 						String vbdef08 = PuPubVO.getString_TrimZeroLenAsNull(bVO.getVbdef08()); // 操作标识
+						String vsourcebillcode = PuPubVO.getString_TrimZeroLenAsNull(bVO.getVsourcebillcode());	// 来源类型
 						if ("AR".equals(bmName) 
 						&& ("TO".equals(vbdef09) 
 						 || "FM".equals(vbdef09))) {
 							if (PuPubVO.getUFDouble_ZeroAsNull(bVO.getPayment()) != null) {
 								// pay <> 0
 								bVO.setPayment(bVO.getPayment().multiply(-1.0));
-								bVO.setVbmemo("NC转应收："+bVO.getVbmemo());
+								bVO.setVbmemo("NC转应收1："+bVO.getVbmemo());
 								bVO.setItem_code("9800");
 								bVO.setItem_name("转应收");
 							}
@@ -456,7 +588,7 @@ public class ImpLvyunData implements IBackgroundWorkPlugin {
 								// charge <> 0
 								bVO.setPayment(bVO.getCharge());
 								bVO.setCharge(UFDouble.ZERO_DBL);
-								bVO.setVbmemo("NC转收入："+bVO.getVbmemo());
+								bVO.setVbmemo("NC转收入2："+bVO.getVbmemo());
 								bVO.setItem_code("9800");
 								bVO.setItem_name("转应收");
 								bVO.setVbdef01("其他-其他"); // sc
@@ -469,7 +601,7 @@ public class ImpLvyunData implements IBackgroundWorkPlugin {
 						}
 						/***END***/
 						/**
-						 * 增加数据
+						 * 增加数据：1
 						 * dept=ar值，trans_flag值为空，pay≠0的，遇见此类数据，需要单独做出一行数值，
 						 *  复制上一条数据所有字段之后，需要把ta_descript字段数值，
 						 *  替换成记账回收(转应收)，Pay字段数值，改为原金额乘以-1
@@ -482,7 +614,8 @@ public class ImpLvyunData implements IBackgroundWorkPlugin {
 							bVO_list_temp.add(bVO);
 							
 							RzmxBVO bVO_clone = (RzmxBVO)bVO.clone();
-							bVO_clone.setVbmemo("NC生成："+bVO_clone.getVbmemo());
+							bVO_clone.setVbmemo("NC生成3："+bVO_clone.getVbmemo());
+							bVO_clone.setPayment(bVO_clone.getPayment().multiply(-1.0));
 							bVO_clone.setItem_code("9800");
 							bVO_clone.setItem_name("转应收");
 							bVO_clone.setVrowno("" + (((rowCount++)+1) * 10));
@@ -492,22 +625,56 @@ public class ImpLvyunData implements IBackgroundWorkPlugin {
 						/***END***/
 						/**
 						 * 会员卡的特殊处理
+						 * ****** 过滤数据的放在前面 A
+						 * 1. dept=储值卡，act_flag=CL，此数据行不取，也不参与任何加工条件的计算
+						 * 2. dept=储值卡，trans_flag=CL，此数据行不取，也不参与任何加工条件的计算
+						 * 3. dept=储值卡，act_flag=PP，此数据行不取，也不参与任何加工条件的计算
+						 * 4. dept=储值卡，card_account_type=BASE，且act_flag=CH，此数据行不取，也不参与任何加工条件的计算
+						 * 5. dept=储值卡，且trans_flag=TO或者FM的，此数据行不取，也不参与任何加工条件的计算
+						 * ****** 处理的数据 B
+						    1. card_account_type=BASE，且act_flag=PA，单独复制原数据一行（并保留原始行数据），PAY字段金额乘以-1，替换ta_descript字段值为储值卡销售。
+							2. card_account_type=TIMES，且act_flag=PA，单独复制原数据一行（并保留原始行数据），PAY字段金额乘以-1，替换ta_descript字段值为储值次卡销售。
+							3. card_account_type字段为TIMES值，且act_flag字段为CH值，单独复制原数据一行（并保留原始行数据），将charge字段列金额，复制到PAY字段列，替换ta_descript字段值为储值次卡
+							4. dept=储值卡，act_flag=AD，card_account_type=TIMES，charge≠0的, 单独复制原数据一行（并保留原始行数据），将charge字段列金额，复制到pay字段列，替换ta_descript字段值为储值次卡
+							5. dept=储值卡，act_flag=AD， card_account_type=TIMES，pay≠0的，单独复制原数据一行（并保留原始行数据），将PAY字段金额乘以-1，替换ta_descript字段值为储值次卡销售
+							6. dept=储值卡，act_flag=AD， card_account_type=BASE，pay≠0的，单独复制原数据一行（并保留原始行数据），将PAY字段金额乘以-1，替换ta_descript字段值为储值卡销售。
 						 */
-						else if ("BASE".equals(csourcetypecode)
+						else if ("储值卡".equals(bmName)
+							  && "CL".equals(vbdef08)
+						) {// A-1
+							continue;
+						}
+						else if ("储值卡".equals(bmName)
+							  && "CL".equals(vbdef09)
+						) {// A-2
+							continue;
+						}
+						else if ("储值卡".equals(bmName)
+							  && "PP".equals(vbdef08)
+						) {// A-3
+							continue;
+						}
+						else if ("储值卡".equals(bmName)
+							&& "BASE".equals(csourcetypecode)
 							&& "CH".equals(vbdef08)
-						) {
-							// 1、card_account_type字段为BASE值，且act_flag字段为CH值，入账明细不取。因为与前台数据重复。
+						) {// A-4
+							continue;
+						}
+						else if ("储值卡".equals(bmName)
+							&& ("TO".equals(vbdef09) 
+							 || "FM".equals(vbdef09))
+						) {// A-5
 							continue;
 						}
 						else if ("BASE".equals(csourcetypecode)
 							&& "PA".equals(vbdef08)
-						) {
+						) {// B-1
 							// 2、card_account_type字段为BASE值，且act_flag字段为PA值，单独复制原数据一行（并保留原始行数据），PAY字段乘以-1，替换ta_descript字段值为储值卡销售。
 							bVO.setVrowno("" + (((rowCount++)+1) * 10));
 							bVO_list_temp.add(bVO);
 							
 							RzmxBVO bVO_clone = (RzmxBVO)bVO.clone();
-							bVO_clone.setVbmemo("NC生成："+bVO_clone.getVbmemo());
+							bVO_clone.setVbmemo("NC生成4："+bVO_clone.getVbmemo());
 							bVO_clone.setPayment(bVO_clone.getPayment().multiply(-1.00));
 							bVO_clone.setItem_code("0301");
 							bVO_clone.setItem_name("储值卡销售");
@@ -517,13 +684,13 @@ public class ImpLvyunData implements IBackgroundWorkPlugin {
 						}
 						else if ("TIMES".equals(csourcetypecode)
 							&& "PA".equals(vbdef08)
-						) {
+						) {// B-2
 							// 3、card_account_type字段为TIMES值，且act_flag字段为PA值，单独复制原数据一行（并保留原始行数据），PAY字段乘以-1，替换ta_descript字段值为储值次卡销售。
 							bVO.setVrowno("" + (((rowCount++)+1) * 10));
 							bVO_list_temp.add(bVO);
 							
 							RzmxBVO bVO_clone = (RzmxBVO)bVO.clone();
-							bVO_clone.setVbmemo("NC生成："+bVO_clone.getVbmemo());
+							bVO_clone.setVbmemo("NC生成5："+bVO_clone.getVbmemo());
 							bVO_clone.setPayment(bVO_clone.getPayment().multiply(-1.00));
 							bVO_clone.setItem_code("0302");
 							bVO_clone.setItem_name("储值次卡销售");
@@ -532,7 +699,7 @@ public class ImpLvyunData implements IBackgroundWorkPlugin {
 						}
 						else if ("TIMES".equals(csourcetypecode)
 							&& "CH".equals(vbdef08)
-						) {
+						) {// B-3
 							// 4、
 							//  1. card_account_type字段为TIMES值，且act_flag字段为CH值，ta_descript里面的值与商品分类里面的账项档案是一样的，对应匹配部门和NC收入项目即可
 							//  2. 单独复制原数据一行（并保留原始行数据），在PAY字段，=charge的金额，ta_descript字段值为储值次卡
@@ -540,7 +707,7 @@ public class ImpLvyunData implements IBackgroundWorkPlugin {
 							bVO_list_temp.add(bVO);
 							
 							RzmxBVO bVO_clone = (RzmxBVO)bVO.clone();
-							bVO_clone.setVbmemo("NC生成："+bVO_clone.getVbmemo());
+							bVO_clone.setVbmemo("NC生成6："+bVO_clone.getVbmemo());
 							bVO_clone.setPayment(bVO_clone.getCharge());
 							bVO_clone.setCharge(UFDouble.ZERO_DBL);
 							bVO_clone.setItem_code("0303");
@@ -549,11 +716,53 @@ public class ImpLvyunData implements IBackgroundWorkPlugin {
 							bVO_list_temp.add(bVO_clone);
 						}
 						else if ("储值卡".equals(bmName)
-							&& ("TO".equals(vbdef09) 
-							 || "FM".equals(vbdef09))
-						) {
-							// 5、dept字段为储值卡，且trans_flag字段是TO和FM的，入账明细暂时不取。（未来如果发生余转调整业务在考虑开放）
-							continue;
+							&& "AD".equals(vbdef08)
+							&& "TIMES".equals(csourcetypecode)
+							&& PuPubVO.getUFDouble_ZeroAsNull(bVO.getCharge()) != null
+						) {// B-4
+							bVO.setVrowno("" + (((rowCount++)+1) * 10));
+							bVO_list_temp.add(bVO);
+							
+							RzmxBVO bVO_clone = (RzmxBVO)bVO.clone();
+							bVO_clone.setVbmemo("NC生成10："+bVO_clone.getVbmemo());
+							bVO_clone.setPayment(bVO_clone.getCharge());
+							bVO_clone.setCharge(UFDouble.ZERO_DBL);
+							bVO_clone.setItem_code("0303");
+							bVO_clone.setItem_name("储值次卡");
+							bVO_clone.setVrowno("" + (((rowCount++)+1) * 10));
+							bVO_list_temp.add(bVO_clone);
+						}
+						else if ("储值卡".equals(bmName)
+							&& "AD".equals(vbdef08)
+							&& "TIMES".equals(csourcetypecode)
+							&& PuPubVO.getUFDouble_ZeroAsNull(bVO.getPayment()) != null
+						) {// B-5
+							bVO.setVrowno("" + (((rowCount++)+1) * 10));
+							bVO_list_temp.add(bVO);
+							
+							RzmxBVO bVO_clone = (RzmxBVO)bVO.clone();
+							bVO_clone.setVbmemo("NC生成11："+bVO_clone.getVbmemo());
+							bVO_clone.setPayment(bVO_clone.getPayment().multiply(-1.0));
+							bVO_clone.setItem_code("0302");
+							bVO_clone.setItem_name("储值次卡销售");
+							bVO_clone.setVrowno("" + (((rowCount++)+1) * 10));
+							bVO_list_temp.add(bVO_clone);
+						}
+						else if ("储值卡".equals(bmName)
+							&& "AD".equals(vbdef08)
+							&& "BASE".equals(csourcetypecode)
+							&& PuPubVO.getUFDouble_ZeroAsNull(bVO.getPayment()) != null
+						) {// B-6
+							bVO.setVrowno("" + (((rowCount++)+1) * 10));
+							bVO_list_temp.add(bVO);
+							
+							RzmxBVO bVO_clone = (RzmxBVO)bVO.clone();
+							bVO_clone.setVbmemo("NC生成12："+bVO_clone.getVbmemo());
+							bVO_clone.setPayment(bVO_clone.getPayment().multiply(-1.0));
+							bVO_clone.setItem_code("0301");
+							bVO_clone.setItem_name("储值卡销售");
+							bVO_clone.setVrowno("" + (((rowCount++)+1) * 10));
+							bVO_list_temp.add(bVO_clone);
 						}
 						/***END***/
 						/**
@@ -566,7 +775,7 @@ public class ImpLvyunData implements IBackgroundWorkPlugin {
 							bVO_list_temp.add(bVO);
 							
 							RzmxBVO bVO_clone = (RzmxBVO)bVO.clone();
-							bVO_clone.setVbmemo("NC生成："+bVO_clone.getVbmemo());
+							bVO_clone.setVbmemo("NC生成7："+bVO_clone.getVbmemo());
 							bVO_clone.setPayment(bVO_clone.getPayment().multiply(-1.00));
 							bVO_clone.setItem_code("9181");
 							bVO_clone.setItem_name("调整-POS-免费招待");
@@ -579,14 +788,47 @@ public class ImpLvyunData implements IBackgroundWorkPlugin {
 							if (zhangdanVOs != null && zhangdanVOs.size() > 0) {
 								for (RzmxBVO zdVO : zhangdanVOs) {
 									RzmxBVO zdVO_clone = (RzmxBVO)zdVO.clone();
-									zdVO_clone.setVbmemo("NC生成："+zdVO_clone.getVbmemo());
+									zdVO_clone.setVbmemo("NC生成8："+zdVO_clone.getVbmemo());
 									zdVO_clone.setCharge(zdVO_clone.getCharge().multiply(-1.00));
 									zdVO_clone.setVrowno("" + (((rowCount++)+1) * 10));
 									bVO_list_temp.add(zdVO_clone);
 								}
 							}
 						}
+						/**
+						 * 1. 所以我们要把PMS系统里面，这条数据隐藏不取它。隐藏条件，是modu_code=04，且trans_flag为空值的。
+						 * 2. 我们的散客押金在计算的时候，需要加上POS系统产生的所有{转应收}的credit那个金额。才是最正确的散客押金。（之前西软也处理过这个情况）
+						 * ** 不处理 第二条
+						 */
+						else if ("04".equals(vsourcebillcode)
+							  && null == vbdef09
+						) {
+							continue;
+						}
 						/***END***/
+						/**
+						 * 发现I状态单据，单独复制原数据一行（并保留原始行数据），descript字段替换成 餐饮预付金，credit字段乘以-1
+						 * 发现T状态单据，单独复制原数据一行（并保留原始行数据），descript字段替换成 餐饮预付金，credit字段乘以-1
+						 */
+						else if ("I".equals(vbdef08)
+							 ||  "T".equals(vbdef08)
+							 ||  "O".equals(vbdef08)
+						) {
+							bVO.setVrowno("" + (((rowCount++)+1) * 10));
+							bVO_list_temp.add(bVO);
+							
+							RzmxBVO bVO_clone = (RzmxBVO)bVO.clone();
+							bVO_clone.setVbmemo("NC生成9："+bVO_clone.getVbmemo());
+							bVO_clone.setPayment(bVO_clone.getPayment().multiply(-1.00));
+							bVO_clone.setItem_code("982001");
+							bVO_clone.setItem_name("餐饮预付金");
+							bVO_clone.setVrowno("" + (((rowCount++)+1) * 10));
+							bVO_list_temp.add(bVO_clone);
+						}
+						
+						/**
+						 * 其它情况
+						 */
 						else {
 							bVO.setVrowno("" + (((rowCount++)+1) * 10));
 							bVO_list_temp.add(bVO);
