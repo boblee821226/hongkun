@@ -70,14 +70,24 @@ public class BeforeHandler {
 		 * 如果 表头 是否酒店 打勾了，那就肯定是酒店。
 		 * 如果 表头 是否酒店 没打勾，就判断 是否为，康福瑞酒店（目前只有康福瑞酒店 是单酒店的情况）
 		 */
-		if(isjd.booleanValue()){	// 酒店打勾 就一定是酒店
-			pk_org = HKJT_PUB.PK_ORG_JIUDIAN;	// 酒店基础
-		}else{
-			if(pk_org.equals(HKJT_PUB.PK_ORG_JIUDIAN_kfrxyld)){// 酒店没打勾，只有 康福瑞酒店 为酒店
-				pk_org = HKJT_PUB.PK_ORG_JIUDIAN;	// 酒店基础;
-			}else{	// 其它 均为 会馆
-				pk_org = HKJT_PUB.PK_ORG_HUIGUAN;	// 会馆基础;
-			}
+//		if(isjd.booleanValue()){	// 酒店打勾 就一定是酒店
+//			pk_org = HKJT_PUB.PK_ORG_JIUDIAN;	// 酒店基础
+//		}else{
+//			if(pk_org.equals(HKJT_PUB.PK_ORG_JIUDIAN_kfrxyld)){// 酒店没打勾，只有 康福瑞酒店 为酒店
+//				pk_org = HKJT_PUB.PK_ORG_JIUDIAN;	// 酒店基础;
+//			}else{	// 其它 均为 会馆
+//				pk_org = HKJT_PUB.PK_ORG_HUIGUAN;	// 会馆基础;
+//			}
+//		}
+		/**
+		 * 2020年3月24日16:20:26
+		 * 酒店基础为 朗丽兹
+		 * 会馆基础为 西山
+		 */
+		if (isjd.booleanValue()) {
+			pk_org = "0001N510000000001SY3";	// 酒店基础
+		} else {
+			pk_org = HKJT_PUB.PK_ORG_HUIGUAN;	// 会馆基础;
 		}
 		
 //		if(HKJT_PUB.PK_ORG_HUIGUAN_gjhg.equals(pk_org)){// 国际+康西
@@ -116,14 +126,24 @@ public class BeforeHandler {
 		 * 如果 表头 是否酒店 打勾了，那就肯定是酒店。
 		 * 如果 表头 是否酒店 没打勾，就判断 是否为，康福瑞酒店（目前只有康福瑞酒店 是单酒店的情况）
 		 */
-		if(isjd.booleanValue()){	// 酒店打勾 就一定是酒店
-			pk_org = HKJT_PUB.PK_ORG_JIUDIAN;	// 酒店基础
-		}else{
-			if(pk_org.equals(HKJT_PUB.PK_ORG_JIUDIAN_kfrxyld)){// 酒店没打勾，只有 康福瑞酒店 为酒店
-				pk_org = HKJT_PUB.PK_ORG_JIUDIAN;	// 酒店基础;
-			}else{	// 其它 均为 会馆
-				pk_org = HKJT_PUB.PK_ORG_HUIGUAN;	// 会馆基础;
-			}
+//		if(isjd.booleanValue()){	// 酒店打勾 就一定是酒店
+//			pk_org = HKJT_PUB.PK_ORG_JIUDIAN;	// 酒店基础
+//		}else{
+//			if(pk_org.equals(HKJT_PUB.PK_ORG_JIUDIAN_kfrxyld)){// 酒店没打勾，只有 康福瑞酒店 为酒店
+//				pk_org = HKJT_PUB.PK_ORG_JIUDIAN;	// 酒店基础;
+//			}else{	// 其它 均为 会馆
+//				pk_org = HKJT_PUB.PK_ORG_HUIGUAN;	// 会馆基础;
+//			}
+//		}
+		/**
+		 * 2020年3月24日16:20:09
+		 * 如果酒店打勾， 则找本公司的收入项目
+		 * 如果没打勾，就找会馆的收入项目
+		 */
+		if(isjd.booleanValue()){
+			pk_org = "LY0-" + pk_org;
+		} else {
+			pk_org = HKJT_PUB.PK_ORG_HUIGUAN; // 会馆基础
 		}
 		
 //		if(HKJT_PUB.PK_ORG_HUIGUAN_gjhg.equals(pk_org)){// 国际+康西
