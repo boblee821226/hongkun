@@ -33,6 +33,7 @@ public class N_HK02_SAVEBASE extends AbstractPfAction<SgshujuBillVO> {
 					Hg_sgshujuPluginPoint.SCRIPT_INSERT);
 		}
 		// TODO 在此处添加前后规则
+		// HK 保存前的校验
 		processor.addBeforeRule(new AceHg_sgshujuBeforeSaveAction());
 		return processor;
 	}
