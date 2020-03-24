@@ -1,10 +1,14 @@
 package nc.bs.hkjt.srgk.huiguan.sgshuju.rewrite.action;
 
+import java.util.HashMap;
+
 import hd.vo.pub.tools.PuPubVO;
-import nc.itf.hkjt.HKJT_PUB;
+import nc.bs.trade.business.HYPubBO;
+import nc.ui.trade.business.HYPubBO_Client;
 import nc.vo.hkjt.srgk.huiguan.sgshuju.SgshujuBVO;
 import nc.vo.hkjt.srgk.huiguan.sgshuju.SgshujuBillVO;
 import nc.vo.hkjt.srgk.huiguan.sgshuju.SgshujuHVO;
+import nc.vo.hkjt.srgk.huiguan.srxm.SrxmHVO;
 import nc.vo.pub.BusinessException;
 import nc.vo.pub.lang.UFDouble;
 
@@ -98,14 +102,20 @@ public class AceHg_sgshujuBeforeSaveAction extends ReWriteBaseAction{
 			String pk_org = hVO.getPk_org();	// 组织
 			String vdef10 = hVO.getVdef10();	// 自定义项-是否酒店
 			boolean isJD = false;				// 是否酒店
-			if("Y".equals(vdef10)&&HKJT_PUB.PK_ORG_HUIGUAN_JIUDIAN_MAP.containsValue(pk_org)){
-				isJD = true;
-			}else if (HKJT_PUB.PK_ORG_HUIGUAN_MAP.containsValue(pk_org)) {
-				
-			}else if (HKJT_PUB.PK_ORG_JIUDIAN_MAP.containsValue(pk_org)) {
+//			if("Y".equals(vdef10)&&HKJT_PUB.PK_ORG_HUIGUAN_JIUDIAN_MAP.containsValue(pk_org)){
+//				isJD = true;
+//			}else if (HKJT_PUB.PK_ORG_HUIGUAN_MAP.containsValue(pk_org)) {
+//				
+//			}else if (HKJT_PUB.PK_ORG_JIUDIAN_MAP.containsValue(pk_org)) {
+//				isJD = true;
+//			}
+			// 2020年3月24日16:28:29
+			if ("Y".equals(vdef10)) {
 				isJD = true;
 			}
-			
+			// key=收入项目pk value=收入项目编码
+			HashMap<String, String> MAP_SRXM = new HashMap<String, String>();
+			HYPubBO dao = new HYPubBO();
 			for( int j=0;j<bvos.length;j++ )
 			{
 				SgshujuBVO bvo = bvos[j];
@@ -233,6 +243,62 @@ public class AceHg_sgshujuBeforeSaveAction extends ReWriteBaseAction{
 						 && !"zdyh".equals(typeB)
 						) {
 							throw new BusinessException("【"+rowno+"】行，【会馆】的{收入项目B}已经录入了，B列必须是调整{收入、自动优惠} 。");
+						}
+					}
+				}
+				
+				/**
+				 * 2020年3月24日16:30:32
+				 * 如果是酒店，则要判断，如果收入项目的编码是 LY01 开头， 那么 3个自定义档案 是必输的
+				 */
+				if (isJD) {
+					String vbdef01 = PuPubVO.getString_TrimZeroLenAsNull(bvo.getVbdef01());
+					String vbdef02 = PuPubVO.getString_TrimZeroLenAsNull(bvo.getVbdef02());
+					String vbdef03 = PuPubVO.getString_TrimZeroLenAsNull(bvo.getVbdef03());
+					if (srxmA != null) {
+						String srxm_code = null;
+						if (MAP_SRXM.containsKey(srxmA)) {
+							srxm_code = MAP_SRXM.get(srxmA);
+						} else {
+							// 查数据库
+							SrxmHVO vo = (SrxmHVO)dao.queryByPrimaryKey(SrxmHVO.class, srxmA);
+							if (vo != null) {
+								srxm_code = vo.getCode();
+							}
+							MAP_SRXM.put(srxmA, srxm_code);
+						}
+						if (srxm_code != null
+						 && srxm_code.startsWith("LY01")
+						) {
+							if( vbdef01 == null
+							 || vbdef02 == null
+							 || vbdef03 == null
+							) {
+								throw new BusinessException("【"+rowno+"】行，【酒店】的{收入项目A}为客房收入，所以{市场、渠道、来源}必填 。");
+							}
+						}
+					}
+					if (srxmB != null) {
+						String srxm_code = null;
+						if (MAP_SRXM.containsKey(srxmB)) {
+							srxm_code = MAP_SRXM.get(srxmB);
+						} else {
+							// 查数据库
+							SrxmHVO vo = (SrxmHVO)dao.queryByPrimaryKey(SrxmHVO.class, srxmB);
+							if (vo != null) {
+								srxm_code = vo.getCode();
+							}
+							MAP_SRXM.put(srxmB, srxm_code);
+						}
+						if (srxm_code != null
+						 && srxm_code.startsWith("LY01")
+						) {
+							if( vbdef01 == null
+							 || vbdef02 == null
+							 || vbdef03 == null
+							) {
+								throw new BusinessException("【"+rowno+"】行，【酒店】的{收入项目B}为客房收入，所以{市场、渠道、来源}必填 。");
+							}
 						}
 					}
 				}
