@@ -777,7 +777,7 @@ public class ImpLvyunData implements IBackgroundWorkPlugin {
 							RzmxBVO bVO_clone = (RzmxBVO)bVO.clone();
 							bVO_clone.setVbmemo("NC生成7："+bVO_clone.getVbmemo());
 							bVO_clone.setPayment(bVO_clone.getPayment().multiply(-1.00));
-							bVO_clone.setItem_code("9181");
+							bVO_clone.setItem_code("918101");
 							bVO_clone.setItem_name("调整-POS-免费招待");
 							bVO_clone.setVrowno("" + (((rowCount++)+1) * 10));
 							bVO_list_temp.add(bVO_clone);
