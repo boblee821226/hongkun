@@ -112,9 +112,9 @@ public class ImpLvyunData implements IBackgroundWorkPlugin {
 		HashMap<String, Object> param = new HashMap<String, Object>();
 		
 		String[] pk_org_list = new String[]{
-				"0001N510000000001SY3", // ÀÊÀö×È 9
+//				"0001N510000000001SY3", // ÀÊÀö×È 9
 				"0001N510000000001SY5", // ¿µÎ÷ 11
-				"0001N510000000001SY7", // Î÷É½ÎÂÈª 10
+//				"0001N510000000001SY7", // Î÷É½ÎÂÈª 10
 		};
 		String[] date_list = new String[]{
 //			"2020-03-10",
@@ -126,9 +126,9 @@ public class ImpLvyunData implements IBackgroundWorkPlugin {
 //			"2020-03-17",
 //			"2020-03-18",
 //			"2020-03-19",
-			"2020-03-20",
+//			"2020-03-20",
 //			"2020-03-21",
-//			"2020-02-26",
+			"2020-02-26",
 //			"2020-02-29",
 		};
 		
