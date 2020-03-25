@@ -158,6 +158,7 @@
 				<ref bean="refreshAction" />
 				<ref bean="separatorAction" />
 				<!--ref bean="fenpeiAction" /-->
+				<ref bean="copyAction" />
 			</list>
 		</property>
 		<property name="editActions">
@@ -207,5 +208,11 @@
 	<bean id="fenpeiAction" class="nc.ui.hkjt.hg_srxm.ace.action.FenPeiAction">
 		<property name="model" ref="appModel" />
 		<property name="dataManager" ref="modelDataManager" />
+	</bean>
+	<!--复制 2020年3月25日13:37:37-->
+	<bean id="copyAction" class="nc.ui.hkjt.hg_srxm.ace.action.CopyAction">
+		<property name="model" ref="appModel" />
+		<property name="dataManager" ref="modelDataManager" />
+		<property name="editor" ref="billFormEditor" />
 	</bean>
 </beans>

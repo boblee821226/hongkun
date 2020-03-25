@@ -85,7 +85,7 @@ public class BeforeHandler {
 		 * 会馆基础为 西山
 		 */
 		if (isjd.booleanValue()) {
-			pk_org = "0001N510000000001SY3";	// 酒店基础
+			pk_org = "LY0-" + pk_org;	// 酒店基础
 		} else {
 			pk_org = HKJT_PUB.PK_ORG_HUIGUAN;	// 会馆基础;
 		}
