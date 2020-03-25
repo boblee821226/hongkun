@@ -2969,7 +2969,8 @@ public class Jd_hzshujuMaintainImpl implements IJd_hzshujuMaintain {
 		List<YyribaoBVO> list_NC = new ArrayList<YyribaoBVO>();
 		
 		String pk_org = srdbhvo.getPk_org();	// 组织
-		
+		// 是否酒店
+		boolean isJD = PuPubVO.getUFBoolean_NullAs(srdbhvo.getVdef10(), UFBoolean.FALSE).booleanValue();
 		/**
 		 * 1、对 营业日报子vo  进行排序
 		 */
@@ -3096,11 +3097,12 @@ public class Jd_hzshujuMaintainImpl implements IJd_hzshujuMaintain {
 				 * 只针对 往来的  进行处理
 				 */
 				String jzfs_code = PuPubVO.getString_TrimZeroLenAsNull(yyrbBVO_3.getJzfs_code());
-				String jzfs_name = null;
-				if(HKJT_PUB.PK_ORG_JIUDIAN_MAP.containsValue(pk_org))
+				String jzfs_name = null; // 用于匹配 客户辅助				
+				if(isJD)
 				{// 酒店
-					if(   jzfs_code==null
-					  || (jzfs_code.startsWith("03") && jzfs_code.length()>=4)
+					if(   jzfs_code == null
+					  || (jzfs_code.startsWith("05-") && jzfs_code.length() >= 7) // 转应收
+					  || (jzfs_code.startsWith("08-") && jzfs_code.length() >= 7) // 会员卡往来
 					)
 					{
 						jzfs_name = PuPubVO.getString_TrimZeroLenAsNull(
@@ -3108,7 +3110,7 @@ public class Jd_hzshujuMaintainImpl implements IJd_hzshujuMaintain {
 						);
 					}
 				}
-				else if(HKJT_PUB.PK_ORG_HUIGUAN_MAP.containsValue(pk_org))
+				else
 				{// 会馆
 					if(   jzfs_code==null
 					  || (jzfs_code.startsWith("05") && jzfs_code.length()>=4)
