@@ -32,8 +32,8 @@ public class TongBuAction extends NCAction {
 	}
 
 	public TongBuAction() {
-		this.setBtnName("同步");
-		this.setCode("同步");
+		this.setBtnName("金贵同步");
+		this.setCode("金贵同步");
 	}
 
 	@ModelMethod(modelType = ModelType.AbstractAppModel, methodType = MethodType.GETTER)
