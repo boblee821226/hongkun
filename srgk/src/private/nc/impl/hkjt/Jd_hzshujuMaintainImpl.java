@@ -3004,6 +3004,18 @@ public class Jd_hzshujuMaintainImpl implements IJd_hzshujuMaintain {
 			String jzfs_code = PuPubVO.getString_TrimZeroLenAsNull( srdbbvos[i].getJzfs_code() );
 			UFDouble jine 	 = PuPubVO.getUFDouble_ZeroAsNull( srdbbvos[i].getJine() );
 			
+//			if ( jine != null 
+//			&& UFDouble.ONE_DBL.compareTo(jine) == 0
+//			) {
+//				System.out.println("====");
+//			}
+//			
+//			if ( jine != null 
+//			&& new UFDouble(-2.0).compareTo(jine) == 0
+//			) {
+//				System.out.println("====");
+//			}
+			
 			// 三者皆为空  说明已经处理完毕
 			if( jzfs_pk==null && jzfs_name==null && jzfs_code==null )
 			{
@@ -3060,6 +3072,11 @@ public class Jd_hzshujuMaintainImpl implements IJd_hzshujuMaintain {
 		 */
 		for( YyribaoBVO yyrbBVO_3 : list_2 )
 		{
+			
+//			if ("POS-餐预付".equals(yyrbBVO_3.getJzfs_name())) {
+//				System.out.println("===");
+//			}
+			
 			JzfsHVO jzfsVO = jzfs_km_map.get( yyrbBVO_3.getJzfs_pk() );
 			
 			if( jzfsVO!=null && jzfsVO.getPk_kjkm()!=null )
@@ -3167,6 +3184,8 @@ public class Jd_hzshujuMaintainImpl implements IJd_hzshujuMaintain {
 		 */
 		UFDouble total_jiefang = UFDouble.ZERO_DBL;	// 借方 之和
 		UFDouble total_daifang = UFDouble.ZERO_DBL;	// 贷方 之和
+		String jie_info = "";	// 借方info
+		String dai_info = "";	// 贷方info
 		for(int i=0;yyrbBVOs!=null&&i<yyrbBVOs.length;i++)
 		{
 			total_jiefang = total_jiefang.add( // 借方
@@ -3175,14 +3194,35 @@ public class Jd_hzshujuMaintainImpl implements IJd_hzshujuMaintain {
 			total_daifang = total_daifang.add( // 贷方
 					PuPubVO.getUFDouble_NullAsZero( yyrbBVOs[i].getDaifang() )
 			);
+			
+			if (PuPubVO.getUFDouble_ZeroAsNull(yyrbBVOs[i].getJiefang()) != null) {
+				// 借方金额 不为空
+				jie_info += (
+					"[" + yyrbBVOs[i].getVbmemo() + "]" + 
+					yyrbBVOs[i].getJiefang() +
+					"\r\n"
+				);
+			}
+			if (PuPubVO.getUFDouble_ZeroAsNull(yyrbBVOs[i].getDaifang()) != null) {
+				// 贷方金额 不为空
+				dai_info += (
+					"[" + yyrbBVOs[i].getVbmemo() + "]" + 
+					yyrbBVOs[i].getDaifang() +
+					"\r\n"
+				);
+			}
 		}
 		
-		if(total_jiefang.compareTo(total_daifang)!=0){
+		if(total_jiefang.compareTo(total_daifang) !=0 ){	
 			throw new BusinessException(
-					"借贷方金额不一致，请检查。\r\n" +
-					"【借方："+total_jiefang+"】\r\n" +
-					"【贷方："+total_daifang+"】\r\n" 
-					);
+				"借贷方金额不一致，请检查。\r\n" +
+				"【借方："+total_jiefang+"】\r\n" +
+				"【贷方："+total_daifang+"】\r\n" +
+				"借方信息：\r\n" +
+				jie_info + 
+				"贷方信息：\r\n" +
+				dai_info
+			);
 		}		
 		/***END***/
 		

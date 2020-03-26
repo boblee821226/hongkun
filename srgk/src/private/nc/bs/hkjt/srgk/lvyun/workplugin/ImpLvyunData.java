@@ -167,22 +167,23 @@ public class ImpLvyunData implements IBackgroundWorkPlugin {
 		InvocationInfoProxy.getInstance().setUserId(HKJT_PUB.MAKER);//设置制单人
 		
 		// 取到 集团级档案
-		// 结账方式
+		// 结账方式（通过名称 去匹配）
 		HashMap<String, JzfsHVO> DOC_JZFS = new HashMap<String, JzfsHVO>();
 		{
 			String whereSQL = " dr = 0 and pk_org = '0001N510000000001SY3' ";
 			ArrayList<JzfsHVO> list = (ArrayList<JzfsHVO>)dao.retrieveByClause(JzfsHVO.class, whereSQL);
 			if (list != null && list.size() > 0) {
 				for (JzfsHVO vo : list) {
-					String code = vo.getCode();
-					if (code.indexOf("-") > 0) {
-						code = code.substring(code.indexOf("-") + 1);
-					}
-					DOC_JZFS.put(code, vo);
+//					String code = vo.getCode();
+//					if (code.indexOf("-") > 0) {
+//						code = code.substring(code.indexOf("-") + 1);
+//					}
+//					DOC_JZFS.put(code, vo);
+					DOC_JZFS.put(vo.getName(), vo);
 				}
 			}
 		}
-		// 市场(通过 名称去匹配)
+		// 市场(通过名称 去匹配)
 		HashMap<String, DefdocVO> DOC_SHICHANG = new HashMap<String, DefdocVO>();
 		{
 			String whereSQL = " dr = 0 and pk_defdoclist = " +
@@ -820,7 +821,7 @@ public class ImpLvyunData implements IBackgroundWorkPlugin {
 							RzmxBVO bVO_clone = (RzmxBVO)bVO.clone();
 							bVO_clone.setVbmemo("NC生成9："+bVO_clone.getVbmemo());
 							bVO_clone.setPayment(bVO_clone.getPayment().multiply(-1.00));
-							bVO_clone.setItem_code("982001");
+							bVO_clone.setItem_code("992001");
 							bVO_clone.setItem_name("餐饮预付金");
 							bVO_clone.setVrowno("" + (((rowCount++)+1) * 10));
 							bVO_list_temp.add(bVO_clone);
@@ -909,11 +910,11 @@ public class ImpLvyunData implements IBackgroundWorkPlugin {
 			* 否则 ，说明该行是 消费信息，需要找 NC的商品分类，以及对应的收入项目 以及部门 
 			*/
 			String bmName = bVO.getBm_name();	// 部门name
-			String itemCode = bVO.getItem_code();	// 入账项目代码
+//			String itemCode = bVO.getItem_code();	// 入账项目代码
 			String itemName = bVO.getItem_name();	// 入账项目名称
 			if (PuPubVO.getUFDouble_ZeroAsNull(bVO.getPayment()) != null) {
 				// 结账 => NC结账方式
-				JzfsHVO doc = DOC_JZFS.get(itemCode);
+				JzfsHVO doc = DOC_JZFS.get(itemName);
 				if (doc != null) {
 					bVO.setJzfs_id(doc.getPk_hk_srgk_hg_jzfs());
 				}
