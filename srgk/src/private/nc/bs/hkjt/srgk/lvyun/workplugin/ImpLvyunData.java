@@ -112,8 +112,8 @@ public class ImpLvyunData implements IBackgroundWorkPlugin {
 		HashMap<String, Object> param = new HashMap<String, Object>();
 		
 		String[] pk_org_list = new String[]{
-//				"0001N510000000001SY3", // 朗丽兹 9
-				"0001N510000000001SY5", // 康西 11
+				"0001N510000000001SY3", // 朗丽兹 9
+//				"0001N510000000001SY5", // 康西 11
 //				"0001N510000000001SY7", // 西山温泉 10
 		};
 		String[] date_list = new String[]{
@@ -128,7 +128,7 @@ public class ImpLvyunData implements IBackgroundWorkPlugin {
 //			"2020-03-19",
 //			"2020-03-20",
 //			"2020-03-21",
-			"2020-02-26",
+			"2020-03-31",
 //			"2020-02-29",
 		};
 		
@@ -241,6 +241,8 @@ public class ImpLvyunData implements IBackgroundWorkPlugin {
 			HashMap<String, SpflHVO> DOC_SPFL_BAOFANG = new HashMap<String, SpflHVO>();
 			// 商品分类-营业点（通过编码 去对应 LY05 分类下的）
 			HashMap<String, SpflHVO> DOC_SPFL_YINGYEDIAN = new HashMap<String, SpflHVO>();
+			// 商品分类-楼层（通过编码 去对应 LY06 分类下的）
+			HashMap<String, SpflHVO> DOC_SPFL_LOUCENG = new HashMap<String, SpflHVO>();
 			{
 				String whereSQL = " dr = 0 and code like 'LY0%' and pk_org = '" + pk_org + "' ";
 				ArrayList<SpflHVO> list = (ArrayList<SpflHVO>)dao.retrieveByClause(SpflHVO.class, whereSQL);
@@ -253,6 +255,8 @@ public class ImpLvyunData implements IBackgroundWorkPlugin {
 							DOC_SPFL_BAOFANG.put(code.substring(5), vo);
 						} else if (code.startsWith("LY05-")) {
 							DOC_SPFL_YINGYEDIAN.put(name, vo);
+						} else if (code.startsWith("LY06-")) {
+							DOC_SPFL_LOUCENG.put(name, vo);
 						}
 					}
 				}
@@ -322,7 +326,7 @@ public class ImpLvyunData implements IBackgroundWorkPlugin {
 						.append(" select ")
 						.append(" id as accid,")
 						.append(" DATE_FORMAT(biz_date, '%Y-%m-%d %H:%i:%s') as transdate,")
-						.append(" dept as bm_name,")
+						.append(" case when NULLIF(floor_des, 'NULL') in ('NULL', '') then dept else floor_des end as bm_name,")
 						.append(" accnt as vbdef04,")
 						.append(" rmno as rmno,")
 						.append(" room_type_des as rmtype_name,")
@@ -848,7 +852,8 @@ public class ImpLvyunData implements IBackgroundWorkPlugin {
 							DOC_SPFL_YINGYEDIAN, 
 							DOC_QUDAO, 
 							DOC_SHICHANG, 
-							DOC_LAIYUAN
+							DOC_LAIYUAN,
+							DOC_SPFL_LOUCENG
 						);
 						
 						bVO_list = (ArrayList<RzmxBVO>)res[0];
@@ -896,7 +901,8 @@ public class ImpLvyunData implements IBackgroundWorkPlugin {
 			HashMap<String, SpflHVO> DOC_SPFL_YINGYEDIAN,
 			HashMap<String, DefdocVO> DOC_QUDAO,
 			HashMap<String, DefdocVO> DOC_SHICHANG,
-			HashMap<String, DefdocVO> DOC_LAIYUAN
+			HashMap<String, DefdocVO> DOC_LAIYUAN,
+			HashMap<String, SpflHVO> DOC_SPFL_LOUCENG
 			
 	) throws BusinessException {
 		
@@ -962,11 +968,17 @@ public class ImpLvyunData implements IBackgroundWorkPlugin {
 						}
 					}
 					if (pk_dept == null) {
-						// 如果 商品分类上的 部门为空，就去 部门对应的商品分类（LY05）上配的部门
-	//					String bmName = bVO.getBm_name();
+						// 如果 商品分类上的 部门为空，就去 部门对应的商品分类营业点（LY05）上配的部门
 						SpflHVO doc_yyd = DOC_SPFL_YINGYEDIAN.get(bmName);
 						if (doc_yyd != null) {
 							pk_dept = doc_yyd.getPk_dept();
+						}
+					}
+					if (pk_dept == null) {
+						// 如果 商品分类上的 部门为空，就去 部门对应的商品分类楼层档案（LY06）上配的部门
+						SpflHVO doc_lc = DOC_SPFL_LOUCENG.get(bmName);
+						if (doc_lc != null) {
+							pk_dept = doc_lc.getPk_dept();
 						}
 					}
 					bVO.setBm_id(pk_dept);
@@ -1199,6 +1211,17 @@ public class ImpLvyunData implements IBackgroundWorkPlugin {
 				.append(" descript as name, ")
 				.append(" DATE_FORMAT(modify_datetime, '%Y-%m-%d %H:%i:%s') vdef4 ")
 				.append(" from pos_pccode ")
+				.append(" where (1=1) ")
+				.append(" and hotel_id = ").append(hotel_id).append(" ")
+				.append(" and is_halt = 'F' ") // 非停用
+			.append(" union all ")
+				// 楼层
+				.append(" SELECT ")
+				.append(" 'LY06' as pk_parent, ")
+				.append(" CONCAT('LY06-', code) as code, ")
+				.append(" descript as name, ")
+				.append(" DATE_FORMAT(modify_datetime, '%Y-%m-%d %H:%i:%s') vdef4 ")
+				.append(" from room_floor ")
 				.append(" where (1=1) ")
 				.append(" and hotel_id = ").append(hotel_id).append(" ")
 				.append(" and is_halt = 'F' ") // 非停用
