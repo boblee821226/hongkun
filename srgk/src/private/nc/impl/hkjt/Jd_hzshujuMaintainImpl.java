@@ -2001,7 +2001,10 @@ public class Jd_hzshujuMaintainImpl implements IJd_hzshujuMaintain {
 		String sql = "select * from hk_srgk_hg_srxm " 
 				+ " where nvl(pk_kjkm,'~')<>'~'"
 				+ " and pk_org='"+ pk_org + "'"
-				+ " and dr=0";
+				+ " and dr = 0 "
+				// 约定 酒店的收入项目 前缀为 LY
+				+ (isJd.booleanValue()? " and code like 'LY%'": " and code not like 'LY%'")
+		;
 		Map<String, SrxmHVO> map = new HashMap<String, SrxmHVO>();
 		List<SrxmHVO> list = (List<SrxmHVO>) getBD().executeQuery(sql,
 				new BeanListProcessor(SrxmHVO.class));
@@ -2881,16 +2884,20 @@ public class Jd_hzshujuMaintainImpl implements IJd_hzshujuMaintain {
 			 * 酒店 与 会馆  要区分对待。 因为酒店的 收入没有值， 所以  要取 应收。   会馆的 取 收入。
 			 */
 			UFDouble srxm_jine = getNull_Zero(srdbbvo.getShouru());
-			if(isJd.booleanValue()&&HKJT_PUB.PK_ORG_HUIGUAN_JIUDIAN_MAP.containsValue(pk_org)){
-				// 酒店
-				srxm_jine = getNull_Zero(srdbbvo.getYingshou());
-			}else if (HKJT_PUB.PK_ORG_HUIGUAN_MAP.containsValue(pk_org)) {
-				// 会馆
-			}else if (HKJT_PUB.PK_ORG_JIUDIAN_MAP.containsValue(pk_org)) {
+//			if(isJd.booleanValue()&&HKJT_PUB.PK_ORG_HUIGUAN_JIUDIAN_MAP.containsValue(pk_org)){
+//				// 酒店
+//				srxm_jine = getNull_Zero(srdbbvo.getYingshou());
+//			}else if (HKJT_PUB.PK_ORG_HUIGUAN_MAP.containsValue(pk_org)) {
+//				// 会馆
+//			}else if (HKJT_PUB.PK_ORG_JIUDIAN_MAP.containsValue(pk_org)) {
+//				// 酒店
+//				srxm_jine = getNull_Zero(srdbbvo.getYingshou());
+//			}
+			// 2020年3月27日15:52:41
+			if(isJd.booleanValue()){
 				// 酒店
 				srxm_jine = getNull_Zero(srdbbvo.getYingshou());
 			}
-			
 			/**END*/
 
 			// 获取收入项目是否有对应的会计科目，否则不进行处理
