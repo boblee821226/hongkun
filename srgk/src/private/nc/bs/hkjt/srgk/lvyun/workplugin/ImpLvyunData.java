@@ -16,6 +16,7 @@ import nc.bs.pub.taskcenter.IBackgroundWorkPlugin;
 import nc.itf.hkjt.HKJT_PUB;
 import nc.itf.hkjt.IJd_rzmxMaintain;
 import nc.jdbc.framework.JdbcSession;
+import nc.jdbc.framework.processor.ArrayListProcessor;
 import nc.jdbc.framework.processor.BeanListProcessor;
 import nc.jdbc.framework.processor.ColumnListProcessor;
 import nc.jdbc.framework.processor.MapProcessor;
@@ -115,6 +116,7 @@ public class ImpLvyunData implements IBackgroundWorkPlugin {
 				"0001N510000000001SY3", // 朗丽兹 9
 //				"0001N510000000001SY5", // 康西 11
 //				"0001N510000000001SY7", // 西山温泉 10
+//				"0001N510000000001SY1", // 学院路
 		};
 		String[] date_list = new String[]{
 //			"2020-03-10",
@@ -128,8 +130,14 @@ public class ImpLvyunData implements IBackgroundWorkPlugin {
 //			"2020-03-19",
 //			"2020-03-20",
 //			"2020-03-21",
+//			"2020-04-01",
+//			"2020-03-26",
+//			"2020-03-27",
+//			"2020-03-28",
+//			"2020-03-29",
+//			"2020-03-30",
 			"2020-03-31",
-//			"2020-02-29",
+//			"2020-04-01",
 		};
 		
 		param.put("pk_org", pk_org_list);
@@ -326,7 +334,7 @@ public class ImpLvyunData implements IBackgroundWorkPlugin {
 						.append(" select ")
 						.append(" id as accid,")
 						.append(" DATE_FORMAT(biz_date, '%Y-%m-%d %H:%i:%s') as transdate,")
-						.append(" case when NULLIF(floor_des, 'NULL') in ('NULL', '') then dept else floor_des end as bm_name,")
+						.append(" case when IFNULL(floor_des, 'NULL') in ('NULL', '') then dept else floor_des end as bm_name,")
 						.append(" accnt as vbdef04,")
 						.append(" rmno as rmno,")
 						.append(" room_type_des as rmtype_name,")
@@ -347,13 +355,14 @@ public class ImpLvyunData implements IBackgroundWorkPlugin {
 						.append(" ta_remark as vbmemo,")
 						.append(" create_user as syy_code,")
 						.append(" card_account_type as csourcetypecode, ")
-						.append(" modu_code as vsourcebillcode ")
+						.append(" modu_code as vsourcebillcode, ")
+						.append(" floor_des as csourcebillid ")
 						.append(" from account_pms ")
 						.append(" where (1=1) ")
 //							.append(" and (charge != 0 or pay != 0)")	// 消费金额 或 结账金额 至少有一个不为0
 						.append(" and hotel_id = ").append(hotel_id).append(" ")
 						.append(" and biz_date = '").append(date).append("' ")
-//					?	.append(" and ( IFNULL(trans_flag, 'NULL') not in ('TO', 'FM') or (IFNULL(trans_flag, 'NULL') in ('TO', 'FM') and charge = 0)) ")
+//						.append(" and ( IFNULL(trans_flag, 'NULL') not in ('TO', 'FM') or (IFNULL(trans_flag, 'NULL') in ('TO', 'FM') and charge = 0)) ")
 //							.append(" order by id ")
 					.append(" union all ")
 					// POS
@@ -381,7 +390,8 @@ public class ImpLvyunData implements IBackgroundWorkPlugin {
 						.append(" null as vbmemo,")
 						.append(" close_user as syy_code,")
 						.append(" null as csourcetypecode, ")
-						.append(" null as vsourcebillcode ")
+						.append(" null as vsourcebillcode, ")
+						.append(" null as csourcebillid ")
 						.append(" from account_pos ")
 						.append(" where (1=1) ")
 //							.append(" and (charge != 0 or credit != 0)")	// 消费金额 或 结账金额 至少有一个不为0
@@ -443,7 +453,7 @@ public class ImpLvyunData implements IBackgroundWorkPlugin {
 						.append(" where (1=1) ")
 						.append(" and hotel_id = ").append(hotel_id).append(" ")
 						.append(" and biz_date = '").append(date).append("' ")
-						.append(" and sta not in ('X') ")
+						.append(" and sta not in ('X') ") // 不取 X
 				;
 				ArrayList<RzmxBVO> list_2 = null;
 				hkjt_jd_conn = new JDBCUtils(db_name + "_bd").getConn(JDBCUtils.HKJT_LY);
@@ -579,7 +589,15 @@ public class ImpLvyunData implements IBackgroundWorkPlugin {
 						String csourcetypecode = PuPubVO.getString_TrimZeroLenAsNull(bVO.getCsourcetypecode()); // 卡类型
 						String vbdef08 = PuPubVO.getString_TrimZeroLenAsNull(bVO.getVbdef08()); // 操作标识
 						String vsourcebillcode = PuPubVO.getString_TrimZeroLenAsNull(bVO.getVsourcebillcode());	// 来源类型
-						if ("AR".equals(bmName) 
+						String csourcebillid = PuPubVO.getString_TrimZeroLenAsNull(bVO.getCsourcebillid());	// 楼层
+						
+						if (csourcebillid != null
+						&& ("TO".equals(vbdef09) 
+						 || "FM".equals(vbdef09))
+						) {// 前台数据中floor_des≠空值，且trans_flag=to和fm的 不取的数据不取入酒店入账明细。
+							continue;
+						}
+						else if ("AR".equals(bmName) 
 						&& ("TO".equals(vbdef09) 
 						 || "FM".equals(vbdef09))) {
 							if (PuPubVO.getUFDouble_ZeroAsNull(bVO.getPayment()) != null) {
@@ -872,6 +890,64 @@ public class ImpLvyunData implements IBackgroundWorkPlugin {
 						RzmxBVO bVO = (RzmxBVO)one;
 						if (bVO.getPk_hk_srgk_jd_rzmx_b() != null) {
 							System.out.println(bVO);
+						}
+					}
+					
+					/**
+					 * 查询5项指数
+					 * 翻房率	ffl			150000
+					 * 平均房价	pjfj	140000
+					 * REVPAR	revpar	160000
+					 * 房晚	kfsr		120000
+					 * 房间数	kczfs		110000
+					 * 
+					 *  110000	a、客房总数	224.00
+						120000	b、房晚(按市场码)	22.00
+						140000	d、平均房价(按市场码)	736.09
+						150000	e、出租率%(不含自用)	9.82
+						160000	f、Revpar	72.29
+					 * 
+					 */
+					{
+						StringBuffer querySQL_5 = 
+							new StringBuffer("SELECT ")
+									.append(" code,")
+									.append(" descript,")
+									.append(" day ")
+									.append(" FROM rep_jour_history ")
+									.append(" WHERE (1=1) ")
+									.append(" AND CODE IN ('140000','150000','160000','110000','120000') ")
+									.append(" and hotel_id = ").append(hotel_id).append(" ")
+									.append(" and biz_date = '").append(date).append("' ")
+						;
+						ArrayList<Object> list_5 = null;
+						hkjt_jd_conn = new JDBCUtils(db_name + "_bd").getConn(JDBCUtils.HKJT_LY);
+						session = new JdbcSession(hkjt_jd_conn);
+						try {	
+							list_5 = (ArrayList)session.executeQuery(querySQL_5.toString(), new ArrayListProcessor());					
+						} catch (Exception ex) {
+							System.out.println(ex);
+						} finally{
+							session.closeAll();
+							JDBCUtils.closeConn(hkjt_jd_conn);
+						}
+						if (list_5 != null && list_5.size() > 0) {
+							for (Object obj : list_5) {
+								Object[] item = (Object[])obj;
+								String code = PuPubVO.getString_TrimZeroLenAsNull(item[0]);
+								UFDouble day = PuPubVO.getUFDouble_ValueAsValue(item[2]);
+								if ("150000".equals(code)) { // 出租率
+									hVO.setFfl(day);
+								} else if ("140000".equals(code)) { // 平均房价
+									hVO.setPjfj(day);
+								} else if ("160000".equals(code)) { // Revpar
+									hVO.setRevpar(day);
+								} else if ("120000".equals(code)) { // 房晚
+									hVO.setKfsr(day);
+								} else if ("110000".equals(code)) { // 客房总数
+									hVO.setKczfs(day);
+								}
+							}
 						}
 					}
 					
