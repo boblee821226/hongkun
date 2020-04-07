@@ -41,7 +41,7 @@ public class QueryHtVO extends SuperVO {
 	private String vdef08;	//					整体合同开始日期
 	private String vdef09;	//					整体合同结束日期
 	private String vdef10;	// 合同号				合同号
-	private String vdef21;
+	private String vdef21;	// 					生成责任凭证
 	private String vdef22;
 	private String vdef23;
 	private String vdef24;
