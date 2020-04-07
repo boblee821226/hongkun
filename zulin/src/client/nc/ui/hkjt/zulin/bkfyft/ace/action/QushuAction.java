@@ -118,6 +118,7 @@ public class QushuAction extends NCAction {
 				.append(",substr(ht.invallidate,1,10) vdef09 ")		// 整体合同结束日期	invallidate
 				.append(",to_number(nvl(replace(htb.vbdef5,'~',''),'0.0')) vdef13 ")	// 计算单价
 				.append(",to_number(nvl(replace(replace(sl.name,'~',''),'%',''),'0.0')) vdef14 ")		// 税率
+				.append(",ht.vhkfield01 vdef21 ") // 生成责任凭证
 				.append(" from ct_pu ht ")		// 合同表头
 				.append(" inner join ct_pu_b htb on ht.pk_ct_pu = htb.pk_ct_pu ")	// 合同表体
 				.append(" left join bd_defdoc fplx on ht.vdef3 = fplx.pk_defdoc ")	// 发票类型
@@ -307,6 +308,7 @@ public class QushuAction extends NCAction {
 					yuebaoBVO.setVbdef07(htVO.getVdef07());		// 实际合同金额
 					yuebaoBVO.setVbdef10(htVO.getVdef10());		// 合同号
 					yuebaoBVO.setVbdef09(zthtTs.toString());	// 整体合同天数
+					yuebaoBVO.setCsourcetypecode(htVO.getVdef21());	// 生成责任凭证 csourcetypecode
 					
 				}
 				else
