@@ -258,5 +258,91 @@ public class CtPuVO extends CtAbstractVO {
   public void setVreason(String vreason) {
     this.setAttributeValue(CtPuVO.VREASON, vreason);
   }
+  
+  /**
+   * HK
+   * 增加 10个字段
+   * vhkfield01 到 vhkfield10
+   */
+  public static final String VHKFIELD01 = "vhkfield01";
+  public String getVhkfield01() {
+	  return (String) this.getAttributeValue(CtPuVO.VHKFIELD01);
+  }
+  public void setVhkfield01(String vhkfield01) {
+	  this.setAttributeValue(CtPuVO.VHKFIELD01, vhkfield01);
+  }
+  
+  public static final String VHKFIELD02 = "vhkfield02";
+  public String getVhkfield02() {
+	  return (String) this.getAttributeValue(CtPuVO.VHKFIELD02);
+  }
+  public void setVhkfield02(String vhkfield02) {
+	  this.setAttributeValue(CtPuVO.VHKFIELD02, vhkfield02);
+  }
+  
+  public static final String VHKFIELD03 = "vhkfield03";
+  public String getVhkfield03() {
+	  return (String) this.getAttributeValue(CtPuVO.VHKFIELD03);
+  }
+  public void setVhkfield03(String vhkfield03) {
+	  this.setAttributeValue(CtPuVO.VHKFIELD03, vhkfield03);
+  }
+  
+  public static final String VHKFIELD04 = "vhkfield04";
+  public String getVhkfield04() {
+	  return (String) this.getAttributeValue(CtPuVO.VHKFIELD04);
+  }
+  public void setVhkfield04(String vhkfield04) {
+	  this.setAttributeValue(CtPuVO.VHKFIELD04, vhkfield04);
+  }
+  
+  public static final String VHKFIELD05 = "vhkfield05";
+  public String getVhkfield05() {
+	  return (String) this.getAttributeValue(CtPuVO.VHKFIELD05);
+  }
+  public void setVhkfield05(String vhkfield05) {
+	  this.setAttributeValue(CtPuVO.VHKFIELD05, vhkfield05);
+  }
+  
+  public static final String VHKFIELD06 = "vhkfield06";
+  public String getVhkfield06() {
+	  return (String) this.getAttributeValue(CtPuVO.VHKFIELD06);
+  }
+  public void setVhkfield06(String vhkfield06) {
+	  this.setAttributeValue(CtPuVO.VHKFIELD06, vhkfield06);
+  }
+  
+  public static final String VHKFIELD07 = "vhkfield07";
+  public String getVhkfield07() {
+	  return (String) this.getAttributeValue(CtPuVO.VHKFIELD07);
+  }
+  public void setVhkfield07(String vhkfield07) {
+	  this.setAttributeValue(CtPuVO.VHKFIELD07, vhkfield07);
+  }
+  
+  public static final String VHKFIELD08 = "vhkfield08";
+  public String getVhkfield08() {
+	  return (String) this.getAttributeValue(CtPuVO.VHKFIELD08);
+  }
+  public void setVhkfield08(String vhkfield08) {
+	  this.setAttributeValue(CtPuVO.VHKFIELD08, vhkfield08);
+  }
+  
+  public static final String VHKFIELD09 = "vhkfield09";
+  public String getVhkfield09() {
+	  return (String) this.getAttributeValue(CtPuVO.VHKFIELD09);
+  }
+  public void setVhkfield09(String vhkfield09) {
+	  this.setAttributeValue(CtPuVO.VHKFIELD09, vhkfield09);
+  }
+  
+  public static final String VHKFIELD10 = "vhkfield10";
+  public String getVhkfield10() {
+	  return (String) this.getAttributeValue(CtPuVO.VHKFIELD10);
+  }
+  public void setVhkfield10(String vhkfield10) {
+	  this.setAttributeValue(CtPuVO.VHKFIELD10, vhkfield10);
+  }
+  /***END***/
 
 }
