@@ -113,10 +113,10 @@ public class ImpLvyunData implements IBackgroundWorkPlugin {
 		HashMap<String, Object> param = new HashMap<String, Object>();
 		
 		String[] pk_org_list = new String[]{
-				"0001N510000000001SY3", // 朗丽兹 9
+//				"0001N510000000001SY3", // 朗丽兹 9
 //				"0001N510000000001SY5", // 康西 11
 //				"0001N510000000001SY7", // 西山温泉 10
-//				"0001N510000000001SY1", // 学院路
+				"0001N510000000001SY1", // 学院路16
 		};
 		String[] date_list = new String[]{
 //			"2020-03-10",
@@ -136,8 +136,8 @@ public class ImpLvyunData implements IBackgroundWorkPlugin {
 //			"2020-03-28",
 //			"2020-03-29",
 //			"2020-03-30",
-			"2020-03-31",
-//			"2020-04-01",
+//			"2020-03-31",
+			"2020-04-07",
 		};
 		
 		param.put("pk_org", pk_org_list);
@@ -334,7 +334,8 @@ public class ImpLvyunData implements IBackgroundWorkPlugin {
 						.append(" select ")
 						.append(" id as accid,")
 						.append(" DATE_FORMAT(biz_date, '%Y-%m-%d %H:%i:%s') as transdate,")
-						.append(" case when IFNULL(floor_des, 'NULL') in ('NULL', '') then dept else floor_des end as bm_name,")
+//						.append(" case when IFNULL(floor_des, 'NULL') in ('NULL', '') then dept else floor_des end as bm_name,")
+						.append(" dept bm_name, ")
 						.append(" accnt as vbdef04,")
 						.append(" rmno as rmno,")
 						.append(" room_type_des as rmtype_name,")
@@ -596,6 +597,11 @@ public class ImpLvyunData implements IBackgroundWorkPlugin {
 						 || "FM".equals(vbdef09))
 						) {// 前台数据中floor_des≠空值，且trans_flag=to和fm的 不取的数据不取入酒店入账明细。
 							continue;
+						} else if ("前台".equals(bmName) 
+						&& ("TO".equals(vbdef09) 
+						 || "FM".equals(vbdef09))
+						) {// dept = 前台 ，且trans_flag=to和fm的 不取的数据
+							continue;
 						}
 						else if ("AR".equals(bmName) 
 						&& ("TO".equals(vbdef09) 
@@ -856,6 +862,14 @@ public class ImpLvyunData implements IBackgroundWorkPlugin {
 							bVO.setVrowno("" + (((rowCount++)+1) * 10));
 							bVO_list_temp.add(bVO);
 						}
+						
+						/**
+						 * 如果楼层有值，则将部门给替换掉
+						 */
+						if (csourcebillid != null) {
+							bVO.setBm_name(csourcebillid);
+						}
+						/***END***/
 						
 						Object[] res = (Object[])this.doBodyVO(
 							bVO_list, 
