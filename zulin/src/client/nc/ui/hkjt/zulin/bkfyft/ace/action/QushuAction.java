@@ -118,7 +118,8 @@ public class QushuAction extends NCAction {
 				.append(",substr(ht.invallidate,1,10) vdef09 ")		// 整体合同结束日期	invallidate
 				.append(",to_number(nvl(replace(htb.vbdef5,'~',''),'0.0')) vdef13 ")	// 计算单价
 				.append(",to_number(nvl(replace(replace(sl.name,'~',''),'%',''),'0.0')) vdef14 ")		// 税率
-				.append(",ht.vhkfield01 vdef21 ") // 生成责任凭证
+//				.append(",ht.vhkfield01 vdef21 ") // 生成责任凭证
+				.append(",'N' vdef21 ") // 生成责任凭证
 				.append(" from ct_pu ht ")		// 合同表头
 				.append(" inner join ct_pu_b htb on ht.pk_ct_pu = htb.pk_ct_pu ")	// 合同表体
 				.append(" left join bd_defdoc fplx on ht.vdef3 = fplx.pk_defdoc ")	// 发票类型
@@ -377,7 +378,7 @@ public class QushuAction extends NCAction {
 						.append(" ht.cvendorid pk_customer ")	// 对方pk
 						.append(",ht.vbillcode vdef10 ")		// 合同号
 						.append(",sum(fkb.money_de) fkje ")		// 付款金额
-						.append(",max(fplx.name) fplx ")				// 发票类型name
+						.append(",max(fplx.name) fplx ")		// 发票类型name
 						.append(",max(to_number(nvl(replace(replace(sl.name,'~',''),'%',''),'0.0'))) sl ")		// 税率
 						.append(" from ap_paybill fk ")
 						.append(" inner join ap_payitem fkb on fk.pk_paybill = fkb.pk_paybill ")
@@ -386,8 +387,10 @@ public class QushuAction extends NCAction {
 						.append(" left join ct_pu_b htb on (ht.pk_ct_pu = htb.pk_ct_pu and htb.dr = 0 and fkjh.crowno = htb.crowno) ")
 						.append(" left join bd_defdoc fplx on ht.vdef3 = fplx.pk_defdoc ")	// 发票类型
 						.append(" left join bd_defdoc sl on ht.vdef4 = sl.pk_defdoc ")		// 税率
+						.append(" left join bd_inoutbusiclass szxm on fkb.def13 = szxm.pk_inoutbusiclass ")// 收入项目
 						.append(" where fk.dr = 0 and fkb.dr = 0 ")
 						.append(" and ht.dr = 0 and fkjh.dr = 0 ")
+						.append(" and nvl(szxm.name, 'NULL') not like '%保证金%' ")	// 不取 保证金 的付款
 						.append(" and ht.pk_org = '").append(pk_org).append("' ")
 						.append(" and fk.billyear || '-' || fk.billperiod = '").append(yearMonth).append("' ")
 						.append(" group by ht.cvendorid, ht.vbillcode ")
