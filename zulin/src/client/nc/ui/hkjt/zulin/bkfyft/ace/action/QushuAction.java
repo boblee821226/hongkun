@@ -324,12 +324,16 @@ public class QushuAction extends NCAction {
 					);	// 当月费用确认金额
 					yuebaoBVO.setDanjia(null);	// 将单价 赋值成null， 后面 重新计算单价
 					
-					
 					if( js_ksrq.compareTo(yuebaoBVO.getJsksrq())<0 )
 						yuebaoBVO.setJsksrq(js_ksrq);
 					if( js_jsrq.compareTo(yuebaoBVO.getJsjsrq())>0 )
 						yuebaoBVO.setJsjsrq(js_jsrq);
 					
+					// 如果 之前存的是 调整营业区租金，本次是 营业区租金， 则用 营业区租金 替换之前的。
+					if ("调整营业区租金".equals(yuebaoBVO.getVbdef03())) {
+						yuebaoBVO.setVbdef03(htVO.getVdef03());	// 支出项目-名称
+						yuebaoBVO.setSrxm(htVO.getPk_srxm());	// 支出项目pk
+					}
 				}
 				
 				{// 备注的处理
@@ -373,7 +377,7 @@ public class QushuAction extends NCAction {
 					.append(",max(a.fplx) ")	// 发票类型
 					.append(",max(a.sl) ") 		// 税率
 					.append(" from (")
-					// 蓝字收款单
+					// 蓝字付款单
 						.append(" select ")
 						.append(" ht.cvendorid pk_customer ")	// 对方pk
 						.append(",ht.vbillcode vdef10 ")		// 合同号
@@ -390,9 +394,11 @@ public class QushuAction extends NCAction {
 						.append(" left join bd_inoutbusiclass szxm on fkb.def13 = szxm.pk_inoutbusiclass ")// 收入项目
 						.append(" where fk.dr = 0 and fkb.dr = 0 ")
 						.append(" and ht.dr = 0 and fkjh.dr = 0 ")
+						.append(" and fk.billstatus = 8 ") // 付款单 取 已签字 状态
 						.append(" and nvl(szxm.name, 'NULL') not like '%保证金%' ")	// 不取 保证金 的付款
 						.append(" and ht.pk_org = '").append(pk_org).append("' ")
-						.append(" and fk.billyear || '-' || fk.billperiod = '").append(yearMonth).append("' ")
+//						.append(" and fk.billyear || '-' || fk.billperiod = '").append(yearMonth).append("' ")
+						.append(" and fk.signdate between '").append(str_yb_ksrq).append(" 00:00:00' and '").append(str_yb_jsrq).append(" 23:59:59' ")
 						.append(" group by ht.cvendorid, ht.vbillcode ")
 					.append(" ) a ")
 					.append(" group by a.pk_customer, a.vdef10 ")
