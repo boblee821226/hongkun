@@ -1025,7 +1025,9 @@ public class ImpLvyunData implements IBackgroundWorkPlugin {
 					doc = DOC_SPFL_BAOFANG.get(rmno);
 				}
 	//			else if ("房费".equalsIgnoreCase(itemName)) {
-				else if (itemName.indexOf("房费") >= 0) {
+				else if (itemName.indexOf("房费") >= 0
+					|| itemName.indexOf("加床费") >= 0
+				) {
 					String rmtypeName = bVO.getRmtype_name();
 					doc = DOC_SPFL.get(rmtypeName);
 				} else {
