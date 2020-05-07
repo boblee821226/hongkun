@@ -1064,7 +1064,7 @@ public class Jd_hzshujuMaintainImpl implements IJd_hzshujuMaintain {
 				// 最后处理平均房价等信息
 				if (rzmxvo != null) {
 					SrdibiaoBVO srdbvo = new SrdibiaoBVO();
-					srdbvo.setJzfs_name("翻房率");
+					srdbvo.setJzfs_name("出租率");
 					srdbvo.setJine(rzmxvo.getFfl());
 					jzfsvos.add(srdbvo);
 					srdbvo = new SrdibiaoBVO();
@@ -1103,7 +1103,7 @@ public class Jd_hzshujuMaintainImpl implements IJd_hzshujuMaintain {
 				// 最后处理平均房价等信息
 				if (rzmxvo != null) {
 					SrdibiaoBVO srdbvo = new SrdibiaoBVO();
-					srdbvo.setJzfs_name("翻房率");
+					srdbvo.setJzfs_name("出租率");
 					srdbvo.setJine(rzmxvo.getFfl());
 					srxmvos.add(srdbvo);
 					srdbvo = new SrdibiaoBVO();
