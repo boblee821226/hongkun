@@ -114,30 +114,12 @@ public class ImpLvyunData implements IBackgroundWorkPlugin {
 		
 		String[] pk_org_list = new String[]{
 //				"0001N510000000001SY3", // 朗丽兹 9
-//				"0001N510000000001SY5", // 康西 11
+				"0001N510000000001SY5", // 康西 11
 //				"0001N510000000001SY7", // 西山温泉 10
-				"0001N510000000001SY1", // 学院路16
+//				"0001N510000000001SY1", // 学院路16
 		};
 		String[] date_list = new String[]{
-//			"2020-03-10",
-//			"2020-03-11",
-//			"2020-03-12",
-//			"2020-03-14",
-//			"2020-03-15",
-//			"2020-03-16",
-//			"2020-03-17",
-//			"2020-03-18",
-//			"2020-03-19",
-//			"2020-03-20",
-//			"2020-03-21",
-//			"2020-04-01",
-//			"2020-03-26",
-//			"2020-03-27",
-//			"2020-03-28",
-//			"2020-03-29",
-//			"2020-03-30",
-//			"2020-03-31",
-			"2020-04-07",
+			"2020-05-13",
 		};
 		
 		param.put("pk_org", pk_org_list);
@@ -243,7 +225,7 @@ public class ImpLvyunData implements IBackgroundWorkPlugin {
 			String db_name = PuPubVO.getString_TrimZeroLenAsNull(INFO_MAP.get("db_name"));
 			
 			// 取到公司级的档案
-			// 商品分类(通过 名称去匹配)
+			// 商品分类(通过 名称去匹配，只取LY01、LY02、LY03下的)
 			HashMap<String, SpflHVO> DOC_SPFL = new HashMap<String, SpflHVO>();
 			// 商品分类-包房（通过编码 去对应 LY04 分类下的）
 			HashMap<String, SpflHVO> DOC_SPFL_BAOFANG = new HashMap<String, SpflHVO>();
@@ -258,13 +240,15 @@ public class ImpLvyunData implements IBackgroundWorkPlugin {
 					for (SpflHVO vo : list) {
 						String code = vo.getCode();
 						String name = vo.getName();
-						DOC_SPFL.put(name, vo);
+						
 						if (code.startsWith("LY04-")) {
 							DOC_SPFL_BAOFANG.put(code.substring(5), vo);
 						} else if (code.startsWith("LY05-")) {
 							DOC_SPFL_YINGYEDIAN.put(name, vo);
 						} else if (code.startsWith("LY06-")) {
 							DOC_SPFL_LOUCENG.put(name, vo);
+						} else {
+							DOC_SPFL.put(name, vo); // 除了以上，其它的都放在DOC_SPFL里
 						}
 					}
 				}
@@ -286,6 +270,7 @@ public class ImpLvyunData implements IBackgroundWorkPlugin {
 			}
 			
 			for (String date : date_list) {
+				// 先判断 该组织该日期下，是否存在 单据， 如果存在 则不处理。
 				String sql2 = "select pk_hk_srgk_jd_rzmx " +
 						" from hk_srgk_jd_rzmx " +
 						" where dr = 0 " +
@@ -909,7 +894,7 @@ public class ImpLvyunData implements IBackgroundWorkPlugin {
 					
 					/**
 					 * 查询5项指数
-					 * 翻房率	ffl			150000
+					 * 出租率	ffl			150000
 					 * 平均房价	pjfj	140000
 					 * REVPAR	revpar	160000
 					 * 房晚	kfsr		120000
