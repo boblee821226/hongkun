@@ -140,6 +140,7 @@ public class QushuAction extends NCAction {
 				.append(" 	and szxm.code not in ('2005', '2022') ")
 				.append(" 	and ht.pk_org = '").append(pk_org).append("' ")
 				.append(" 	and ht.blatest = 'Y' ")
+				.append(" 	and ht.fstatusflag = 1 ")
 				.append("	group by ht.pk_ct_pu ")
 				.append(" ) htze on (htze.pk_ct_pu = ht.pk_ct_pu)")
 				
@@ -150,6 +151,9 @@ public class QushuAction extends NCAction {
 				.append(" and ht.pk_org = '").append(pk_org).append("' ")
 				// 只取最新版
 				.append(" and ht.blatest = 'Y' ")
+				// 只取生效的
+				.append(" and ht.fstatusflag = 1 ")
+				// 时间范围
 				.append(" and ( ")
 				.append(" 	'").append(str_yb_ksrq).append("' between substr(htb.vbdef3,1,10) and substr(htb.vbdef4,1,10) ")
 				.append(" 	or ")
@@ -377,7 +381,7 @@ public class QushuAction extends NCAction {
 					.append(",max(a.fplx) ")	// 发票类型
 					.append(",max(a.sl) ") 		// 税率
 					.append(" from (")
-					// 蓝字付款单
+					// 蓝字付款单、红冲付款单，src字段都是合同，所以可以统一处理
 						.append(" select ")
 						.append(" ht.cvendorid pk_customer ")	// 对方pk
 						.append(",ht.vbillcode vdef10 ")		// 合同号
@@ -386,8 +390,8 @@ public class QushuAction extends NCAction {
 						.append(",max(to_number(nvl(replace(replace(sl.name,'~',''),'%',''),'0.0'))) sl ")		// 税率
 						.append(" from ap_paybill fk ")
 						.append(" inner join ap_payitem fkb on fk.pk_paybill = fkb.pk_paybill ")
-						.append(" inner join ct_pu ht on fkb.top_billid = ht.pk_ct_pu ")
-						.append(" inner join ct_payplan fkjh on fkb.top_itemid = fkjh.pk_ct_payplan ")
+						.append(" inner join ct_pu ht on fkb.src_billid = ht.pk_ct_pu ")
+						.append(" inner join ct_payplan fkjh on fkb.src_itemid = fkjh.pk_ct_payplan ")
 						.append(" left join ct_pu_b htb on (ht.pk_ct_pu = htb.pk_ct_pu and htb.dr = 0 and fkjh.crowno = htb.crowno) ")
 						.append(" left join bd_defdoc fplx on ht.vdef3 = fplx.pk_defdoc ")	// 发票类型
 						.append(" left join bd_defdoc sl on ht.vdef4 = sl.pk_defdoc ")		// 税率
@@ -682,6 +686,8 @@ public class QushuAction extends NCAction {
 				.append(" and ht.pk_org = '").append(pk_org).append("' ")
 				// 只取最新版
 				.append(" and ht.blatest = 'Y' ")
+				// 只取生效的
+				.append(" and ht.fstatusflag = 1 ")
 				// 只取第一版(存在着 有变更，但是还没取过数的情况，所以不能限定于只取第一版)
 //				.append(" and ht.version = 1.0 ")
 				// 合同开始日期（只按 合同开始日期 在期间范围内，就可以确保唯一取值）
