@@ -65,11 +65,14 @@ public class GenNCVoucherAction extends NCAction {
 		String pk_org = hvo.getPk_org();
 		String pznum = "";
 
-		if (HKJT_PUB.PK_ORG_HUIGUAN_MAP.containsValue(pk_org)) {
-			 pznum = getJdMainTain().genNCVoucherInfo(srdbvo,0);		// 返回凭证号，（ 临时凭证 没有凭证号）
-		} else if (HKJT_PUB.PK_ORG_JIUDIAN_MAP.containsValue(pk_org)) {
-			 pznum = getJdMainTain().genNCVoucherInfo(srdbvo,0);
-		}
+//		if (HKJT_PUB.PK_ORG_HUIGUAN_MAP.containsValue(pk_org)) {
+//			 pznum = getJdMainTain().genNCVoucherInfo(srdbvo,0);		// 返回凭证号，（ 临时凭证 没有凭证号）
+//		} else if (HKJT_PUB.PK_ORG_JIUDIAN_MAP.containsValue(pk_org)) {
+//			 pznum = getJdMainTain().genNCVoucherInfo(srdbvo,0);
+//		}
+		// 去掉 会馆、酒店的判断，直接发送凭证
+		pznum = getJdMainTain().genNCVoucherInfo(srdbvo,0);
+		
 		srdbvo.getParentVO().setAttributeValue(YyribaoHVO.VDEF02, pznum);
 		this.setEnabled(false);
 		// 提示信息
