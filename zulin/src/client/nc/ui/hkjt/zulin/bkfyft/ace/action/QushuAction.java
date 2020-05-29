@@ -98,11 +98,12 @@ public class QushuAction extends NCAction {
 		}
 		
 		StringBuffer querySQL = 
+				// 生效的处理，取 合同结束日期
 		new StringBuffer("select ")
 				.append(" htb.vbdef1 pk_srxm ")	// 支出项目pk
 				.append(",szxm.name vdef03 ")	// 支出项目name
 				.append(",substr(htb.vbdef3,1,10) ksrq ")	// 合同开始日期
-				.append(",substr(htb.vbdef4,1,10) jsrq ")	// 合同结束日期
+				.append(",case when ht.actualinvalidate is null then substr(htb.vbdef4,1,10) else substr(ht.actualinvalidate,1,10) end jsrq ")	// 合同结束日期
 				.append(",htb.norigmny vdef11 ")	// 无税金额
 				.append(",htb.norigtaxmny vdef12 ")	// 含税金额
 				.append(",ht.depid vdef05 ")	// 部门pk
@@ -140,10 +141,10 @@ public class QushuAction extends NCAction {
 				.append(" 	and szxm.code not in ('2005', '2022') ")
 				.append(" 	and ht.pk_org = '").append(pk_org).append("' ")
 				.append(" 	and ht.blatest = 'Y' ")
-				.append(" 	and ht.fstatusflag = 1 ")
+				.append(" 	and ht.fstatusflag in (1, 6) ")
+//				.append(" 	and ht.fstatusflag in (1) ")
 				.append("	group by ht.pk_ct_pu ")
 				.append(" ) htze on (htze.pk_ct_pu = ht.pk_ct_pu)")
-				
 				.append(" where ht.dr = 0 and htb.dr = 0 ")
 				.append(" and ht.vtrantypecode = '").append(IPub_data.BKHT_type_code).append("' ")
 				// 不取保证金
@@ -151,14 +152,19 @@ public class QushuAction extends NCAction {
 				.append(" and ht.pk_org = '").append(pk_org).append("' ")
 				// 只取最新版
 				.append(" and ht.blatest = 'Y' ")
-				// 只取生效的
-				.append(" and ht.fstatusflag = 1 ")
+				// 只取生效的 和 终止的
+				.append(" and ht.fstatusflag in (1, 6) ")
 				// 时间范围
 				.append(" and ( ")
 				.append(" 	'").append(str_yb_ksrq).append("' between substr(htb.vbdef3,1,10) and substr(htb.vbdef4,1,10) ")
 				.append(" 	or ")
 				.append("  	'").append(str_yb_jsrq).append("' between substr(htb.vbdef3,1,10) and substr(htb.vbdef4,1,10) ")
+//				.append("	or ")
+//				// 考虑合同终止日期
+//				.append("	substr(nvl(ht.actualinvalidate, '2999-12-31'), 1, 10) between '").append(str_yb_ksrq).append("' and '").append(str_yb_jsrq).append("' ")
 				.append(" ) ")
+				.append(" and '"+str_yb_ksrq+"' <= substr(nvl(replace(ht.actualinvalidate, '~', ''), '2099-12-31'), 1, 10) ")	// 合同终止日期 来 判断计费时点（终止的那天 要算租金的）
+			.append(" and substr(htb.vbdef3,1,10) <= substr(nvl(replace(ht.actualinvalidate, '~', ''), '2099-12-31'), 1, 10) ")	// 合同明细的开始日期 要小于等于 合同终止日期
 //				.append(" and ht.vbillcode like 'aaabbb%' ")	// 测试
 		;
 		
@@ -634,6 +640,23 @@ public class QushuAction extends NCAction {
 					;
 			bvo.setVbdef09(byWtsts.toString());
 			
+			// 如果未摊销天数未0，并且 期末预付款余额为 正负1 之内，则将 期末预付款余额，加到 本期发生。
+			// 必须存在合同
+			// 2020年5月29日16:27:08
+			if (byWtsts == 0 
+			 && qmye.abs().compareTo(UFDouble.ONE_DBL) < 0
+			 && bvo.getVbdef10() != null
+			) {
+				bvo.setDysrqrje(PuPubVO.getUFDouble_NullAsZero(bvo.getDysrqrje()).add(qmye));
+				bvo.setQmyskye(UFDouble.ZERO_DBL);
+				String vbmemo = "【自动调差" + qmye + "】";
+				bvo.setVbmemo(
+					bvo.getVbmemo() == null
+					? vbmemo
+					: bvo.getVbmemo() + vbmemo
+				);
+			}
+			// END
 		}
 		/***END***/
 		
