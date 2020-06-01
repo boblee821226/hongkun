@@ -556,7 +556,8 @@ public class QushuAction extends NCAction {
 				new StringBuffer(" select ")
 					.append(" tzb.vbdef11 ")	// 对方pk
 					.append(",tzb.vbdef12 ")	// 合同号
-					.append(",tzb.dytzje ")
+					.append(",tzb.dytzje ")		// 本月费用调整
+					.append(",tzb.vbdef01 ")	// 本月预付调整
 					.append(" from hk_zulin_tiaozheng tz ")
 					.append(" inner join hk_zulin_tiaozheng_b tzb on tz.pk_hk_zulin_tiaozheng = tzb.pk_hk_zulin_tiaozheng ")
 					.append(" where tz.dr=0 and tzb.dr=0 ")
@@ -583,11 +584,14 @@ public class QushuAction extends NCAction {
 					String key = pk_cutomer+"##"+roomno;
 					
 					UFDouble tzje = PuPubVO.getUFDouble_NullAsZero(obj[2]);		// 调整金额
+					UFDouble yfje = PuPubVO.getUFDouble_NullAsZero(obj[3]);		// 预付调整金额
 					
 					YuebaoBVO yuebaoBVO = MAP_yuebaoBVO.get(key);
 					if(yuebaoBVO!=null)
-					{// 表体自定义08 存储 调整金额
+					{	// 表体自定义08 存储 调整金额
 						yuebaoBVO.setVbdef08(tzje.toString());
+						// 上游单据号 存储 预付调整金额
+						yuebaoBVO.setVsourcebillcode(yfje.toString());
 					}
 					else
 					{// 如果发生数据 没有  则不做处理
@@ -605,10 +609,11 @@ public class QushuAction extends NCAction {
 		 */
 		for(YuebaoBVO bvo : bodyVOs)
 		{
-			// 期末余额 = 期初余额+本期付款-本期费用-本期调整
+			// 期末余额 = 期初余额+本期付款+本期预付调整-本期费用-本期调整
 			UFDouble qmye = 
 					 PuPubVO.getUFDouble_NullAsZero(bvo.getQcyskye())
 				.add(PuPubVO.getUFDouble_NullAsZero(bvo.getBqskje()))
+				.add(PuPubVO.getUFDouble_NullAsZero(bvo.getVsourcebillcode()))
 				.sub(PuPubVO.getUFDouble_NullAsZero(bvo.getDysrqrje()))
 				.sub(PuPubVO.getUFDouble_NullAsZero(bvo.getVbdef08()))
 			;
