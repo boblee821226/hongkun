@@ -73,6 +73,12 @@ public class N_HK43_SAVEBASE extends AbstractPfAction<YuebaoBillVO> {
 				) {
 					isYhs = "N";
 				}
+				String isZrpz = hvo.getVdef03();	// 是否责任凭证
+				if (null == isZrpz
+				 || "~".equals(isZrpz)
+				) {
+					isZrpz = "N";
+				}
 				
 				if (pk == null) pk="null";
 				
@@ -85,12 +91,15 @@ public class N_HK43_SAVEBASE extends AbstractPfAction<YuebaoBillVO> {
 							.append(" and y.pk_org = '"+pk_org+"' ")
 							.append(" and y.vdef01 = '"+qijian+"' ")
 							.append(" and y.pk_hk_zulin_yuebao != '"+pk+"' ")
+							// 印花税
 							.append(" and replace(nvl(y.vdef02, 'N'), '~', 'N') = '").append(isYhs).append("' ")
+							// 责任凭证
+							.append(" and replace(nvl(y.vdef03, 'N'), '~', 'N') = '").append(isZrpz).append("' ")
 				;
 				List list = (List)dao.executeQuery(querySQL.toString(),new ArrayListProcessor());
 				if(list!=null && list.size()>0)
 				{
-					throw new BusinessException("同组织同期间，不能保存多份费用分摊（印花税）。");
+					throw new BusinessException("同组织同期间，不能保存多份费用分摊（印花税）（责任凭证）。");
 				}
 				
 			}
