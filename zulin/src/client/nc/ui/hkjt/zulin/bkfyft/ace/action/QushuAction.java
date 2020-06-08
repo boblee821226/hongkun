@@ -96,7 +96,18 @@ public class QushuAction extends NCAction {
 			this.handleYhs(pk_org, str_yb_ksrq, str_yb_jsrq);
 			return;
 		}
-		
+		// 是否责任凭证
+		UFBoolean isZeren = PuPubVO.getUFBoolean_NullAs(
+				this.getEditor().getBillCardPanel().getHeadItem("vdef03").getValueObject()
+				, UFBoolean.FALSE
+		);
+		// 责任凭证的处理
+		String whereSql_zeren = " and nvl(ht.vhkfield01, 'N') in ('N', '~') ";
+		String whereSql_zeren_sy = " and nvl(y.vdef01, 'N') in ('N', '~') ";
+		if (isZeren.booleanValue()) {
+			whereSql_zeren = " and nvl(ht.vhkfield01, 'N') = 'Y' ";
+			whereSql_zeren_sy = " and nvl(y.vdef01, 'N') = 'Y' ";
+		}
 		StringBuffer querySQL = 
 				// 生效的处理，取 合同结束日期
 		new StringBuffer("select ")
@@ -120,7 +131,7 @@ public class QushuAction extends NCAction {
 				.append(",to_number(nvl(replace(htb.vbdef5,'~',''),'0.0')) vdef13 ")	// 计算单价
 				.append(",to_number(nvl(replace(replace(sl.name,'~',''),'%',''),'0.0')) vdef14 ")		// 税率
 //				.append(",ht.vhkfield01 vdef21 ") // 生成责任凭证
-				.append(",'N' vdef21 ") // 生成责任凭证
+//				.append(",'N' vdef21 ") // 生成责任凭证
 				.append(" from ct_pu ht ")		// 合同表头
 				.append(" inner join ct_pu_b htb on ht.pk_ct_pu = htb.pk_ct_pu ")	// 合同表体
 				.append(" left join bd_defdoc fplx on ht.vdef3 = fplx.pk_defdoc ")	// 发票类型
@@ -165,6 +176,7 @@ public class QushuAction extends NCAction {
 				.append(" ) ")
 				.append(" and '"+str_yb_ksrq+"' <= substr(nvl(replace(ht.actualinvalidate, '~', ''), '2099-12-31'), 1, 10) ")	// 合同终止日期 来 判断计费时点（终止的那天 要算租金的）
 			.append(" and substr(htb.vbdef3,1,10) <= substr(nvl(replace(ht.actualinvalidate, '~', ''), '2099-12-31'), 1, 10) ")	// 合同明细的开始日期 要小于等于 合同终止日期
+				.append(whereSql_zeren) // 责任凭证的sql
 //				.append(" and ht.vbillcode like 'aaabbb%' ")	// 测试
 		;
 		
@@ -319,7 +331,7 @@ public class QushuAction extends NCAction {
 					yuebaoBVO.setVbdef07(htVO.getVdef07());		// 实际合同金额
 					yuebaoBVO.setVbdef10(htVO.getVdef10());		// 合同号
 					yuebaoBVO.setVbdef09(zthtTs.toString());	// 整体合同天数
-					yuebaoBVO.setCsourcetypecode(htVO.getVdef21());	// 生成责任凭证 csourcetypecode
+//					yuebaoBVO.setCsourcetypecode(htVO.getVdef21());	// 生成责任凭证 csourcetypecode
 					
 				}
 				else
@@ -489,10 +501,11 @@ public class QushuAction extends NCAction {
 						.append(" where y.dr=0 and yb.dr=0 ")
 						.append(" and y.vbilltypecode = 'HK43' ")
 						.append(" and nvl(y.vdef02, 'N') in ('~', 'N', 'n') ")	// 只取 非印花税的
+						.append(whereSql_zeren_sy)	// 按 是否责任凭证，取上月的余额
 						.append(" and y.yearmonth = '"+syqj+"' ")
 						.append(" and y.pk_org = '"+pk_org+"' ")
 						.append(" group by yb.pk_cutomer, yb.vbdef10 ")	// Group By  客户+房号
-						.append(" having sum(yb.qmyskye)<>0.00 ")		// 取 余额不为0的
+						.append(" having sum(yb.qmyskye) <> 0.00 ")		// 取 余额不为0的
 			;
 			ArrayList list_QC = (ArrayList)iUAPQueryBS.executeQuery(
 					querySQL_QC.toString()
