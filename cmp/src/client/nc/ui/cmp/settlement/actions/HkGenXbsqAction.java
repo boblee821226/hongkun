@@ -18,6 +18,7 @@ import nc.ui.pub.beans.MessageDialog;
 import nc.ui.uif2.NCAction;
 import nc.vo.cmp.settlement.SettlementAggVO;
 import nc.vo.cmp.settlement.SettlementHeadVO;
+import nc.vo.pub.BusinessException;
 import nc.vo.pub.VOStatus;
 import nc.vo.pub.lang.UFBoolean;
 import nc.vo.pub.lang.UFDate;
@@ -63,12 +64,26 @@ public class HkGenXbsqAction extends NCAction {
 		}
 		
 		// 选单时 判断 不能选多个组织的
+		String pk_org_buffer = null;
+		for (Object data : selectData) {
+			SettlementAggVO  slBillVO = (SettlementAggVO)data;
+			SettlementHeadVO    slHVO = (SettlementHeadVO)slBillVO.getParentVO();
+			String pk_org_temp = slHVO.getPk_org();
+			if (pk_org_buffer == null) {
+				pk_org_buffer = pk_org_temp;
+			} else {
+				if (!pk_org_buffer.equals(pk_org_temp)) {
+					throw new BusinessException("必须选择同组织的");
+				}
+			}
+		}
 		
 		// 获得 pk_org 去找 账户信息
 		HashMap<String, String[]> map_zhanghu = new HashMap<String, String[]>();
 		
 		/**
 		 * 循环所选数据，进行分单处理
+		 * 分 
 		 */
 		HashMap<String,ArrayList<String>> map_bill = new HashMap<String,ArrayList<String>>();
 		for (Object data : selectData) {
@@ -201,6 +216,8 @@ public class HkGenXbsqAction extends NCAction {
 				.append(",fktype.name ")		// 7 付款业务类型
 				.append(",zjxm.pk_fundplan ")	// 8 资金项目pk
 				.append(",zjxm.name ")			// 9 资金项目name
+				.append(",jsb.memo ")			// 10 结算单-摘要
+				.append(",js.billcode ")		// 11 业务单号
 				.append(" from cmp_settlement js ")
 				.append(" inner join cmp_detail jsb on js.pk_settlement = jsb.pk_settlement ")
 				.append(" left join ap_payitem fkb on (jsb.pk_billdetail = fkb.pk_payitem and fkb.dr = 0) ")
@@ -215,7 +232,7 @@ public class HkGenXbsqAction extends NCAction {
 				.append(" and js.pk_settlement in ").append(pkSettlementStr)
 		;
 		ArrayList list = (ArrayList)itf.executeQuery(querySQL.toString(), new ArrayListProcessor());
-		
+				
 		/**
 		 *  汇总行（按照摘要）
 		 * key: 摘要
@@ -243,6 +260,9 @@ public class HkGenXbsqAction extends NCAction {
 			String zjjxxm 		= PuPubVO.getString_TrimZeroLenAsNull(rowObj[8]);	// 资金项目pk
 			String zjjxxm_name	= PuPubVO.getString_TrimZeroLenAsNull(rowObj[9]);	// 资金项目name
 			
+			String zhaiyao 	= PuPubVO.getString_TrimZeroLenAsNull(rowObj[10]);	// 结算单-摘要
+			String billCode = PuPubVO.getString_TrimZeroLenAsNull(rowObj[11]);	// 业务单号
+			
 			if (zjjxxm == null) {
 				zjjxxm = IPub_data.JSXB_jhxm_caigou;
 				zjjxxm_name = "采购款";
@@ -263,9 +283,9 @@ public class HkGenXbsqAction extends NCAction {
 			String[] zhanghuInfo = map_zhanghu.get(pk_org);
 			
 //			String zhaiyao = fkxz + fklx;
-			String zhaiyao = fkxz + zjjxxm_name; // 摘要 = 付款性质 + 资金计划项目
+			String key = pk_jsd + fkxz + zjjxxm_name; // key = 结算单+付款性质+资金计划项目
 			
-			if (!map_body.containsKey(zhaiyao)) {
+			if (!map_body.containsKey(key)) {
 				rowCount++;
 				String uuid = UUID.randomUUID().toString();
 				AllocateApplyBVO bVO = new AllocateApplyBVO();
@@ -285,21 +305,22 @@ public class HkGenXbsqAction extends NCAction {
 				bVO.setPk_accid(zhanghuInfo[4]);		// 收款单位内部账户 bd_accid
 				
 				bVO.setPk_planitem_r(zjjxxm);	// 资金计划项目
-				bVO.setRemark(zhaiyao);
+				bVO.setRemark("");	// 摘要 需要叠加
 				bVO.setRowno("" + (rowCount * 10));
 				bVO.setStatus(VOStatus.NEW);
 				bVO.setAttributeValue("pseudocolumn", (rowCount - 1));
 				bVO.setVuserdef1(uuid);		// 表体自定义项1，记录关联关系
+				bVO.setVuserdef2(billCode);	// 业务单号
 				
 				Object[] body_value = new Object[3];
 				body_value[0] = bVO;
 				body_value[1] = new ArrayList<String[]>();
 				body_value[2] = uuid;
 				
-				map_body.put(zhaiyao, body_value);
+				map_body.put(key, body_value);
 			}
 			
-			Object[] body_value = map_body.get(zhaiyao);
+			Object[] body_value = map_body.get(key);
 			AllocateApplyBVO bVO = (AllocateApplyBVO)body_value[0];
 			ArrayList<String[]> body_link = (ArrayList<String[]>)body_value[1];
 			body_link.add(new String[]{
@@ -308,6 +329,13 @@ public class HkGenXbsqAction extends NCAction {
 			});
 			bVO.setApplyamount(bVO.getApplyamount().add(mny));
 			bVO.setApplyolcamount(bVO.getApplyolcamount().add(mny));
+			String zhaiyao_new = bVO.getRemark() + "【" + zhaiyao + "】";
+			if (zhaiyao_new.length() < 280) {
+				// 下拨申请的摘要  最大长度为 300， 所以做一下限制，只有小于280 才叠加
+				bVO.setRemark(bVO.getRemark() + "【" + zhaiyao + "】"); // 需要叠加
+			} else {
+				bVO.setRemark(bVO.getRemark() + "...");
+			}
 			totalMny = totalMny.add(mny);
 		}
 		
@@ -388,6 +416,8 @@ public class HkGenXbsqAction extends NCAction {
 				.append(",jsb.pay ")			// 5 金额
 				.append(",szxm.def5 ")			// 6 资金计划项目pk
 				.append(",zjjxxm.name ")		// 7 资金计划项目name
+				.append(",jsb.memo ")			// 8 结算单-摘要
+				.append(",js.billcode ")		// 9 业务单号
 				.append(" from cmp_settlement js ")
 				.append(" inner join cmp_detail jsb on js.pk_settlement = jsb.pk_settlement ")
 				.append(" left join er_busitem bxb on (jsb.pk_billdetail = bxb.PK_BUSITEM and bxb.dr = 0) ")
@@ -401,7 +431,7 @@ public class HkGenXbsqAction extends NCAction {
 		ArrayList list = (ArrayList)itf.executeQuery(querySQL.toString(), new ArrayListProcessor());
 		
 		/**
-		 *  汇总行（按照摘要）
+		 * 汇总行（按照摘要）
 		 * key: 摘要
 		 * value: 0- AllocateApplyBVO (自定义01)
 		 * 		  1- Array<String[pk_jsd,pk_jsd_b]> 
@@ -421,8 +451,10 @@ public class HkGenXbsqAction extends NCAction {
 			String pk_org 	= PuPubVO.getString_TrimZeroLenAsNull(rowObj[3]);
 			String pk_org_v = PuPubVO.getString_TrimZeroLenAsNull(rowObj[4]);
 			UFDouble mny 	= PuPubVO.getUFDouble_NullAsZero(rowObj[5]);
-			String zjjxxm 	= PuPubVO.getString_TrimZeroLenAsNull(rowObj[6]);	// 资金计划项目pk
+			String zjjxxm 	= PuPubVO.getString_TrimZeroLenAsNull(rowObj[6]);		// 资金计划项目pk
 			String zjjhxm_name 	= PuPubVO.getString_TrimZeroLenAsNull(rowObj[7]);	// 资金计划项目name
+			String zhaiyao 	= PuPubVO.getString_TrimZeroLenAsNull(rowObj[8]);	// 摘要
+			String billCode = PuPubVO.getString_TrimZeroLenAsNull(rowObj[9]);	// 业务单号
 			
 			if (PK_GROUP == null) {
 				PK_GROUP = pk_group;
@@ -432,9 +464,9 @@ public class HkGenXbsqAction extends NCAction {
 			
 			String[] zhanghuInfo = map_zhanghu.get(pk_org);
 			
-			String zhaiyao = zjjhxm_name;
+			String key = pk_jsd + "##" +zjjhxm_name; // 按 结算单+资金计划项目  来汇总行
 			
-			if (!map_body.containsKey(zhaiyao)) {
+			if (!map_body.containsKey(key)) {
 				rowCount++;
 				String uuid = UUID.randomUUID().toString();
 				AllocateApplyBVO bVO = new AllocateApplyBVO();
@@ -454,21 +486,22 @@ public class HkGenXbsqAction extends NCAction {
 				bVO.setPk_accid(zhanghuInfo[4]);		// 收款单位内部账户 bd_accid
 				
 				bVO.setPk_planitem_r(zjjxxm);	// 资金计划项目
-				bVO.setRemark(zhaiyao);
+				bVO.setRemark(""); // 需要叠加
 				bVO.setRowno("" + (rowCount * 10));
 				bVO.setStatus(VOStatus.NEW);
 				bVO.setAttributeValue("pseudocolumn", (rowCount - 1));
 				bVO.setVuserdef1(uuid);		// 表体自定义项1，记录关联关系
+				bVO.setVuserdef2(billCode);	// 业务单号
 				
 				Object[] body_value = new Object[3];
 				body_value[0] = bVO;
 				body_value[1] = new ArrayList<String[]>();
 				body_value[2] = uuid;
 				
-				map_body.put(zhaiyao, body_value);
+				map_body.put(key, body_value);
 			}
 			
-			Object[] body_value = map_body.get(zhaiyao);
+			Object[] body_value = map_body.get(key);
 			AllocateApplyBVO bVO = (AllocateApplyBVO)body_value[0];
 			ArrayList<String[]> body_link = (ArrayList<String[]>)body_value[1];
 			body_link.add(new String[]{
@@ -477,6 +510,13 @@ public class HkGenXbsqAction extends NCAction {
 			});
 			bVO.setApplyamount(bVO.getApplyamount().add(mny));
 			bVO.setApplyolcamount(bVO.getApplyolcamount().add(mny));
+			String zhaiyao_new = bVO.getRemark() + "【" + zhaiyao + "】";
+			if (zhaiyao_new.length() < 280) {
+				// 下拨申请的摘要  最大长度为 300， 所以做一下限制，只有小于280 才叠加
+				bVO.setRemark(bVO.getRemark() + "【" + zhaiyao + "】"); // 需要叠加
+			} else {
+				bVO.setRemark(bVO.getRemark() + "...");
+			}
 			totalMny = totalMny.add(mny);
 		}
 		
