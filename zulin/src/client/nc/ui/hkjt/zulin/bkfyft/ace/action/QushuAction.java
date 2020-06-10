@@ -103,10 +103,10 @@ public class QushuAction extends NCAction {
 		);
 		// 责任凭证的处理
 		String whereSql_zeren = " and nvl(ht.vhkfield01, 'N') in ('N', '~') ";
-		String whereSql_zeren_sy = " and nvl(y.vdef01, 'N') in ('N', '~') ";
+		String whereSql_zeren_sy = " and nvl(y.vdef03, 'N') in ('N', '~') "; // 查询上月
 		if (isZeren.booleanValue()) {
 			whereSql_zeren = " and nvl(ht.vhkfield01, 'N') = 'Y' ";
-			whereSql_zeren_sy = " and nvl(y.vdef01, 'N') = 'Y' ";
+			whereSql_zeren_sy = " and nvl(y.vdef03, 'N') = 'Y' ";	// 查询上月
 		}
 		StringBuffer querySQL = 
 				// 生效的处理，取 合同结束日期
@@ -578,6 +578,7 @@ public class QushuAction extends NCAction {
 					.append(" and tz.ibillstatus = 1 ")		// 只取 审核通过的
 					.append(" and tz.yearmonth = '"+yearMonth+"' ")
 					.append(" and tz.pk_org = '"+pk_org+"' ")
+					// TODO 需要做调整，按 是否责任凭证  来分别获取
 			;
 			
 			ArrayList list_TZ = (ArrayList)iUAPQueryBS.executeQuery(
