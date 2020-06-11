@@ -104,9 +104,11 @@ public class QushuAction extends NCAction {
 		// 责任凭证的处理
 		String whereSql_zeren = " and nvl(ht.vhkfield01, 'N') in ('N', '~') ";
 		String whereSql_zeren_sy = " and nvl(y.vdef03, 'N') in ('N', '~') "; // 查询上月
+		String whereSql_zeren_tz = " and nvl(tz.vdef03, 'N') in ('N', '~') "; // 查询调整
 		if (isZeren.booleanValue()) {
 			whereSql_zeren = " and nvl(ht.vhkfield01, 'N') = 'Y' ";
 			whereSql_zeren_sy = " and nvl(y.vdef03, 'N') = 'Y' ";	// 查询上月
+			whereSql_zeren_tz = " and nvl(tz.vdef03, 'N') = 'Y' "; // 查询调整
 		}
 		StringBuffer querySQL = 
 				// 生效的处理，取 合同结束日期
@@ -419,6 +421,7 @@ public class QushuAction extends NCAction {
 						.append(" and fk.billstatus = 8 ") // 付款单 取 已签字 状态
 						.append(" and nvl(szxm.name, 'NULL') not like '%保证金%' ")	// 不取 保证金 的付款
 						.append(" and ht.pk_org = '").append(pk_org).append("' ")
+						.append(whereSql_zeren) // 责任凭证的过滤
 //						.append(" and fk.billyear || '-' || fk.billperiod = '").append(yearMonth).append("' ")
 						.append(" and fk.signdate between '").append(str_yb_ksrq).append(" 00:00:00' and '").append(str_yb_jsrq).append(" 23:59:59' ")
 						.append(" group by ht.cvendorid, ht.vbillcode ")
@@ -578,7 +581,7 @@ public class QushuAction extends NCAction {
 					.append(" and tz.ibillstatus = 1 ")		// 只取 审核通过的
 					.append(" and tz.yearmonth = '"+yearMonth+"' ")
 					.append(" and tz.pk_org = '"+pk_org+"' ")
-					// TODO 需要做调整，按 是否责任凭证  来分别获取
+					.append(whereSql_zeren_tz)	// 按 是否责任凭证，取调整数
 			;
 			
 			ArrayList list_TZ = (ArrayList)iUAPQueryBS.executeQuery(
@@ -597,15 +600,15 @@ public class QushuAction extends NCAction {
 					// 对方##合同号
 					String key = pk_cutomer+"##"+roomno;
 					
-					UFDouble tzje = PuPubVO.getUFDouble_NullAsZero(obj[2]);		// 调整金额
-					UFDouble yfje = PuPubVO.getUFDouble_NullAsZero(obj[3]);		// 预付调整金额
+					UFDouble tzje = PuPubVO.getUFDouble_ZeroAsNull(obj[2]);		// 调整金额
+					UFDouble yfje = PuPubVO.getUFDouble_ZeroAsNull(obj[3]);		// 预付调整金额
 					
 					YuebaoBVO yuebaoBVO = MAP_yuebaoBVO.get(key);
 					if(yuebaoBVO!=null)
 					{	// 表体自定义08 存储 调整金额
-						yuebaoBVO.setVbdef08(tzje.toString());
+						yuebaoBVO.setVbdef08(tzje==null?null:tzje.toString());
 						// 上游单据号 存储 预付调整金额
-						yuebaoBVO.setVsourcebillcode(yfje.toString());
+						yuebaoBVO.setVsourcebillcode(yfje==null?null:yfje.toString());
 					}
 					else
 					{// 如果发生数据 没有  则不做处理
