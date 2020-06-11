@@ -216,7 +216,7 @@ public class HkGenXbsqAction extends NCAction {
 				.append(",fktype.name ")		// 7 付款业务类型
 				.append(",zjxm.pk_fundplan ")	// 8 资金项目pk
 				.append(",zjxm.name ")			// 9 资金项目name
-				.append(",jsb.memo ")			// 10 结算单-摘要
+				.append(",case when jsb.systemcode = 'erm' then bi.defitem5 else jsb.memo end ")			// 10 结算单-摘要
 				.append(",js.billcode ")		// 11 业务单号
 				.append(" from cmp_settlement js ")
 				.append(" inner join cmp_detail jsb on js.pk_settlement = jsb.pk_settlement ")
@@ -227,6 +227,8 @@ public class HkGenXbsqAction extends NCAction {
 				.append(" left join bd_inoutbusiclass szxm on (fkb.pk_subjcode = szxm.pk_inoutbusiclass) ")
 				// 资金项目
 				.append(" left join bd_fundplan zjxm on (szxm.def5 = zjxm.pk_fundplan) ")
+				// 取摘要
+				.append(" left join er_busitem bi on (bi.pk_busitem = jsb.pk_billdetail)")
 				.append(" where js.dr = 0 and jsb.dr = 0 ")
 				.append(" and nvl(js.def1,'N') <> '").append(IPub_data.JSXB_done).append("' ")
 				.append(" and js.pk_settlement in ").append(pkSettlementStr)
@@ -416,7 +418,7 @@ public class HkGenXbsqAction extends NCAction {
 				.append(",jsb.pay ")			// 5 金额
 				.append(",szxm.def5 ")			// 6 资金计划项目pk
 				.append(",zjjxxm.name ")		// 7 资金计划项目name
-				.append(",jsb.memo ")			// 8 结算单-摘要
+				.append(",case when jsb.systemcode = 'erm' then bi.defitem5 else jsb.memo end ")			// 8 结算单-摘要
 				.append(",js.billcode ")		// 9 业务单号
 				.append(" from cmp_settlement js ")
 				.append(" inner join cmp_detail jsb on js.pk_settlement = jsb.pk_settlement ")
@@ -424,6 +426,8 @@ public class HkGenXbsqAction extends NCAction {
 				.append(" left join er_bxzb bx on (bxb.PK_JKBX = bx.PK_JKBX and bx.dr = 0) ")
 				.append(" left join bd_inoutbusiclass szxm ON (bxb.SZXMID = szxm.PK_INOUTBUSICLASS AND SZXM.DR = 0) ")
 				.append(" left join bd_fundplan zjjxxm ON (szxm.DEF5 = zjjxxm.PK_FUNDPLAN AND ZJJXXM.dr = 0) ")
+				// 取摘要
+				.append(" left join er_busitem bi on (bi.pk_busitem = jsb.pk_billdetail)")
 				.append(" where js.dr = 0 and jsb.dr = 0 ")
 				.append(" and nvl(js.def1,'N') <> '").append(IPub_data.JSXB_done).append("' ")
 				.append(" and js.pk_settlement in ").append(pkSettlementStr)
