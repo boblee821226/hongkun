@@ -555,6 +555,7 @@ public class QushuAction extends NCAction {
 						yuebaoBVO.setVbdef05(PuPubVO.getString_TrimZeroLenAsNull(obj[7]));		// 部门pk
 						yuebaoBVO.setVbdef07(PuPubVO.getString_TrimZeroLenAsNull(obj[8]));		// 实际合同金额
 						yuebaoBVO.setVbdef09(ls_wtxts.toString());	// 未摊销天数
+						yuebaoBVO.setVbdef10(vbdef10);	// 合同号
 						yuebaoBVO.setVbmemo("【上期有余额，本期无发生】");	// 备注
 						
 						MAP_yuebaoBVO.put(key, yuebaoBVO);
