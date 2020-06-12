@@ -331,12 +331,16 @@ public class HkGenXbsqAction extends NCAction {
 			});
 			bVO.setApplyamount(bVO.getApplyamount().add(mny));
 			bVO.setApplyolcamount(bVO.getApplyolcamount().add(mny));
-			String zhaiyao_new = bVO.getRemark() + "【" + zhaiyao + "】";
-			if (zhaiyao_new.length() < 280) {
-				// 下拨申请的摘要  最大长度为 300， 所以做一下限制，只有小于280 才叠加
-				bVO.setRemark(bVO.getRemark() + "【" + zhaiyao + "】"); // 需要叠加
-			} else {
-				bVO.setRemark(bVO.getRemark() + "...");
+			if (zhaiyao != null) {
+				String zhaiyao_new = bVO.getRemark() + "【" + zhaiyao + "】";
+				if (zhaiyao_new.length() < 280) {
+					// 下拨申请的摘要  最大长度为 300， 所以做一下限制，只有小于280 才叠加
+					bVO.setRemark(bVO.getRemark() + "【" + zhaiyao + "】"); // 需要叠加
+				} else if (zhaiyao_new.endsWith("...")) {
+					// 如果以 ... 结尾 就不再处理
+				} else {
+					bVO.setRemark(bVO.getRemark() + "...");
+				}
 			}
 			totalMny = totalMny.add(mny);
 		}
@@ -514,12 +518,16 @@ public class HkGenXbsqAction extends NCAction {
 			});
 			bVO.setApplyamount(bVO.getApplyamount().add(mny));
 			bVO.setApplyolcamount(bVO.getApplyolcamount().add(mny));
-			String zhaiyao_new = bVO.getRemark() + "【" + zhaiyao + "】";
-			if (zhaiyao_new.length() < 280) {
-				// 下拨申请的摘要  最大长度为 300， 所以做一下限制，只有小于280 才叠加
-				bVO.setRemark(bVO.getRemark() + "【" + zhaiyao + "】"); // 需要叠加
-			} else {
-				bVO.setRemark(bVO.getRemark() + "...");
+			if (zhaiyao != null) {
+				String zhaiyao_new = bVO.getRemark() + "【" + zhaiyao + "】";
+				if (zhaiyao_new.length() < 280) {
+					// 下拨申请的摘要  最大长度为 300， 所以做一下限制，只有小于280 才叠加
+					bVO.setRemark(bVO.getRemark() + "【" + zhaiyao + "】"); // 需要叠加
+				} else if (zhaiyao_new.endsWith("...")) {
+					// 如果以 ... 结尾 就不再处理
+				} else {
+					bVO.setRemark(bVO.getRemark() + "...");
+				}
 			}
 			totalMny = totalMny.add(mny);
 		}
