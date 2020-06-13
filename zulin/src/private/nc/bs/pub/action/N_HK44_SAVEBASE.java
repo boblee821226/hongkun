@@ -66,6 +66,13 @@ public class N_HK44_SAVEBASE extends AbstractPfAction<TzBillVO> {
 				String pk_org = hvo.getPk_org();			// 组织
 				String qijian = hvo.getVdef01();			// 期间
 				
+				String isZrpz = hvo.getVdef03();	// 是否责任凭证
+				if (null == isZrpz
+				 || "~".equals(isZrpz)
+				) {
+					isZrpz = "N";
+				}
+				
 				if(pk==null) pk="null";
 				
 				BaseDAO dao = new BaseDAO();
@@ -77,11 +84,13 @@ public class N_HK44_SAVEBASE extends AbstractPfAction<TzBillVO> {
 							.append(" and tz.pk_org = '"+pk_org+"' ")
 							.append(" and tz.vdef01 = '"+qijian+"' ")
 							.append(" and tz.pk_hk_zulin_tiaozheng != '"+pk+"' ")
+							// 责任凭证
+							.append(" and replace(nvl(tz.vdef03, 'N'), '~', 'N') = '").append(isZrpz).append("' ")
 				;
 				List list = (List)dao.executeQuery(querySQL.toString(),new ArrayListProcessor());
 				if(list!=null && list.size()>0)
 				{
-					throw new BusinessException("同组织同期间，不能保存多份月报调整。");
+					throw new BusinessException("同组织同期间，不能保存多份月报调整（责任凭证）。");
 				}
 				
 			}

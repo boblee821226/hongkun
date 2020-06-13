@@ -575,6 +575,7 @@ public class QushuAction extends NCAction {
 					.append(",tzb.vbdef12 ")	// 合同号
 					.append(",tzb.dytzje ")		// 本月费用调整
 					.append(",tzb.vbdef01 ")	// 本月预付调整
+					.append(",tzb.vbdef02 ")	// 本月摊销天数调整
 					.append(" from hk_zulin_tiaozheng tz ")
 					.append(" inner join hk_zulin_tiaozheng_b tzb on tz.pk_hk_zulin_tiaozheng = tzb.pk_hk_zulin_tiaozheng ")
 					.append(" where tz.dr=0 and tzb.dr=0 ")
@@ -603,6 +604,7 @@ public class QushuAction extends NCAction {
 					
 					UFDouble tzje = PuPubVO.getUFDouble_ZeroAsNull(obj[2]);		// 调整金额
 					UFDouble yfje = PuPubVO.getUFDouble_ZeroAsNull(obj[3]);		// 预付调整金额
+					Integer txTs  = PuPubVO.getInteger_NullAs(obj[4], 0);	// 摊销天数
 					
 					YuebaoBVO yuebaoBVO = MAP_yuebaoBVO.get(key);
 					if(yuebaoBVO!=null)
@@ -610,6 +612,12 @@ public class QushuAction extends NCAction {
 						yuebaoBVO.setVbdef08(tzje==null?null:tzje.toString());
 						// 上游单据号 存储 预付调整金额
 						yuebaoBVO.setVsourcebillcode(yfje==null?null:yfje.toString());
+						// 摊销天数
+						Integer txTs_VO = (PuPubVO.getInteger_NullAs(yuebaoBVO.getVbdef09(),0)
+								+ txTs);
+						yuebaoBVO.setVbdef09(
+							txTs_VO.toString()
+						);
 					}
 					else
 					{// 如果发生数据 没有  则不做处理
