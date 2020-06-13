@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="gbk"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+<bean id="menuItem" class="nc.pubapp.pade.funcmodel.vo.MenuItem"><property name="dr" value="0"/>
+<property name="funModelFilePath" value="store/designmodel/funcmodel/hk_store_lvyun_out/funcregis/HKJ20228.menu"/>
+<property name="funcode" value="HKJ20228"/>
+<property name="ismenutype" value="false"/>
+<property name="menuitemcode" value="HKJ20228"/>
+<property name="menuitemname" value="绿云出库明细"/>
+<property name="pk_menuitem" value="0001ZZ100000001P7NSJ"/>
+<property name="resid" value="DHKJ20228"/>
+<property name="ts" value="2020-06-13 16:52:54"/>
+</bean>
+
+</beans>

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="gbk"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+<bean id="funcregister" class="nc.pubapp.pade.funcmodel.vo.FuncRegister"><property name="bmf_path" value="store\METADATA\lvyun\hk_store_lvyun_out.bmf"/>
+<property name="busiActiveList">
+<list></list>
+</property>
+<property name="cfunid" value="0001ZZ100000001P7NSH"/>
+<property name="class_name" value="nc.ui.pubapp.uif2app.ToftPanelAdaptorEx"/>
+<property name="dr" value="0"/>
+<property name="fun_name" value="绿云出库明细"/>
+<property name="fun_property" value="0"/>
+<property name="funcRegisterButtonList">
+<list></list>
+</property>
+<property name="funcRegisterParamList">
+<list><bean class="nc.pubapp.pade.funcmodel.vo.FuncRegisterParam"><property name="dr" value="0"/>
+<property name="paramname" value="BeanConfigFilePath"/>
+<property name="paramvalue" value="nc/ui/hkjt/store/lvyun_out/ace/view/Hk_store_lvyun_out_config.xml"/>
+<property name="parentid" value="0001ZZ100000001P7NSH"/>
+<property name="pk_param" value="0001ZZ100000001P7NSI"/>
+<property name="ts" value="2020-06-13 16:52:52"/>
+</bean>
+</list>
+</property>
+<property name="funcode" value="HKJ20228"/>
+<property name="funnode_path" value="store\designmodel\ace\client\HKJ20228.fnf"/>
+<property name="funtype" value="0"/>
+<property name="isbuttonpower" value="false"/>
+<property name="isenable" value="true"/>
+<property name="isfunctype" value="false"/>
+<property name="menuModelFilePath" value="store/designmodel/funcmodel/hk_store_lvyun_out/menuitemregis/HKJ20228.menu"/>
+<property name="metaDataID" value="78ba16e1-ae78-4798-b553-05520fa72994"/>
+<property name="moduleName" value="hkjt"/>
+<property name="orgtypecode" value="STOCKORGTYPE00000000"/>
+<property name="own_module" value="HKJ2"/>
+<property name="pageList">
+<list></list>
+</property>
+<property name="parent_id" value="0001ZZ10000000000EPS"/>
+<property name="pk_group" value="~"/>
+<property name="ts" value="2020-06-13 16:52:52"/>
+<property name="uif2model_path" value="store\designmodel\ace\uif2model\HKJ20228.umf"/>
+</bean>
+
+</beans>
