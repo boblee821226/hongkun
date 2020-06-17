@@ -38,6 +38,11 @@ public class Hk_fp_sk_billMaintainImpl extends AceHk_fp_sk_billPubServiceImpl
 						.append(" from hk_fapiao_sk_bill fp ")
 						.append(" where fp.dr = 0 ")
 						.append(" and fp.fphm = '"+clientHVO.getFphm()+"' ")
+						/**
+						 * 区分 收款 和 付款
+						 * 2020年6月16日22:22:31
+						 */
+						.append(" and fp.vbilltypecode = '"+clientHVO.getVbilltypecode()+"' ")
 			;
 			ArrayList list = (ArrayList)new BaseDAO().executeQuery(querySQL.toString(), new ArrayListProcessor());
 			if(list!=null && list.size()>0)
