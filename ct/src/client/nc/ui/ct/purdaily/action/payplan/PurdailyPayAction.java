@@ -95,7 +95,8 @@ public class PurdailyPayAction extends PayAction {
 			StringBuffer querySQL = 
 			new StringBuffer("select ")
 				.append(" htp.pk_ct_payplan ")
-				.append(",gys.name ||  '【' || substr(htb.vbdef3,1,10) || '至' || substr(htb.vbdef4,1,10) || '】' || szxm.name ")
+				// 前面加上 合同名称 （2020年6月17日16:05:09）
+				.append(",ht.ctname || '-' || gys.name ||  '【' || substr(htb.vbdef3,1,10) || '至' || substr(htb.vbdef4,1,10) || '】' || szxm.name ")
 				.append(",htb.vbdef1 ")
 				.append(" from ct_payplan htp ")
 				.append(" inner join ct_pu_b htb on htp.pk_ct_pu = htb.pk_ct_pu and htp.crowno = htb.crowno ")
