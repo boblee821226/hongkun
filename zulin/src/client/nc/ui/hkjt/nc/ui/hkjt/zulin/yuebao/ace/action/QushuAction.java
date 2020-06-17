@@ -127,6 +127,8 @@ public class QushuAction extends NCAction {
 			.append("		'"+str_yb_ksrq+"' between substr(ctb.vbdef3,1,10) and substr(ctb.vbdef4,1,10) ")
 			.append("    or ")
 			.append("		'"+str_yb_jsrq+"' between substr(ctb.vbdef3,1,10) and substr(ctb.vbdef4,1,10) ")
+			.append("	 or ")
+			.append("		(substr(ctb.vbdef3, 1, 10) > '"+str_yb_ksrq+"' and substr(ctb.vbdef4, 1, 10) < '"+str_yb_jsrq+"') ")
 			.append("     ) ")
 			
 			.append(" and ct.fstatusflag in (1,6) ")	// 取 生效 和 终止
@@ -134,7 +136,7 @@ public class QushuAction extends NCAction {
 			.append(" and '"+str_yb_ksrq+"' <= substr(nvl(replace(ct.vdef19,'~',''),'2099-12-31'),1,10) ")	// 用退租日期 来 判断计费时点（退租的那天 要算租金的）
 			.append(" and substr(ctb.vbdef3,1,10)<=substr(nvl(replace(ct.vdef19,'~',''),'2099-12-31'),1,10) ")	// 合同明细的开始日期 要小于等于 退租日期
 			
-//			.append(" and ct.vbillcode = '201809111-6-50011-6-50021-6-5003' ")		// 测试
+//			.append(" and ct.vbillcode in ('202003261403','202005311403') ")		// 测试
 		;
 		
 		IUAPQueryBS iUAPQueryBS = (IUAPQueryBS)NCLocator.getInstance().lookup(IUAPQueryBS.class.getName()); 
@@ -200,7 +202,7 @@ public class QushuAction extends NCAction {
 				ht_ksrq.compareTo(yb_ksrq)>0
 			 &&	ht_jsrq.compareTo(yb_jsrq)>=0	
 			)
-			{// 如果 如果 合同明细开始日期 大于 月报开始日期  并且  合同明细结束日期 大于等于 月报结束日期
+			{// 如果 合同明细开始日期 大于 月报开始日期  并且  合同明细结束日期 大于等于 月报结束日期
 			 // 说明 月报的 后半段 在 第二行合同明细， 计费天数 = 合同明细开始日期 到 月报结束日期
 				yb_days = yb_jsrq.getDaysAfter(ht_ksrq)+1;	// 月报结束日期-合同开始日期+1
 				htVO.setYb_days(yb_days);	// 计费天数
@@ -210,8 +212,25 @@ public class QushuAction extends NCAction {
 				js_ksrq = ht_ksrq;
 				js_jsrq = yb_jsrq;
 			}
+			else if(
+				ht_ksrq.compareTo(yb_ksrq)>0
+			 &&	ht_jsrq.compareTo(yb_jsrq)<=0	
+			)
+			{ // 如果 合同明细开始日期 大于 月报开始日期  并且  合同明细结束日期 小于 月报结束日期
+			  // 说明不足月，计费天数 = 合同明细开始日期 到 合同明细结束日期
+			  // 2020年6月16日23:45:07
+				yb_days = ht_jsrq.getDaysAfter(ht_ksrq)+1;	// 合同明细结束日期-合同明细开始日期+1
+				htVO.setYb_days(yb_days);	// 计费天数
+				
+				js_ksrq = ht_ksrq;
+				js_jsrq = ht_jsrq;
+			}
 			
 			// 如果 结束日期 大于 终止日期， 需要 将结束日期 赋值为终止日期， 并且重新计算 月报天数
+//			if(js_jsrq == null || ht_zzrq == null) {
+//				System.out.print("====");
+//			}
+			
 			if(js_jsrq.compareTo(ht_zzrq)>0)
 			{
 				js_jsrq = ht_zzrq;

@@ -169,12 +169,11 @@ public class QushuAction extends NCAction {
 				.append(" and ht.fstatusflag in (1, 6) ")
 				// 时间范围
 				.append(" and ( ")
-				.append(" 	'").append(str_yb_ksrq).append("' between substr(htb.vbdef3,1,10) and substr(htb.vbdef4,1,10) ")
+				.append(" 		'").append(str_yb_ksrq).append("' between substr(htb.vbdef3,1,10) and substr(htb.vbdef4,1,10) ")
 				.append(" 	or ")
-				.append("  	'").append(str_yb_jsrq).append("' between substr(htb.vbdef3,1,10) and substr(htb.vbdef4,1,10) ")
-//				.append("	or ")
-//				// 考虑合同终止日期
-//				.append("	substr(nvl(ht.actualinvalidate, '2999-12-31'), 1, 10) between '").append(str_yb_ksrq).append("' and '").append(str_yb_jsrq).append("' ")
+				.append("  		'").append(str_yb_jsrq).append("' between substr(htb.vbdef3,1,10) and substr(htb.vbdef4,1,10) ")
+				.append("	or ")
+				.append("		(substr(ctb.vbdef3, 1, 10) > '"+str_yb_ksrq+"' and substr(ctb.vbdef4, 1, 10) < '"+str_yb_jsrq+"') ")
 				.append(" ) ")
 				.append(" and '"+str_yb_ksrq+"' <= substr(nvl(replace(ht.actualinvalidate, '~', ''), '2099-12-31'), 1, 10) ")	// 合同终止日期 来 判断计费时点（终止的那天 要算租金的）
 			.append(" and substr(htb.vbdef3,1,10) <= substr(nvl(replace(ht.actualinvalidate, '~', ''), '2099-12-31'), 1, 10) ")	// 合同明细的开始日期 要小于等于 合同终止日期
@@ -283,6 +282,19 @@ public class QushuAction extends NCAction {
 				
 				js_ksrq = ht_ksrq;
 				js_jsrq = yb_jsrq;
+			}
+			else if(
+				ht_ksrq.compareTo(yb_ksrq)>0
+			 &&	ht_jsrq.compareTo(yb_jsrq)<=0	
+			)
+			{ // 如果 合同明细开始日期 大于 月报开始日期  并且  合同明细结束日期 小于 月报结束日期
+			  // 说明不足月，计费天数 = 合同明细开始日期 到 合同明细结束日期
+			  // 2020年6月16日23:45:07
+				yb_days = ht_jsrq.getDaysAfter(ht_ksrq)+1;	// 合同明细结束日期-合同明细开始日期+1
+				htVO.setYb_days(yb_days);	// 计费天数
+				
+				js_ksrq = ht_ksrq;
+				js_jsrq = ht_jsrq;
 			}
 			
 			// 如果 结束日期 大于 终止日期， 需要 将结束日期 赋值为终止日期， 并且重新计算 月报天数
