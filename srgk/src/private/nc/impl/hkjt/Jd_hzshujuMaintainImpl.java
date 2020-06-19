@@ -491,7 +491,7 @@ public class Jd_hzshujuMaintainImpl implements IJd_hzshujuMaintain {
 			sb.append("hzshuju.pk_org_v, ");
 			sb.append("hzshuju.pk_dept, ");
 			sb.append("hzshuju.pk_fdept, ");
-			sb.append("hzshuju.hzdate, ");
+//			sb.append("hzshuju.hzdate, ");
 			sb.append("hzshuju.jzfs_id lx_id, ");
 			sb.append("hzshuju.khmz, ");
 			sb.append("jzfs.pk_parent, ");
@@ -505,6 +505,11 @@ public class Jd_hzshujuMaintainImpl implements IJd_hzshujuMaintain {
 	//		sb.append(" where payment<>0 and nvl(hzshuju.dr,0)=0 and jzfs.name<>'" + ZHUANYINGSHOU + "' ");
 			sb.append(" where payment<>0 and nvl(hzshuju.dr,0)=0 " +
 					" and jzfs.name not in ('" + ZHUANYINGSHOU + "','" + ZHUANYINGSHOU_POS + "') ");
+			sb.append(" and hzshuju.pk_org in (" + pk_org + ") ");
+			sb.append(" and to_date(hzshuju.hzdate,'yyyy-mm-dd hh24:mi:ss')>=to_date('"
+					+ begindate.substring(0, 10) + "','yyyy-mm-dd hh24:mi:ss') ");
+			sb.append("  and to_date(hzshuju.hzdate,'yyyy-mm-dd hh24:mi:ss')<=to_date('"
+					+ enddate.substring(0, 10) + "','yyyy-mm-dd hh24:mi:ss') ");
 		sb.append(" union all ");
 			sb.append("select  ");
 			sb.append("hzshuju.pk_group, ");
@@ -512,7 +517,7 @@ public class Jd_hzshujuMaintainImpl implements IJd_hzshujuMaintain {
 			sb.append("hzshuju.pk_org_v, ");
 			sb.append("hzshuju.pk_dept, ");
 			sb.append("hzshuju.pk_fdept, ");
-			sb.append("hzshuju.hzdate, ");
+//			sb.append("hzshuju.hzdate, ");
 			sb.append("hzshuju.srxm_id lx_id, ");
 			sb.append("hzshuju.khmz, ");
 			sb.append("srxm.pk_parent, ");
@@ -523,52 +528,69 @@ public class Jd_hzshujuMaintainImpl implements IJd_hzshujuMaintain {
 			sb.append(" from hk_srgk_jd_hzshuju  hzshuju  left join hk_srgk_hg_srxm srxm ");
 			sb.append("on hzshuju.srxm_id=srxm.pk_hk_srgk_hg_srxm ");
 			sb.append(" where charge<>0 and nvl(hzshuju.dr,0)=0  ");
+			sb.append(" and hzshuju.pk_org in (" + pk_org + ") ");
+			sb.append(" and to_date(hzshuju.hzdate,'yyyy-mm-dd hh24:mi:ss')>=to_date('"
+					+ begindate.substring(0, 10) + "','yyyy-mm-dd hh24:mi:ss') ");
+			sb.append("  and to_date(hzshuju.hzdate,'yyyy-mm-dd hh24:mi:ss')<=to_date('"
+					+ enddate.substring(0, 10) + "','yyyy-mm-dd hh24:mi:ss') ");
 		sb.append(" union all ");
 			sb.append(" select  ");
-			sb.append("hzshuju.pk_group, ");
-			sb.append("hzshuju.pk_org, ");
-			sb.append("hzshuju.pk_org_v, ");
-			sb.append("hzshuju.pk_dept, ");
-			sb.append("hzshuju.pk_fdept, ");
-			sb.append("hzshuju.hzdate, ");
+			sb.append("max(hzshuju.pk_group), ");
+			sb.append("max(hzshuju.pk_org), ");
+			sb.append("max(hzshuju.pk_org_v), ");
+			sb.append("null, ");
+			sb.append("null, ");
+//			sb.append("hzshuju.hzdate, ");
 			sb.append("hzshuju.jzfs_id lx_id, ");
 			sb.append("hzshuju.khmz, ");
-			sb.append("jzfs.pk_parent, ");
-			sb.append("jzfs.code, ");
-			sb.append("jzfs.name, ");
-			sb.append("hzshuju.payment jine, ");
+			sb.append("max(jzfs.pk_parent), ");
+			sb.append("max(jzfs.code), ");
+			sb.append("max(jzfs.name), ");
+			sb.append("sum(hzshuju.payment) jine, ");
 			sb.append("'xfwlk' xflx ");
 			sb.append(" from hk_srgk_jd_hzshuju hzshuju left join ");
 			sb.append(" hk_srgk_hg_jzfs jzfs ");
 			sb.append(" on hzshuju.jzfs_id=jzfs.pk_hk_srgk_hg_jzfs ");
 			sb.append(" where payment<>0 and nvl(hzshuju.dr,0)=0 and jzfs.name='" + ZHUANYINGSHOU + "' ");
+			sb.append(" and hzshuju.pk_org in (" + pk_org + ") ");
+			sb.append(" and to_date(hzshuju.hzdate,'yyyy-mm-dd hh24:mi:ss')>=to_date('"
+					+ begindate.substring(0, 10) + "','yyyy-mm-dd hh24:mi:ss') ");
+			sb.append("  and to_date(hzshuju.hzdate,'yyyy-mm-dd hh24:mi:ss')<=to_date('"
+					+ enddate.substring(0, 10) + "','yyyy-mm-dd hh24:mi:ss') ");
+			sb.append(" group by hzshuju.jzfs_id,hzshuju.khmz ");
 			// POS-×ªÓ¦ÊÕ
 		sb.append(" union all ");
 			sb.append(" select  ");
-			sb.append("hzshuju.pk_group, ");
-			sb.append("hzshuju.pk_org, ");
-			sb.append("hzshuju.pk_org_v, ");
-			sb.append("hzshuju.pk_dept, ");
-			sb.append("hzshuju.pk_fdept, ");
-			sb.append("hzshuju.hzdate, ");
+			sb.append("max(hzshuju.pk_group), ");
+			sb.append("max(hzshuju.pk_org), ");
+			sb.append("max(hzshuju.pk_org_v), ");
+			sb.append("null, ");
+			sb.append("null, ");
+//			sb.append("hzshuju.hzdate, ");
 			sb.append("hzshuju.jzfs_id lx_id, ");
 			sb.append("hzshuju.khmz, ");
-			sb.append("jzfs.pk_parent, ");
-			sb.append("jzfs.code, ");
-			sb.append("jzfs.name, ");
-			sb.append("hzshuju.payment jine, ");
+			sb.append("max(jzfs.pk_parent), ");
+			sb.append("max(jzfs.code), ");
+			sb.append("max(jzfs.name), ");
+			sb.append("sum(hzshuju.payment) jine, ");
 			sb.append("'xfwlk-pos' xflx ");
 			sb.append(" from hk_srgk_jd_hzshuju hzshuju left join ");
 			sb.append(" hk_srgk_hg_jzfs jzfs ");
 			sb.append(" on hzshuju.jzfs_id=jzfs.pk_hk_srgk_hg_jzfs ");
 			sb.append(" where payment<>0 and nvl(hzshuju.dr,0)=0 and jzfs.name='" + ZHUANYINGSHOU_POS + "' ");
-			
-			sb.append(" ) xfinfo ");
-			sb.append(" where xfinfo.pk_org in (" + pk_org + ") ");
-			sb.append(" and to_date(xfinfo.hzdate,'yyyy-mm-dd hh24:mi:ss')>=to_date('"
+			sb.append(" and hzshuju.pk_org in (" + pk_org + ") ");
+			sb.append(" and to_date(hzshuju.hzdate,'yyyy-mm-dd hh24:mi:ss')>=to_date('"
 					+ begindate.substring(0, 10) + "','yyyy-mm-dd hh24:mi:ss') ");
-			sb.append("  and to_date(xfinfo.hzdate,'yyyy-mm-dd hh24:mi:ss')<=to_date('"
+			sb.append("  and to_date(hzshuju.hzdate,'yyyy-mm-dd hh24:mi:ss')<=to_date('"
 					+ enddate.substring(0, 10) + "','yyyy-mm-dd hh24:mi:ss') ");
+			sb.append(" group by hzshuju.jzfs_id,hzshuju.khmz ");
+			sb.append(" ) xfinfo ");
+//			sb.append(" where xfinfo.pk_org in (" + pk_org + ") ");
+//			sb.append(" and to_date(xfinfo.hzdate,'yyyy-mm-dd hh24:mi:ss')>=to_date('"
+//					+ begindate.substring(0, 10) + "','yyyy-mm-dd hh24:mi:ss') ");
+//			sb.append("  and to_date(xfinfo.hzdate,'yyyy-mm-dd hh24:mi:ss')<=to_date('"
+//					+ enddate.substring(0, 10) + "','yyyy-mm-dd hh24:mi:ss') ");
+			sb.append(" where (1=1) ");
 			if (pk_dept != null && !"".equals(pk_dept)) {
 				sb.append("and (xfinfo.pk_dept in ");
 				sb.append("(select dept.pk_dept ");
@@ -577,7 +599,7 @@ public class Jd_hzshujuMaintainImpl implements IJd_hzshujuMaintain {
 				sb.append(" start with dept.pk_dept in ('" + pk_dept
 						+ "')) or xfinfo.pk_dept in ('" + pk_dept + "')) ");
 			}
-			sb.append(" order by xfinfo.xflx,xfinfo.code ");
+			sb.append(" order by xfinfo.xflx,xfinfo.code,xfinfo.khmz ");
 
 		List<HZShuJuVO> list = (List<HZShuJuVO>) getBD().executeQuery(
 				sb.toString(), new BeanListProcessor(HZShuJuVO.class));
