@@ -173,7 +173,7 @@ public class QushuAction extends NCAction {
 				.append(" 	or ")
 				.append("  		'").append(str_yb_jsrq).append("' between substr(htb.vbdef3,1,10) and substr(htb.vbdef4,1,10) ")
 				.append("	or ")
-				.append("		(substr(ctb.vbdef3, 1, 10) > '"+str_yb_ksrq+"' and substr(ctb.vbdef4, 1, 10) < '"+str_yb_jsrq+"') ")
+				.append("		(substr(htb.vbdef3, 1, 10) > '"+str_yb_ksrq+"' and substr(htb.vbdef4, 1, 10) < '"+str_yb_jsrq+"') ")
 				.append(" ) ")
 				.append(" and '"+str_yb_ksrq+"' <= substr(nvl(replace(ht.actualinvalidate, '~', ''), '2099-12-31'), 1, 10) ")	// 合同终止日期 来 判断计费时点（终止的那天 要算租金的）
 			.append(" and substr(htb.vbdef3,1,10) <= substr(nvl(replace(ht.actualinvalidate, '~', ''), '2099-12-31'), 1, 10) ")	// 合同明细的开始日期 要小于等于 合同终止日期
