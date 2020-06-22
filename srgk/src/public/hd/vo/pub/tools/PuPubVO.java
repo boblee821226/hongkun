@@ -1,5 +1,6 @@
 package hd.vo.pub.tools;
 
+import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -162,4 +163,20 @@ public class PuPubVO {
 		
 		return result;
 	}
+	
+	/**
+	 * 字符长度
+	 */
+	public static int getStringLength(String str,String encoding) throws UnsupportedEncodingException{
+		if(isNullOrEmpty(str)) return 0;
+		else return str.getBytes(encoding).length;
+	}
+	/**
+	* 判断字段是否为空
+	* @return true 为空， false 不为空
+	*/
+	public static boolean isNullOrEmpty(String str){
+	    return null == str || "".equals(str);
+	}
+	
 }
