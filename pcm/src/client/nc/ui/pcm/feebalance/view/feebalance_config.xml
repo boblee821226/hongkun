@@ -1,0 +1,390 @@
+<?xml version="1.0" encoding="gbk"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+	
+	<import resource="classpath:nc/ui/pmpub/config/frame_config.xml" />
+	<import resource="classpath:nc/ui/pmpub/config/action_config.xml" />
+	<import resource="classpath:nc/ui/pmpub/config/mediator_config.xml" />
+	
+	<!-- 删行判断依据：列出的字段中有一个不为空，则不是空行 -->
+	<bean id="noBlankRowKeyFiledsMap" class="java.util.HashMap">
+	    <constructor-arg>
+			<map>
+				<entry key="bodyvos">
+					<list>
+						<value>pk_project</value>
+						<value>pk_material</value>
+					</list>
+				</entry>
+			</map>
+		</constructor-arg>
+	</bean>
+	
+	<!-- 保存 -->
+	<bean id="saveAction" class="nc.ui.pcm.feebalance.action.SaveAction"
+		init-method="initAction">
+		<property name="model" ref="manageAppModel" />
+		<property name="editor" ref="billFormEditor" />
+		<property name="filledUpInFlow" value="false" />	
+	    <property name="validationService" ref="validateService" />
+	</bean>
+    <bean id="validateService" class="nc.ui.pubapp.uif2app.validation.CompositeValidation">
+		<property name="validators">
+			<list>
+			    <!-- 表体非空 校验 -->
+				<bean class="nc.ui.pm.action.validator.BodyNotNullValidator" >
+				   <property name="bodyC_E">
+						<map>
+							<entry key="nc.vo.pcm.feebalance.FeeBalanceBodyVO" value="default"></entry>
+						</map>
+					</property>
+				</bean>
+				
+				<!-- 保存时校验-->
+              	<bean class="nc.ui.pcm.feebalance.validator.SaveValidator" />
+				
+				<!-- 项目+项目任务+CBS+物料 唯一性校验 -->
+				<bean class="nc.ui.pcm.feebalance.validator.FieldsUniqueValidator" />
+				
+			</list>
+		</property>
+	</bean>
+	
+	<!-- 保存提交 -->
+	<bean id="saveAndCommitAction" class="nc.ui.pcm.feebalance.action.saveAndCommitAction"
+		init-method="initAction">
+		<property name="model" ref="manageAppModel" />
+		<property name="editor" ref="billFormEditor" />
+		<property name="filledUpInFlow" value="false" />
+		<property name="validationService" ref="validateServicecommit" /> 
+	</bean>
+	<bean id="validateServicecommit" class="nc.ui.pubapp.uif2app.validation.CompositeValidation">
+		<property name="validators">
+			<list>
+			    <!-- 表体非空 校验 -->
+				<bean class="nc.ui.pm.action.validator.BodyNotNullValidator" >
+				   <property name="bodyC_E">
+						<map>
+							<entry key="nc.vo.pcm.feebalance.FeeBalanceBodyVO" value="default"></entry>
+						</map>
+					</property>
+				</bean>
+				
+			   <!-- 保存时校验-->
+               <bean class="nc.ui.pcm.feebalance.validator.SaveValidator" />
+				
+				<!-- 项目+项目任务+CBS+物料 唯一性校验 -->
+				<bean class="nc.ui.pcm.feebalance.validator.FieldsUniqueValidator" />
+				
+			</list>
+		</property>
+	</bean>
+	
+	<!-- 提交 -->
+	<bean id="commitAction" class="nc.ui.pm.action.CommitAction">
+		<property name="model" ref="manageAppModel" />
+		<property name="editor" ref="billFormEditor" />
+		<property name="billType" value="4D83" />
+		<property name="actionName" value="SAVE" />
+		<property name="filledUpInFlow" value="true" />
+	</bean>
+	<bean id="commitValidationService" class ="nc.ui.pubapp.uif2app.validation.CompositeValidation">
+		<property name = "validators">
+			<list>
+				<!-- ref bean = "commitValidate" / -->
+			</list>
+		</property>
+	</bean>
+	<bean id = "commitValidate" class="nc.ui.pcm.feebalance.validator.CommitValidator" >
+		<property name="billForm" ref="billFormEditor" />
+	</bean>
+	
+	<!-- 表体行action -->
+	<bean id="bodyLineActions" class="java.util.ArrayList">
+		<constructor-arg>
+			<list>
+				<!-- 提供了一组默认实现 -->
+				<bean class="nc.ui.pubapp.uif2app.actions.BodyAddLineAction" />
+				<bean class="nc.ui.pubapp.uif2app.actions.BodyInsertLineAction" />
+				<ref bean="bodyDeleteLineAction" />
+				<bean class="nc.ui.pubapp.uif2app.actions.BodyLineEditAction" />
+				<bean class="nc.ui.pub.beans.ActionsBar$ActionsBarSeparator" />
+				<ref bean="bodyViewMaxAction" />
+			</list>
+		</constructor-arg>
+	</bean>
+	<!-- 删行按钮 -->
+	<bean id="bodyDeleteLineAction" class="nc.ui.pcm.feebalance.action.BodyDeleteLineAction" />
+	
+	<!-- 审批 -->
+	<bean id="approveAction" class="nc.ui.pcm.feebalance.action.ApproveAction"
+		init-method="initAction">
+		<property name="model" ref="manageAppModel" />
+		<property name="editor" ref="billFormEditor" />
+		<property name="filledUpInFlow" value="true" />
+		<property name="checkDataPower" value="true" />
+	</bean>
+	<!-- 联查按钮组 -->
+	<bean id="linkMenuAction" class="nc.ui.pm.action.container.LinkQueryMenuAction">
+		<property name="code" value="linkAction" />
+		<property name="actions">
+			<list>
+				<ref bean="linkQueryAction" />
+				<ref bean="linkVoucherAction" />
+			</list>
+		</property>
+	</bean>
+	<!-- 联查凭证 -->
+	<bean id="linkVoucherAction" class="nc.ui.pm.action.PMQueryAboutVoucherAction">
+		<property name="model" ref="manageAppModel" />
+	</bean>
+	<!-- 业务单据只能复制进行事件扩展，但是公共的handler不能删除必须保留 -->
+	<bean id="eventMediator" class="nc.ui.pubapp.uif2app.model.AppEventHandlerMediator">
+		<property name="model" ref="manageAppModel" />
+		<property name="handlerMap">
+			<map>
+				<!-- 组织切换事件 -->
+				<entry key="nc.ui.pubapp.uif2app.event.OrgChangedEvent">
+					<list>
+					    <ref bean="rollBackCodeOrgChgHandler" />
+						<ref bean="resetDataOrgChgHandler" />
+						<ref bean="getCodeOrgchgHandler" />
+						<ref bean="initRefOrgchgHandler" />
+					</list>
+				</entry>
+				<!-- 表头字段编辑前事件 -->
+				<entry key="nc.ui.pubapp.uif2app.event.card.CardHeadTailBeforeEditEvent">
+					<list>
+					<ref bean="CardHeadBeforeEditHandler" />	
+					</list>
+				</entry>
+				
+				<!-- 表头字段编辑后事件 -->
+				<entry key="nc.ui.pubapp.uif2app.event.card.CardHeadTailAfterEditEvent">
+					<list>
+					<ref bean="CardHeadAfterEditHandler" />
+					</list>
+				</entry>
+				<!-- 列表界面初始化事件 -->
+				<entry key="nc.ui.pubapp.uif2app.event.list.ListPanelLoadEvent">
+					<list>
+					</list>
+				</entry>
+				<!-- 列表界面表头行切换事件 -->
+				<entry key="nc.ui.pubapp.uif2app.event.list.ListHeadRowChangedEvent">
+					<list>
+					
+					</list>
+				</entry>
+				<!-- 新增事件 -->
+				<entry key="nc.ui.pubapp.uif2app.event.billform.AddEvent">
+					<list>
+						<ref bean="addHandler"/>
+					</list>
+				</entry>
+			</map>
+		</property>
+		<property name="handlerGroup">
+			<list>
+				<!-- 表体字段编辑前事件 -->
+				<bean class="nc.ui.pubapp.uif2app.event.EventHandlerGroup">
+					<property name="event"
+						value="nc.ui.pubapp.uif2app.event.card.CardBodyBeforeEditEvent" />
+					<property name="picky" ref="childrenPicky" />
+				    <property name="handler" ref="CardBodybeforeHandler" />	
+				</bean>
+				
+				<bean class="nc.ui.pubapp.uif2app.event.EventHandlerGroup">
+					<property name="event"
+						value="nc.ui.pubapp.uif2app.event.card.CardBodyBeforeEditEvent" />
+					<property name="picky" ref="childrenPicky" />
+					<property name="handler">
+						<bean class="nc.ui.pm.handler.CBSAndProjectBodyBeforeEditHandler">
+							<property name="CBSNodeFiled" value="pk_cbsnode" />
+							<property name="projectIDFeild" value="pk_project" />
+						</bean>
+					</property>
+				</bean>
+				
+				<!-- 表体字段编辑后事件 -->
+				<bean class="nc.ui.pubapp.uif2app.event.EventHandlerGroup">
+					<property name="event"
+						value="nc.ui.pubapp.uif2app.event.card.CardBodyAfterEditEvent" />
+					<property name="picky" ref="childrenPicky" />
+				    <property name="handler" ref="CardBodyafterHandler" />			
+			
+				</bean>
+				<!-- 表头根据状态转换规则，过滤项目 -->
+				<bean class="nc.ui.pubapp.uif2app.event.EventHandlerGroup">
+					<property name="event"
+						value="nc.ui.pubapp.uif2app.event.card.CardHeadTailBeforeEditEvent" />
+					<property name="handler">
+						<bean class="nc.ui.pm.disposeprojectref.HeadProjectRefBeforeEditHandler" />
+					</property>
+				</bean>
+				<!-- 表体根据状态转换规则，过滤项目 -->
+				<bean class="nc.ui.pubapp.uif2app.event.EventHandlerGroup">
+					<property name="event"
+						value="nc.ui.pubapp.uif2app.event.card.CardBodyBeforeEditEvent" />
+					<property name="handler">
+						<bean class="nc.ui.pm.disposeprojectref.BodyProjectRefBeforeEditHandler" />
+					</property>
+				</bean>
+				
+				<!-- 跨组织选部门、人员编辑前事件 -->
+				<bean class="nc.ui.pubapp.uif2app.event.EventHandlerGroup">
+				    <property name="event" value="nc.ui.pubapp.uif2app.event.card.CardHeadTailBeforeEditEvent" />
+				    <property name="handler" ref="deptAndPsnBeforeEditHandler" />
+				</bean>
+				<!-- 跨组织选部门编辑后事件 -->
+				<bean class="nc.ui.pubapp.uif2app.event.EventHandlerGroup">
+				    <property name="event" value="nc.ui.pubapp.uif2app.event.card.CardHeadTailAfterEditEvent" />
+				    <property name="handler" ref="psnAfterEditHandler" />
+				</bean>
+				
+			</list>
+		</property>
+	</bean>
+	
+	<!-- 事件监听 -->
+	<!-- 子表事件过滤器，主要用以防止二次开发扩展页签后，事件处理发生混乱 -->
+	<bean id="childrenPicky" class="nc.ui.pubapp.uif2app.event.ChildrenPicky">
+		<property name="billform" ref="billFormEditor" />
+		<property name="bodyVoClasses">
+			<list>
+				<value>nc.vo.pcm.feebalance.FeeBalanceBodyVO</value>
+			</list>
+		</property>
+	</bean>
+	<!-- 表头编辑前事件-->
+	<bean id="CardHeadBeforeEditHandler" class="nc.ui.pcm.feebalance.handler.CardHeadTailBeforeEditHandler"/>
+	
+	<!-- 表头编辑后事件 -->
+	<bean id="CardHeadAfterEditHandler" class="nc.ui.pcm.feebalance.handler.CardHeadTailAfterEditHandler"/>
+	
+	<!-- 表体编辑前事件 -->
+	<bean id="CardBodybeforeHandler" class="nc.ui.pcm.feebalance.handler.BodyBeforeEditHandler">
+		<property name="refmutiField" ref="refmutiField"></property>
+		<property name="refMultiFiList">
+			<list>
+				<value>pk_material_v</value>
+			</list>
+		</property>
+	</bean>
+	
+	<!-- 表体编辑后事件 -->
+	<bean id="CardBodyafterHandler" class="nc.ui.pcm.feebalance.handler.BodyAfterEditHandler">
+		<property name="billForm" ref="billFormEditor" />
+		<property name="refmutiField" ref="refmutiField"></property>
+	</bean>
+	<bean id="refmutiField" class="nc.ui.pm.config.VarString">
+		<property name="valueStr" value="pk_ct_termset" />
+	</bean>
+	
+	<!-- 跨组织选部门、人员编辑前事件 -->
+	<bean id="deptAndPsnBeforeEditHandler" class="nc.ui.pm.handler.DeptAndPsnBeforeEditHandler">
+	    <property name="pk_dept" value="pk_transact_dept_v"/>
+	    <property name="pk_psn" value="pk_transactor" />
+	    <property name="cardForm" ref="billFormEditor" />
+	</bean>
+	<!-- 跨组织选部门编辑后事件 -->
+	<bean id="psnAfterEditHandler" class="nc.ui.pm.handler.PsnAfterEditHandler">
+	    <property name="pk_dept" value="pk_transact_dept"/>
+	    <property name="pk_psn" value="pk_transactor" />
+	    <property name="cardForm" ref="billFormEditor" />
+	</bean>
+	
+	<!--新增事件  -->
+	<bean id="addHandler" class="nc.ui.pcm.feebalance.handler.AddHandler"/>
+
+    <!-- 精度处理器 -->
+	<bean id="scaleProcess" class="nc.ui.pcm.feebalance.util.FeeBalanceScaleUtil" />
+	<!-- 打印精度处理 -->
+	<bean id="printScaleUtil" class="nc.ui.pcm.feebalance.util.FeeBalancePrintScaleUtil" />
+	
+	<!-- 查询条件过滤 -->
+	<bean id="qryCondInitializer" class="nc.ui.pcm.feebalance.query.FeeBalanceConditionInitializer" />
+
+    <!-- 打开节点监听 -->
+	<bean id="InitDataListener" class="nc.ui.pm.model.PMInitDataListenerEx">
+		<property name="model" ref="manageAppModel" />
+		<property name="context" ref="context"></property>
+		<property name="pmodelDataManager" ref="modelDataManager"/>
+		<!-- 打开节点节点后要显示的界面 -->
+      <property name="listView" ref="listView" />
+		<property name="cardForm" ref="billFormEditor" />
+		<property name="voClassName" ref="Voclass" />
+		<property name="queryAction" ref="queryAction"></property>
+		<property name="autoShowUpComponent" ref="listView" />
+		<property name="multiLinkQueryEnable" value="true" />
+		<property name="billType" value="4D83"></property>
+		
+		<property name="container" ref="actionsOfList"></property>
+		<property name="tableCode" value="bodyvos"/>
+ 		<property name="cardBodyAfterEditEventHandler" ref="CardBodyafterHandler"/>
+	</bean>
+	
+	<bean id="Voclass" class="nc.ui.pm.config.VarString" >
+    	<property name = "valueStr" value ="nc.vo.pcm.feebalance.FeeBalanceBillVO"/> 
+	</bean>
+	
+	
+	<!-- 自定义项查询容器 -->
+	<bean id="userdefitemContainer" class="nc.ui.pmpub.view.defprocess.PMUserDefItemContainer">
+		<property name="context" ref="context" />
+		<property name="params">
+			<list>
+				<bean class="nc.ui.uif2.userdefitem.QueryParam">
+					<property name="mdfullname" value="pcm.FeeBalanceHeadVO" />
+				</bean>
+				<bean class="nc.ui.uif2.userdefitem.QueryParam">
+					<property name="mdfullname" value="pcm.FeeBalanceBodyVO" />
+				</bean>
+			</list>
+		</property>
+	</bean>
+	<!-- 卡片自定义项配置 -->
+	<bean name="cardUserdefitemPreparator"
+		class="nc.ui.pmpub.view.defprocess.PMUserdefitemContainerCardPreparator">
+		<property name="container" ref="userdefitemContainer" />
+		<property name="loginContext" ref="context" />
+		<property name="params">
+			<list>
+				<bean class="nc.ui.uif2.editor.UserdefQueryParam">
+					<property name="mdfullname" value="pcm.FeeBalanceHeadVO" />
+					<property name="pos" value="0" />
+					<property name="prefix" value="def" />
+				</bean>
+				<bean class="nc.ui.uif2.editor.UserdefQueryParam">
+					<property name="mdfullname" value="pcm.FeeBalanceBodyVO" />
+					<property name="pos" value="1" />
+					<property name="tabcode" value="bodyvos" />
+					<property name="prefix" value="def" />
+				</bean>
+			</list>
+		</property>
+	</bean>
+	<!-- 列表自定义项处理 -->
+	<bean name="listUserdefitemlistPreparator"
+		class="nc.ui.pmpub.view.defprocess.PMUserdefitemContainerListPreparator">
+		<property name="container" ref="userdefitemContainer" />
+		<property name="loginContext" ref="context" />
+		<property name="params">
+			<list>
+				<bean class="nc.ui.uif2.editor.UserdefQueryParam">
+					<property name="mdfullname" value="pcm.FeeBalanceHeadVO" />
+					<property name="pos" value="0" />
+					<property name="prefix" value="def" />
+				</bean>
+				<bean class="nc.ui.uif2.editor.UserdefQueryParam">
+					<property name="mdfullname" value="pcm.FeeBalanceBodyVO" />
+					<property name="pos" value="1" />
+					<property name="tabcode" value="bodyvos" />
+					<property name="prefix" value="def" />
+				</bean>
+			</list>
+		</property>
+	</bean>
+	
+</beans>
