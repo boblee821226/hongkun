@@ -1,0 +1,458 @@
+<?xml version="1.0" encoding="gbk"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+	<!-- Actions -->
+	<bean id="toftpanelActionContributors" class="nc.ui.pmpub.action.contributors.PMActionContributors"
+		init-method="initActions">
+		<property name="contributors">
+			<list>
+				<ref bean="actionsOfList" />
+				<ref bean="actionsOfCard" />
+			</list>
+		</property>
+		<property name="model" ref="manageAppModel" />
+		<property name="billForm" ref="billFormEditor" />
+		<property name="transferViewProcessor" ref="transferProcessor" />
+		<property name="pfAddInfoRemoteCaller" ref="pfAddInfoContainer" />
+	</bean>
+	<bean id="pfAddInfoContainer" class="nc.ui.pmpub.remotecall.PfAddInfoRemoteCallCombinator">
+		<property name="model" ref="manageAppModel"></property>
+	</bean>
+	<bean name="transferProcessor" class="nc.ui.pubapp.billref.dest.TransferViewProcessor">
+		<property name="list" ref="listView" />
+		<property name="transferLogic" ref="transferLogic" />
+		<property name="actionContainer" ref="actionsOfList" />
+		<property name="billForm" ref="billFormEditor" />
+		<!-- 为解决拉单界面 返回后，查询方案隐藏的Bug <property name="queryAreaShell" ref="queryArea" 
+			/> -->
+		<property name="cardActionContainer" ref="actionsOfCard" />
+		<property name="saveAction" ref="saveAction" />
+		<property name="cancelAction" ref="cancelAction" />
+		<property name="commitAction" ref="saveAndCommitAction" />
+		<property name="listProcessor" ref="transferListViewProcessor" />
+	</bean>
+
+	<!-- 拉单精度处理 -->
+	<bean id="transferListViewProcessor" class="nc.ui.pm.scale.TransferListViewProcessor">
+		<property name="scaleProcessClassName" value="nc.ui.pm.scale.DefaultScaleProcess" />
+	</bean>
+
+	<bean name="transferLogic" class="nc.ui.pubapp.billref.dest.DefaultBillDataLogic">
+		<property name="billForm" ref="billFormEditor" />
+	</bean>
+
+	<!-- 列表显示下的按钮 -->
+	<bean id="actionsOfList" class="nc.ui.uif2.actions.StandAloneToftPanelActionContainer">
+		<constructor-arg ref="listView" />
+		<property name="model" ref="manageAppModel" />
+		<property name="actions">
+			<list>
+				<ref bean="addAction" />
+				<ref bean="editAction" />
+				<ref bean="deleteAction" />
+				<ref bean="separatorAction" />
+				<ref bean="queryAction" />
+				<ref bean="refreshAction" />
+				<ref bean="separatorAction" />
+				<ref bean="commitMenuAction" />
+				<ref bean="auditMenuAction" />
+				<ref bean="assMenuAction" />
+				<ref bean="separatorAction" />
+				<ref bean="linkMenuAction" />
+				<ref bean="separatorAction" />
+				<ref bean="printMenuAction" />
+			</list>
+		</property>
+	</bean>
+
+	<!-- 卡片显示下的按钮 -->
+	<bean id="actionsOfCard" class="nc.ui.uif2.actions.StandAloneToftPanelActionContainer">
+		<constructor-arg ref="billFormEditor" />
+		<property name="model" ref="manageAppModel" />
+		<!-- 此处配置的Action浏览态始终可见 -->
+		<property name="actions">
+			<list>
+				<ref bean="addAction" />
+				<ref bean="editAction" />
+				<ref bean="deleteAction" />
+				<ref bean="separatorAction" />
+				<ref bean="queryAction" />
+				<ref bean="cardRefreshAction" />
+				<ref bean="separatorAction" />
+				<ref bean="commitMenuAction" />
+				<ref bean="auditMenuAction" />
+				<ref bean="assMenuAction" />
+				<ref bean="separatorAction" />
+				<ref bean="linkMenuAction" />
+				<ref bean="separatorAction" />
+				<ref bean="printMenuAction" />
+				<!-- HK 2020年6月23日20:23:01 -->
+				<!-- 红冲 -->
+				<ref bean="separatorAction" />
+				<ref bean="reverseAction" />
+				<!-- END -->
+			</list>
+		</property>
+
+		<!-- 此处配置的Action编辑态始终可见 -->
+		<property name="editActions">
+			<list>
+				<ref bean="saveAction" />
+				<ref bean="saveAndCommitAction" />
+				<ref bean="separatorAction" />
+				<!-- 取消按钮区 -->
+				<ref bean="cancelAction" />
+				<ref bean="separatorAction" />
+			</list>
+		</property>
+	</bean>
+
+	<!-- 卡片右肩默认翻页按钮组 -->
+	<bean id="headTabActions" class="java.util.ArrayList">
+		<constructor-arg>
+			<list>
+				<ref bean="pmAttachmentAction" />
+				<bean class="nc.ui.pub.beans.ActionsBar$ActionsBarSeparator" />
+				<ref bean="firstLineAction" />
+				<ref bean="preLineAction" />
+				<ref bean="nextLineAction" />
+				<ref bean="lastLineAction" />
+				<bean class="nc.ui.pub.beans.ActionsBar$ActionsBarSeparator" />
+				<ref bean="headViewMaxAction" />
+			</list>
+		</constructor-arg>
+	</bean>
+
+
+	<bean id="bodyLineActions" class="java.util.ArrayList">
+		<constructor-arg>
+			<list>
+				<!-- 提供了一组默认实现 -->
+				<bean class="nc.ui.pubapp.uif2app.actions.BodyAddLineAction" />
+				<bean class="nc.ui.pubapp.uif2app.actions.BodyInsertLineAction" />
+				<bean class="nc.ui.pubapp.uif2app.actions.BodyDelLineAction" />
+				<bean class="nc.ui.pubapp.uif2app.actions.BodyLineEditAction" />
+				<bean class="nc.ui.pub.beans.ActionsBar$ActionsBarSeparator" />
+				<ref bean="bodyViewMaxAction" />
+			</list>
+		</constructor-arg>
+	</bean>
+
+	<!-- 表头最大化按钮 -->
+	<bean id="headViewMaxAction" class="nc.ui.pm.action.BillViewMaxAction">
+		<property name="billForm" ref="billFormEditor" />
+		<property name="pos" value="0" />
+	</bean>
+
+	<!-- 表体最大化按钮 -->
+	<bean id="bodyViewMaxAction" class="nc.ui.pm.action.BillViewMaxAction">
+		<property name="billForm" ref="billFormEditor" />
+		<property name="pos" value="1" />
+	</bean>
+
+
+	<!--联查 -->
+	<bean id="linkMenuAction" class="nc.ui.pm.action.container.LinkQueryMenuAction">
+		<property name="code" value="linkAction" />
+		<property name="actions">
+			<list>
+				<ref bean="linkQueryAction" />
+				<!-- <ref bean="linkNextQueryAction" /> -->
+			</list>
+		</property>
+	</bean>
+	<!-- 辅助功能按钮组 -->
+	<bean id="assMenuAction" class="nc.ui.pm.action.container.AssMenuAction">
+		<property name="actions">
+			<list>
+				<ref bean="pmAttachmentAction" />
+			</list>
+		</property>
+	</bean>
+	<!-- 附件管理 -->
+	<bean id="pmAttachmentAction" class="nc.ui.pm.action.PMAttachmentAction">
+		<property name="model" ref="manageAppModel" />
+		<!-- 审批后不能删除 -->
+		<property name="approveNoDelete" value="false"></property>
+		<!-- 能上传 -->
+		<property name="canUpload" value="true"></property>
+		<!-- 能删除 -->
+		<property name="canDelete" value="true"></property>
+	</bean>
+
+	<!-- 附件管理 卡片显示个数 -->
+	<bean id="pmAttachmentActionCard" class="nc.ui.pm.action.PMAttachmentActionCard">
+		<property name="model" ref="manageAppModel" />
+		<property name="service" ref="modelService" />
+		<property name="pmAttachmentActionListener" ref="pmAttachmentActionListener" />
+	</bean>
+	<bean id="pmAttachmentActionListener" class="nc.ui.pm.action.PMAttachmentActionListener">
+		<property name="model" ref="manageAppModel" />
+		<!-- 审批后不能删除 -->
+		<property name="approveNoDelete" value="false"></property>
+		<!-- 能上传 -->
+		<property name="canUpload" value="true"></property>
+		<!-- 能删除 -->
+		<property name="canDelete" value="true"></property>
+	</bean>
+
+	<!-- 分隔按钮 -->
+	<bean id="separatorAction" class="nc.funcnode.ui.action.SeparatorAction" />
+	<!-- 显示列表的拦截器 -->
+	<bean id="showListInterceptor"
+		class="nc.ui.pubapp.uif2app.actions.interceptor.ShowUpComponentInterceptor">
+		<property name="showUpComponent" ref="listView" />
+	</bean>
+	<!-- 显示卡片的拦截器 -->
+	<bean id="showCardInterceptor"
+		class="nc.ui.pubapp.uif2app.actions.interceptor.ShowUpComponentInterceptor">
+		<property name="showUpComponent" ref="billFormEditor" />
+	</bean>
+
+	<bean id="addAction" class="nc.ui.pubapp.uif2app.actions.AddAction">
+		<property name="model" ref="manageAppModel" />
+		<property name="interceptor" ref="showCardInterceptor" />
+	</bean>
+	<bean id="editAction" class="nc.ui.pmpub.action.PMEditAction"
+		init-method="initAction">
+		<property name="model" ref="manageAppModel" />
+		<property name="billForm" ref="billFormEditor" />
+		<property name="interceptor" ref="showCardInterceptor" />
+		<property name="checkDataPower" value="true" />
+	</bean>
+	<bean id="deleteAction" class="nc.ui.pmpub.action.PMDeleteAction"
+		init-method="initAction">
+		<property name="model" ref="manageAppModel" />
+		<property name="editor" ref="billFormEditor" />
+		<property name="filledUpInFlow" value="true" />
+		<property name="checkDataPower" value="true" />
+	</bean>
+
+	<bean id="saveAction" class="nc.ui.pmpub.action.PMSaveAction"
+		init-method="initAction">
+		<property name="model" ref="manageAppModel" />
+		<property name="editor" ref="billFormEditor" />
+		<property name="filledUpInFlow" value="false" />
+		<property name="validators">
+			<list>
+				<bean class="nc.ui.pmpub.validate.BodyNotNullValidator">
+					<constructor-arg>
+						<list>
+							<value>bodyvos</value>
+						</list>
+					</constructor-arg>
+					<property name="editor" ref="billFormEditor" />
+				</bean>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="cancelAction" class="nc.ui.pm.action.PMCancelAction">
+		<property name="model" ref="manageAppModel" />
+		<property name="editor" ref="billFormEditor" />
+	</bean>
+
+	<!-- 复制 -->
+	<bean id="copyAction" class="nc.ui.pm.action.PMCopyAction">
+		<property name="model" ref="manageAppModel" />
+		<property name="interceptor" ref="showCardInterceptor" />
+		<property name="editor" ref="billFormEditor" />
+		<property name="copyActionProcessor" ref="copyActionProcessor" />
+	</bean>
+	<bean id="copyActionProcessor" class="nc.ui.pmpub.action.processor.DefaultCopyActionProcessor" />
+	
+	<!-- 红冲  -->
+	<!-- HK 2020年6月23日20:19:37 -->
+	<bean id="reverseAction" class="nc.ui.pm.action.ReverseAction">
+		<property name="model" ref="manageAppModel" />
+		<property name="interceptor" ref="showCardInterceptor" />
+		<property name="editor" ref="billFormEditor" />
+		<property name="copyActionProcessor" ref="reverseActionProcessor" />
+	</bean>
+	<bean id="reverseActionProcessor" class="nc.ui.pmpub.action.processor.DefaultReverseActionProcessor" />
+	<!-- END -->
+
+	<!-- 查询按钮 -->
+	<bean id="queryAction" class="nc.ui.pmpub.action.PMQueryAction">
+		<property name="model" ref="manageAppModel" />
+		<property name="dataManager" ref="modelDataManager" />
+		<property name="qryCondDLGInitializer" ref="qryCondInitializer" />
+		<property name="showUpComponent" ref="listView" />
+		<property name="templateContainer" ref="queryTemplateContainer" />
+	</bean>
+
+	<bean id="qryCondInitializer"
+		class="nc.ui.pmpub.action.processor.DefaultQueryConditionInitializer" />
+
+
+	<!-- 列表下刷新 -->
+	<bean id="refreshAction" class="nc.ui.pmpub.action.PMListRefreshAction">
+		<property name="dataManager" ref="modelDataManager" />
+		<property name="model" ref="manageAppModel" />
+	</bean>
+
+	<!-- 卡片下刷新 -->
+	<bean id="cardRefreshAction" class="nc.ui.pubapp.uif2app.actions.RefreshSingleAction">
+		<property name="model" ref="manageAppModel" />
+	</bean>
+
+	<!-- 提交 -->
+	<bean id="commitAction" class="nc.ui.pmpub.action.PMCommitAction"
+		init-method="initAction">
+		<property name="model" ref="manageAppModel" />
+		<property name="editor" ref="billFormEditor" />
+		<property name="filledUpInFlow" value="true" />
+	</bean>
+	<!-- 保存提交 -->
+	<bean id="saveAndCommitAction" class="nc.ui.pmpub.action.PMSaveAndCommitAction"
+		init-method="initAction">
+		<property name="model" ref="manageAppModel" />
+		<property name="editor" ref="billFormEditor" />
+		<property name="filledUpInFlow" value="false" />
+		<property name="validators">
+			<list>
+				<bean class="nc.ui.pmpub.validate.BodyNotNullValidator">
+					<constructor-arg>
+						<list>
+							<value>bodyvos</value>
+						</list>
+					</constructor-arg>
+					<property name="editor" ref="billFormEditor" />
+				</bean>
+			</list>
+		</property>
+	</bean>
+	<!-- 收回 -->
+	<bean id="unCommitAction" class="nc.ui.pmpub.action.PMUnCommitAction"
+		init-method="initAction">
+		<property name="model" ref="manageAppModel" />
+		<property name="editor" ref="billFormEditor" />
+		<property name="filledUpInFlow" value="true" />
+	</bean>
+	<!-- 提交按钮组 -->
+	<bean id="commitMenuAction" class="nc.funcnode.ui.action.GroupAction">
+		<property name="code" value="commitMenuAction" />
+		<property name="name" value="提交" />
+		<property name="actions">
+			<list>
+				<ref bean="commitAction" />
+				<ref bean="unCommitAction" />
+			</list>
+		</property>
+	</bean>
+
+	<!-- 审批 -->
+	<bean id="approveAction" class="nc.ui.pmpub.action.PMApproveAction"
+		init-method="initAction">
+		<property name="model" ref="manageAppModel" />
+		<property name="editor" ref="billFormEditor" />
+		<property name="filledUpInFlow" value="true" />
+		<property name="checkDataPower" value="true" />
+	</bean>
+	<!-- 弃审 -->
+	<bean id="unApproveAction" class="nc.ui.pmpub.action.PMUnApproveAction"
+		init-method="initAction">
+		<property name="model" ref="manageAppModel" />
+		<property name="editor" ref="billFormEditor" />
+		<property name="filledUpInFlow" value="true" />
+		<property name="checkDataPower" value="true" />
+		<property name="validators">
+			<list>
+				<ref bean="ApproveDataPermissionValidator"></ref>
+			</list>
+		</property>
+	</bean>
+	<bean id="ApproveDataPermissionValidator"
+		class="nc.ui.pm.action.validator.ApproveDataPermissionValidator">
+		<property name="context" ref="context"></property>
+	</bean>
+	<!-- 审批按钮组 -->
+	<bean id="auditMenuAction" class="nc.funcnode.ui.action.GroupAction">
+		<property name="code" value="auditMenuAction" />
+		<property name="name" value="审批" />
+		<property name="actions">
+			<list>
+				<ref bean="approveAction" />
+				<ref bean="unApproveAction" />
+				<ref bean="separatorAction" />
+				<ref bean="queryAuditFlowAction" />
+			</list>
+		</property>
+	</bean>
+
+	<!-- 打印 -->
+	<bean id="printAction" class="nc.ui.pubapp.uif2app.actions.MetaDataBasedPrintAction">
+		<property name="preview" value="false" />
+		<property name="model" ref="manageAppModel" />
+		<property name="beforePrintDataProcess" ref="printProcessor" />
+	</bean>
+
+	<!-- 预览 -->
+	<bean id="previewAction" class="nc.ui.pubapp.uif2app.actions.MetaDataBasedPrintAction">
+		<property name="preview" value="true" />
+		<property name="model" ref="manageAppModel" />
+		<property name="beforePrintDataProcess" ref="printProcessor" />
+	</bean>
+
+	<!-- 输出 -->
+	<bean id="outputAction" class="nc.ui.pubapp.uif2app.actions.OutputAction">
+		<property name="model" ref="manageAppModel" />
+		<property name="parent" ref="billFormEditor" />
+		<property name="beforePrintDataProcess" ref="printProcessor" />
+	</bean>
+
+	<!-- 打印精度处理 -->
+	<bean id="printProcessor" class="nc.ui.pm.print.scale.PrintDataProcess">
+		<property name="model" ref="manageAppModel" />
+		<property name="printScale" ref="printScaleUtil" />
+	</bean>
+
+	<bean id="printScaleUtil" class="nc.ui.pm.print.scale.PrintScale" />
+
+	<!-- 打印按钮组 -->
+	<bean id="printMenuAction" class="nc.funcnode.ui.action.GroupAction">
+		<property name="code" value="printMenuAction" />
+		<property name="name" value="打印" />
+		<property name="actions">
+			<list>
+				<ref bean="printAction" />
+				<ref bean="previewAction" />
+				<ref bean="outputAction" />
+			</list>
+		</property>
+	</bean>
+
+	<!-- 联查单据 -->
+	<bean id="linkQueryAction" class="nc.ui.pmpub.action.PMLinkQueryBillAction"
+		init-method="initAction">
+		<property name="model" ref="manageAppModel" />
+	</bean>
+	<!-- 查看审批流 -->
+	<bean id="queryAuditFlowAction" class="nc.ui.pmpub.action.PMLinkQueryApproveInfoAction">
+		<property name="model" ref="manageAppModel" />
+	</bean>
+
+	<!-- ###################################翻页按钮#################################### -->
+
+	<!-- 第一行按钮 -->
+	<bean id="firstLineAction" class="nc.ui.uif2.actions.FirstLineAction">
+		<property name="model" ref="manageAppModel" />
+	</bean>
+
+	<!-- 上一行按钮 -->
+	<bean id="preLineAction" class="nc.ui.uif2.actions.PreLineAction">
+		<property name="model" ref="manageAppModel" />
+	</bean>
+
+	<!-- 下一行按钮 -->
+	<bean id="nextLineAction" class="nc.ui.uif2.actions.NextLineAction">
+		<property name="model" ref="manageAppModel" />
+	</bean>
+
+	<!-- 最后一行按钮 -->
+	<bean id="lastLineAction" class="nc.ui.uif2.actions.LastLineAction">
+		<property name="model" ref="manageAppModel" />
+	</bean>
+
+</beans>
