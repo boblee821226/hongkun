@@ -5,17 +5,25 @@
 
 package nc.bs.pub.action;
 
+import hd.vo.pub.tools.PuPubVO;
+
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.Map;
 
 import nc.bs.arap.actions.N_BASE_ACTION;
 import nc.bs.arap.paybp.PayBillBO;
+import nc.bs.dao.BaseDAO;
 import nc.itf.arap.fieldmap.IBillFieldGet;
+import nc.jdbc.framework.processor.ArrayListProcessor;
 import nc.vo.arap.pay.AggPayBillVO;
 import nc.vo.arap.pay.PayBillItemVO;
 import nc.vo.arap.pub.BillEnumCollection;
 import nc.vo.fipub.exception.ExceptionHandler;
 import nc.vo.pub.BusinessException;
 import nc.vo.pub.compiler.PfParameterVO;
+import nc.vo.pub.lang.UFDouble;
 
 
 
@@ -62,6 +70,52 @@ public class N_F3_SAVE extends N_BASE_ACTION {
 			// // 走批量
 			setParameter("context", paraVo.m_preValueVos);
 
+			/**
+			 * HK 2020年6月23日18:35:11
+			 * 如果来源是 4D48、4D50、4D83 ：表体金额为0，则return
+			 * 如果来源是 4D83：款项冲销 & 金额为负数、则return
+			 */
+			{
+				Map<String, String> _48 = new HashMap<>();
+				_48.put("4D48", "进度款单");
+				_48.put("4D50", "结算单");
+				_48.put("4D83", "费用结算单");
+				PayBillItemVO[] bVOs = (PayBillItemVO[])paraVo.m_preValueVo.getChildrenVO();
+				for(PayBillItemVO bVO : bVOs)
+	        	{
+	        		UFDouble money_de = bVO.getMoney_de();
+	        		if (_48.containsKey(bVO.getSrc_billtype())) {
+		        		if(PuPubVO.getUFDouble_ZeroAsNull(money_de) == null)
+		        		{// 若 金额为0的，则不生单
+		        			return null;
+		        		}
+	        		}
+	        		if ("4D83".equals(bVO.getSrc_billtype())) {
+	        			// 如果是 来源是费用结算单，则 需要检查费用结算单 的 表头自定义5 = 款项冲销，并且 金额小于0
+	        			if (money_de.compareTo(UFDouble.ZERO_DBL) < 0) {
+	        				// 如果金额小于0 才需要做判断。
+	        				String fyjsId = bVO.getSrc_billid(); // 费用结算单id
+	        				StringBuffer querySQL = 
+	        				new StringBuffer("select ")
+		        					.append(" f.pk_feebalance ")
+		        					.append(" from pm_feebalance f ")
+		        					.append(" inner join bd_defdoc d on f.def5 = d.pk_defdoc ")
+		        					.append(" where ")
+		        					.append(" d.name = '款项冲销' ") // 查询 费用结算单 是不是 款项冲销的
+		        					.append(" and f.pk_feebalance = '").append(fyjsId).append("' ")
+	        				;
+	        				BaseDAO dao = new BaseDAO();
+	        				ArrayList list = (ArrayList)dao.executeQuery(querySQL.toString(), new ArrayListProcessor());
+	        				if (list != null && !list.isEmpty()) {
+	        					// 若是 款项冲销的，则不生单。
+	        					return null;
+	        				}
+	        			}
+	        		}
+	        	}
+			}
+			/***END***/
+			
 			/**
 			 * HK 2019年10月31日 15点00分
 			 * 记录 单据上正确的 合同类型
