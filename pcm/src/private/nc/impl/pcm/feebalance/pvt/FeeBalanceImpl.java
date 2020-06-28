@@ -1,5 +1,10 @@
 package nc.impl.pcm.feebalance.pvt;
 
+import hd.vo.pub.tools.PuPubVO;
+
+import java.util.ArrayList;
+
+import nc.bs.dao.BaseDAO;
 import nc.bs.pcm.contract.bp.rule.CheckPayApplyRule;
 import nc.bs.pmpub.rule.AppendBusiTypeBeforeRule;
 import nc.bs.pmpub.rule.Approve4SendFipRule;
@@ -17,11 +22,14 @@ import nc.impl.pmpub.servicebase.action.UpdateAction;
 import nc.itf.pbm.commonrule.BillDelOrUnApprove4BudgetRule;
 import nc.itf.pbm.commonrule.BillSaveOrApprove4BudgetRule;
 import nc.itf.pcm.feebalance.prv.IFeeBalance;
+import nc.jdbc.framework.processor.ArrayListProcessor;
 import nc.vo.pbm.budgetctrl.BudgetCtrlPoint;
 import nc.vo.pcm.feebalance.FeeBalanceBillVO;
 import nc.vo.pcm.feebalance.FeeBalanceBodyVO;
 import nc.vo.pub.BusinessException;
+import nc.vo.pub.ISuperVO;
 import nc.vo.pub.compiler.PfParameterVO;
+import nc.vo.pub.lang.UFDouble;
 
 /**
  * 费用结算单 后台实现类
@@ -35,6 +43,44 @@ public class FeeBalanceImpl extends BillBaseImpl<FeeBalanceBillVO> implements
 	@Override
 	public FeeBalanceBillVO[] insertFeeBalance(FeeBalanceBillVO[] billVOs)
 			throws BusinessException {
+		/**
+		 * HK 2020年6月26日14:32:46
+		 * 新增保存前 判断，红冲金额 不能超过原单。
+		 */
+		BaseDAO dao = new BaseDAO();
+		for (FeeBalanceBillVO billVO : billVOs) {
+			for (ISuperVO childvo : billVO.getChildren(billVO.getMetaData().getChildren()[0])) {
+				String bid = childvo.getAttributeValue("def20").toString();
+				UFDouble mny = PuPubVO.getUFDouble_NullAsZero(childvo.getAttributeValue("money"));
+				if (mny.compareTo(UFDouble.ZERO_DBL) > 0) {
+					// 若 金额大于0  则报错。 既然是红冲，必须小于0
+					throw new BusinessException("红冲金额，必须为负数。");
+				}
+				// 根据bid 去查询已经存在的 红冲单 以及 原单。汇总出剩余金额。
+				StringBuffer querySQL = 
+					new StringBuffer("select ")
+							.append(" sum(fb.money) ")
+							.append(" from pm_feebalance_b fb ")
+							.append(" where fb.dr = 0 ")
+							.append(" and ( ")
+							.append(" 	fb.def20 = '").append(bid).append("' ")
+							.append(" or ")
+							.append(" 	fb.pk_feebalance_b = '").append(bid).append("' ")
+							.append(" ) ")
+							;
+				UFDouble lishi = UFDouble.ZERO_DBL; // 历史余额
+				ArrayList list = (ArrayList) dao.executeQuery(querySQL.toString(), new ArrayListProcessor());
+				if (list != null && !list.isEmpty()) {
+					lishi = PuPubVO.getUFDouble_NullAsZero(((Object[])list.get(0))[0]);
+				}
+				// mny + lishi < 0 , 说明 红冲金额超过 原单，则报错。
+				UFDouble shenghyu = mny.add(lishi);
+				if (shenghyu.compareTo(UFDouble.ZERO_DBL) < 0) {
+					throw new BusinessException("本次红冲金额，超过原单金额。");
+				}
+			}
+		}
+		/***END***/
 		return this.insert(billVOs);
 	}
 
@@ -50,6 +96,46 @@ public class FeeBalanceImpl extends BillBaseImpl<FeeBalanceBillVO> implements
 	@Override
 	public FeeBalanceBillVO[] updateFeeBalance(FeeBalanceBillVO[] billVOs,
 			FeeBalanceBillVO[] originBillVOs) throws BusinessException {
+		/**
+		 * HK 2020年6月26日14:32:46
+		 * 修改保存前 判断，红冲金额 不能超过原单。
+		 */
+		BaseDAO dao = new BaseDAO();
+		for (FeeBalanceBillVO billVO : billVOs) {
+			for (ISuperVO childvo : billVO.getChildren(billVO.getMetaData().getChildren()[0])) {
+				String bid = childvo.getAttributeValue("def20").toString();
+				String benId = childvo.getAttributeValue("pk_feebalance_b").toString();
+				UFDouble mny = PuPubVO.getUFDouble_NullAsZero(childvo.getAttributeValue("money"));
+				if (mny.compareTo(UFDouble.ZERO_DBL) > 0) {
+					// 若 金额大于0  则报错。 既然是红冲，必须小于0
+					throw new BusinessException("红冲金额，必须为负数。");
+				}
+				// 根据bid 去查询已经存在的 红冲单 以及 原单。汇总出剩余金额。
+				StringBuffer querySQL = 
+					new StringBuffer("select ")
+							.append(" sum(fb.money) ")
+							.append(" from pm_feebalance_b fb ")
+							.append(" where fb.dr = 0 ")
+							.append(" and ( ")
+							.append(" 	fb.def20 = '").append(bid).append("' ")
+							.append(" or ")
+							.append(" 	fb.pk_feebalance_b = '").append(bid).append("' ")
+							.append(" ) ")
+							.append(" and fb.pk_feebalance_b <> '").append(benId).append("' ") // 不取本单
+							;
+				UFDouble lishi = UFDouble.ZERO_DBL; // 历史余额
+				ArrayList list = (ArrayList) dao.executeQuery(querySQL.toString(), new ArrayListProcessor());
+				if (list != null && !list.isEmpty()) {
+					lishi = PuPubVO.getUFDouble_NullAsZero(((Object[])list.get(0))[0]);
+				}
+				// mny + lishi < 0 , 说明 红冲金额超过 原单，则报错。
+				UFDouble shenghyu = mny.add(lishi);
+				if (shenghyu.compareTo(UFDouble.ZERO_DBL) < 0) {
+					throw new BusinessException("本次红冲金额，超过原单金额。");
+				}
+			}
+		}
+		/***END***/
 		return this.update(billVOs, originBillVOs);
 	}
 
