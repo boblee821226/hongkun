@@ -82,6 +82,19 @@ public class DefaultReverseActionProcessor implements
 				childvo.setAttributeValue("money", benci);
 				/***END***/
 				
+				/**
+				 * HK 2020年6月30日15:30:35
+				 * 摘要前面加 红冲
+				 */
+				String memo = PuPubVO.getString_TrimZeroLenAsNull(childvo.getAttributeValue("memo"));
+				if (memo == null) {
+					memo = "红冲";
+				} else {
+					memo = "红冲：" + memo;
+				}
+				childvo.setAttributeValue("memo", memo);
+				/***END***/
+				
 				childvo.setAttributeValue(meta.getPrimaryAttribute().getName(),
 						null);
 				childvo.setAttributeValue(CommonKeyConst.PK_GROUP, null);
