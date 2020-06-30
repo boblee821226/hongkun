@@ -50,7 +50,10 @@ public class FeeBalanceImpl extends BillBaseImpl<FeeBalanceBillVO> implements
 		BaseDAO dao = new BaseDAO();
 		for (FeeBalanceBillVO billVO : billVOs) {
 			for (ISuperVO childvo : billVO.getChildren(billVO.getMetaData().getChildren()[0])) {
-				String bid = childvo.getAttributeValue("def20").toString();
+//				System.out.print("======");
+				String bid = PuPubVO.getString_TrimZeroLenAsNull(childvo.getAttributeValue("def20"));
+//				System.out.print(bid);
+				if (bid == null) continue;	// 如果不是红冲的，则不进行下面的判断
 				UFDouble mny = PuPubVO.getUFDouble_NullAsZero(childvo.getAttributeValue("money"));
 				if (mny.compareTo(UFDouble.ZERO_DBL) > 0) {
 					// 若 金额大于0  则报错。 既然是红冲，必须小于0
@@ -104,6 +107,7 @@ public class FeeBalanceImpl extends BillBaseImpl<FeeBalanceBillVO> implements
 		for (FeeBalanceBillVO billVO : billVOs) {
 			for (ISuperVO childvo : billVO.getChildren(billVO.getMetaData().getChildren()[0])) {
 				String bid = childvo.getAttributeValue("def20").toString();
+				if (bid == null) continue;	// 如果不是红冲的，则不进行下面的判断
 				String benId = childvo.getAttributeValue("pk_feebalance_b").toString();
 				UFDouble mny = PuPubVO.getUFDouble_NullAsZero(childvo.getAttributeValue("money"));
 				if (mny.compareTo(UFDouble.ZERO_DBL) > 0) {
