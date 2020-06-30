@@ -117,6 +117,7 @@ public class PuGenBodyAction extends NCAction {
 		else if("季付".equals(fk_type))	fk_month = 3;
 		else if("半年付".equals(fk_type))	fk_month = 6;
 		else if("年付".equals(fk_type))	fk_month = 12;
+		else if("两月付".equals(fk_type))	fk_month = 2;
 		else throw new Exception("无法处理的付款方式");
 		
 		// 支出项目1
