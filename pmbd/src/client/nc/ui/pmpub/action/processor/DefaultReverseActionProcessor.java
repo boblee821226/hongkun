@@ -17,6 +17,7 @@ import nc.vo.pub.ISuperVO;
 import nc.vo.pub.IVOMeta;
 import nc.vo.pub.lang.UFDateTime;
 import nc.vo.pub.lang.UFDouble;
+import nc.vo.pubapp.AppContext;
 import nc.vo.pubapp.pattern.model.entity.bill.AbstractBill;
 import nc.vo.uif2.LoginContext;
 
@@ -95,6 +96,21 @@ public class DefaultReverseActionProcessor implements
 				childvo.setAttributeValue("memo", memo);
 				/***END***/
 				
+				/**
+				 * HK 2020年6月30日16:15:41
+				 * 将 申请、实付、核销 金额 清空
+				 */
+				childvo.setAttributeValue("apply_mny", UFDouble.ZERO_DBL);
+				childvo.setAttributeValue("pay_mny", UFDouble.ZERO_DBL);
+				childvo.setAttributeValue("verify_mny", UFDouble.ZERO_DBL);
+				
+				childvo.setAttributeValue("apply_global", UFDouble.ZERO_DBL);
+				childvo.setAttributeValue("apply_group", UFDouble.ZERO_DBL);
+				childvo.setAttributeValue("apply_mny", UFDouble.ZERO_DBL);
+				
+				childvo.setAttributeValue("verify_mny", UFDouble.ZERO_DBL);
+				/***END***/
+				
 				childvo.setAttributeValue(meta.getPrimaryAttribute().getName(),
 						null);
 				childvo.setAttributeValue(CommonKeyConst.PK_GROUP, null);
@@ -129,6 +145,12 @@ public class DefaultReverseActionProcessor implements
 		hvo.setAttributeValue(CommonKeyConst.BILLMAKETIME, datetime.getDate());
 		hvo.setAttributeValue(CommonKeyConst.PK_ORG, context.getPk_org());
 		hvo.setAttributeValue(CommonKeyConst.BILL_STATUS, BillStatusConst.free);
+		/**
+		 * HK 2020年6月30日16:48:19
+		 * 结算日期 = 当前登陆日期
+		 */
+		hvo.setAttributeValue("balance_date", AppContext.getInstance().getBusiDate());
+		hvo.setAttributeValue("verify_mny", UFDouble.ZERO_DBL);
 	}
 
 }
