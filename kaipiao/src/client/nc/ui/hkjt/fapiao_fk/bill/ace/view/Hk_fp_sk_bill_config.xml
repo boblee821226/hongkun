@@ -65,8 +65,10 @@
 	<bean id="billListView" class="nc.ui.pubapp.uif2app.view.ShowUpableBillListView" init-method="initUI">
 		<property name="model"><ref bean="bmModel" /></property>
 		<property name="nodekey" value="bt" />
-		<property name="multiSelectionEnable" value="false" />
+		<property name="multiSelectionEnable" value="true" /><!--列表 是否多选 HK 2020年6月29日13:43:19-->
 		<property name="templateContainer" ref="templateContainer"/>
+		<property name="showTotalLine" value="true" /><!--列表 表头 合计行 显示 HK 2020年6月29日13:43:19-->
+		<property name="showTotalLineTabcodes" value="pk_hk_fapiao_sk_bill_b" /><!--列表 表体 合计行 显示，需要指定 页签编码 HK 2020年6月29日13:43:19-->
 	</bean>
 
 	<!--====== 视图元素：[卡片界面工具栏和返回按钮控件实例对象] ==============-->
