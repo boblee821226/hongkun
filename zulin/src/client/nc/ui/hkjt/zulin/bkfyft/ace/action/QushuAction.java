@@ -405,13 +405,12 @@ public class QushuAction extends NCAction {
 			// 也就是59621.4/1.05=56782.29
 			StringBuffer querySQL_FK = 
 			new StringBuffer(" select ")
-					.append(" a.pk_customer ")				// 客户pk
-					.append(",a.vdef10 ")					// 房间pk
-					.append(",sum(a.fkje) fkje ")			// 付款金额
-//					.append(",max(a.pk_dept) pk_dept ")		// 部门pk
-//					.append(",max(cust.name) vdef01 ")		// 对方-name
-					.append(",max(a.fplx) ")	// 发票类型
-					.append(",max(a.sl) ") 		// 税率
+					.append(" a.pk_customer ")				// 0客户pk
+					.append(",a.vdef10 ")					// 1房间pk
+					.append(",sum(a.fkje) fkje ")			// 2付款金额
+					.append(",max(a.fplx) ")				// 3发票类型
+					.append(",max(a.sl) ") 					// 4税率
+					.append(",max(a.gys_name) vdef01 ")		// 5对方-name
 					.append(" from (")
 					// 蓝字付款单、红冲付款单，src字段都是合同，所以可以统一处理
 						.append(" select ")
@@ -420,6 +419,7 @@ public class QushuAction extends NCAction {
 						.append(",sum(fkb.money_de) fkje ")		// 付款金额
 						.append(",max(fplx.name) fplx ")		// 发票类型name
 						.append(",max(to_number(nvl(replace(replace(sl.name,'~',''),'%',''),'0.0'))) sl ")		// 税率
+						.append(",max(gys.name) gys_name ")	// 供应商名称
 						.append(" from ap_paybill fk ")
 						.append(" inner join ap_payitem fkb on fk.pk_paybill = fkb.pk_paybill ")
 						.append(" inner join ct_pu ht on fkb.src_billid = ht.pk_ct_pu ")
@@ -428,6 +428,7 @@ public class QushuAction extends NCAction {
 						.append(" left join bd_defdoc fplx on ht.vdef3 = fplx.pk_defdoc ")	// 发票类型
 						.append(" left join bd_defdoc sl on ht.vdef4 = sl.pk_defdoc ")		// 税率
 						.append(" left join bd_inoutbusiclass szxm on fkb.def13 = szxm.pk_inoutbusiclass ")// 收入项目
+						.append(" left join bd_supplier gys on ht.cvendorid = gys.pk_supplier ") // 供应商
 						.append(" where fk.dr = 0 and fkb.dr = 0 ")
 						.append(" and ht.dr = 0 and fkjh.dr = 0 ")
 						.append(" and fk.billstatus = 8 ") // 付款单 取 已签字 状态
@@ -478,6 +479,7 @@ public class QushuAction extends NCAction {
 						
 						yuebaoBVO.setPk_cutomer(PuPubVO.getString_TrimZeroLenAsNull(obj[0]));	// 客户pk
 						yuebaoBVO.setVbdef10(PuPubVO.getString_TrimZeroLenAsNull(obj[1]));		// 合同号
+						yuebaoBVO.setVbdef01(PuPubVO.getString_TrimZeroLenAsNull(obj[5])); 		// 对方名称
 						
 						MAP_yuebaoBVO.put(key, yuebaoBVO);	// 放到缓存里
 					}
