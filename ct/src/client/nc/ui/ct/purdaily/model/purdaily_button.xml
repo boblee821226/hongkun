@@ -93,6 +93,10 @@
 				<ref bean="separatorAction" />
 				<ref bean="genBodyAction" />
 				<!-- END -->
+				<!-- 计算单价 HK 2020年6月30日11:16:21 -->
+				<ref bean="separatorAction" />
+				<ref bean="execPriceAction" />
+				<!-- END -->
 			</list>
 		</property>
 	</bean>
@@ -682,4 +686,12 @@
 		<property name="editor" ref="billFormEditor" />
 	</bean>
   	<!-- END -->
+  	
+  	<!-- 计算单价  HK 2020年6月30日11:10:31-->
+	<bean id="execPriceAction" class="nc.ui.ct.purdaily.action.PuExecPriceAction">
+		<property name="model" ref="ManageAppModel" />
+		<property name="editor" ref="billFormEditor" />
+	</bean>
+  	<!-- END -->
+  	
 </beans>
