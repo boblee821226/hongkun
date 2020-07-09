@@ -3033,6 +3033,10 @@ public class Jd_hzshujuMaintainImpl implements IJd_hzshujuMaintain {
 			String jzfs_code = PuPubVO.getString_TrimZeroLenAsNull( srdbbvos[i].getJzfs_code() );
 			UFDouble jine 	 = PuPubVO.getUFDouble_ZeroAsNull( srdbbvos[i].getJine() );
 			
+//			if ("99902".equals(jzfs_code)) {
+//				System.out.print("==");
+//			}
+			
 //			if ( jine != null 
 //			&& UFDouble.ONE_DBL.compareTo(jine) == 0
 //			) {
@@ -3048,6 +3052,12 @@ public class Jd_hzshujuMaintainImpl implements IJd_hzshujuMaintain {
 			// 三者皆为空  说明已经处理完毕
 			if( jzfs_pk==null && jzfs_name==null && jzfs_code==null )
 			{
+				if (yyrbBVO_temp != null 
+				&& PuPubVO.getUFDouble_ZeroAsNull(yyrbBVO_temp.getJine()) != null 
+				&& yyrbBVO_temp.getJzfs_pk() != null
+				) {
+					list_2.add(yyrbBVO_temp);
+				}
 				break;
 			}
 			
