@@ -5,6 +5,7 @@ import hd.vo.pub.tools.PuPubVO;
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map.Entry;
 
 import nc.bs.dao.BaseDAO;
@@ -114,12 +115,13 @@ public class ImpLvyunData implements IBackgroundWorkPlugin {
 		
 		String[] pk_org_list = new String[]{
 //				"0001N510000000001SY3", // 朗丽兹 9
-				"0001N510000000001SY5", // 康西 11
+//				"0001N510000000001SY5", // 康西 11
 //				"0001N510000000001SY7", // 西山温泉 10
 //				"0001N510000000001SY1", // 学院路16
+				"0001N5100000000UVI5I"	// 太申18
 		};
 		String[] date_list = new String[]{
-			"2020-05-13",
+			"2020-07-09",
 		};
 		
 		param.put("pk_org", pk_org_list);
@@ -885,12 +887,12 @@ public class ImpLvyunData implements IBackgroundWorkPlugin {
 					billVO.setParentVO(hVO);
 					billVO.setChildrenVO(bVO_list.toArray(new RzmxBVO[0]));
 					
-					for (Object one : billVO.getChildrenVO()) {
-						RzmxBVO bVO = (RzmxBVO)one;
-						if (bVO.getPk_hk_srgk_jd_rzmx_b() != null) {
-							System.out.println(bVO);
-						}
-					}
+//					for (Object one : billVO.getChildrenVO()) {
+//						RzmxBVO bVO = (RzmxBVO)one;
+//						if (bVO.getPk_hk_srgk_jd_rzmx_b() != null) {
+//							System.out.println(bVO);
+//						}
+//					}
 					
 					/**
 					 * 查询5项指数
@@ -1015,7 +1017,28 @@ public class ImpLvyunData implements IBackgroundWorkPlugin {
 				) {
 					String rmtypeName = bVO.getRmtype_name();
 					doc = DOC_SPFL.get(rmtypeName);
-				} else {
+				}
+				/**
+				 * 零点及套餐（总）：如果绿云传过来的是 总，则需要根据 时间段，去找到 具体的商品分类。
+				 * 零点及套餐（午）零点及套餐（晚）零点及套餐（早）零点及套餐（夜）
+				 * 2020年7月9日17:29:28
+				 */
+				else if ("零点及套餐（总）".equals(itemName)) {
+					SpflHVO zong = DOC_SPFL.get("零点及套餐（总）");
+					String sjd = zong.getVdef2(); // 时间段：午=00:00-17:00;晚=17:00-24:00
+					// 按照最大化需求，构造出 早、午、晚、夜 的数据模型。
+					// 大于等于 开始时间，小于 结束时间
+					// 入账时间 vbdef06
+					List<String[]> sjd_list = this.getSjdList(sjd);
+					String[] sjd_str_list = this.getSjdStrList();
+					// 入账时间-例如：2020-07-01 12:19:10
+					String rzsj = bVO.getVbdef06().substring(11, 19);	// 入账时间
+					String sjd_str = this.getSjdStr(sjd_list, sjd_str_list, rzsj); // 时间段描述
+					// 找到 真实的商品分类， 按时间段的。
+					String trueItemName = itemName.replaceFirst("总", sjd_str);
+					doc = DOC_SPFL.get(trueItemName);
+				}
+				else {
 					doc = DOC_SPFL.get(itemName);
 				}
 				if (doc != null) {
@@ -1092,6 +1115,111 @@ public class ImpLvyunData implements IBackgroundWorkPlugin {
 			charge,
 			pay,
 		};
+	}
+	
+	/**
+	 * 获得时间段
+	 */
+	private List<String[]> getSjdList(String sjd) {
+		List<String[]> sjd_list = new ArrayList<>();
+		String[] sjd_0 = new String[]{null, null};	// 早
+		String[] sjd_1 = new String[]{null, null};	// 午
+		String[] sjd_2 = new String[]{null, null};	// 晚
+		String[] sjd_3 = new String[]{null, null};	// 夜
+		sjd_list.add(sjd_0);
+		sjd_list.add(sjd_1);
+		sjd_list.add(sjd_2);
+		sjd_list.add(sjd_3);
+		
+		if (PuPubVO.getString_TrimZeroLenAsNull(sjd) != null) {
+			// 考虑半角全角的差异，统一转成 半角。
+			sjd = sjd.replaceAll("；", ";");
+			sjd = sjd.replaceAll("：", ":");
+			sjd = sjd.replaceAll(" ", "");
+			// 1、先按; 分割时间段
+			String[] _1 = sjd.split(";");
+			for (int i = 0; i < _1.length; i++) {
+				String _1_str = _1[i];
+				// 2、按= 分割时间描述
+				String[] _2 = _1_str.split("=");
+				Integer sjdIndex = getSjdIndex(_2[0]); // 获得时间段索引
+				// 3、按- 分割开始时间、结束时间
+				String[] _3 = _2[1].split("-");
+				// 封装
+				sjd_list.get(sjdIndex)[0] = _3[0] + ":00";
+				sjd_list.get(sjdIndex)[1] = _3[1] + ":00";
+			}
+			
+		} else {
+			/**
+			 * 	早餐经营时间 06:00—10:30
+				午餐经营时间 10:30—17:30
+				晚餐经营时间 17:30—06:00（次日）
+				NC的配置 ↓
+				早=06:00-10:30;午=10:30-17:30;晚=17:30-06:00
+			 */
+			// 早
+			sjd_list.get(0)[0] = "06:00:00";
+			sjd_list.get(0)[1] = "10:30:00";
+			// 午
+			sjd_list.get(1)[0] = "10:30:00";
+			sjd_list.get(1)[1] = "17:30:00";
+			// 晚
+			sjd_list.get(2)[0] = "17:30:00";
+			sjd_list.get(2)[1] = "06:00:00";
+		}
+		
+		return sjd_list;
+	}
+	
+	/**
+	 * 获得时间段描述
+	 */
+	private String[] getSjdStrList() {
+		return new String[]{"早", "午", "晚", "夜"};
+	}
+	
+	/**
+	 * 根据 时间段描述返回索引
+	 */
+	private Integer getSjdIndex(String sjdStr) {
+		String[] sjdStrList = getSjdStrList();
+		for (int i = 0; i < sjdStrList.length; i++) {
+			if (sjdStr.equals(sjdStrList[i])) {
+				return i;
+			}
+		}
+		return -1;
+	}
+	
+	/**
+	 * 根据 时间 获取 时间段描述
+	 * 约定，最后一期 是 跨天的。
+	 */
+	private String getSjdStr(List<String[]> sjd_list, String[] sjd_str_list, String sj) {
+		String sjd_str = "总";
+		for (int i = 0; i < sjd_list.size(); i++) {
+			// 循环时间段，如果入账时间 小于 时间段的结束日期，就说明再此时间内。
+			String beginTime = sjd_list.get(i)[0]; 	// 时间段的开始日期
+			String endTime = sjd_list.get(i)[1]; 	// 时间段的结束日期
+			// 如果开始日期 或 结束日期 为空，则不处理
+			if (beginTime == null || endTime == null) {
+				continue;
+			}
+			// 若 结束日期 大于 开始日期，说明是 前面几期， 则按 范围来判断
+			if (endTime.compareTo(beginTime) > 0) {
+				if (sj.compareTo(beginTime) >= 0 && sj.compareTo(endTime) < 0) {
+					sjd_str = sjd_str_list[i];
+					break;
+				}
+			}
+			// 否则，就是这一期。
+			else {
+				sjd_str = sjd_str_list[i];
+				break;
+			}
+		}
+		return sjd_str;
 	}
 	
 	/**
