@@ -196,8 +196,8 @@ public class HuiyuanPlugin implements IBackgroundWorkPlugin {
 	public Object executeTest(Object obj) throws BusinessException
 	{
 		String[] pk_orgs = {
-			"0001N510000000001SY7"	// 西山
-//			"0001N510000000001SXV"	// 国际
+//			"0001N510000000001SY7"	// 西山
+			"0001N510000000001SXV"	// 国际
 //			"0001N510000000001SXX"	// "牡丹"
 //			"0001N510000000001SY1", // "康福瑞酒店"
 //			"0001N510000000001SY3",	// "朗丽兹"
@@ -205,8 +205,8 @@ public class HuiyuanPlugin implements IBackgroundWorkPlugin {
 				
 		};
 		
-		UFDate bdate = PuPubVO.getUFDate("2019-01-26");
-		UFDate edate = PuPubVO.getUFDate("2019-01-26");
+		UFDate bdate = PuPubVO.getUFDate("2020-06-23");
+		UFDate edate = PuPubVO.getUFDate("2020-06-23");
 		
 		try
 		{
