@@ -52,7 +52,12 @@ public class N_45_SIGN extends AbstractCompiler2 {
        */
       //首先判断 是否存在 固定资产类的物料
       List<PurchaseInVO> voList = new ArrayList();
-      for (PurchaseInVO billVo : inVOs) {
+      for (PurchaseInVO billVo_source : inVOs) {
+    	  /**
+    	   * 2020年7月13日10:43:12
+    	   * 需要clone出来，进行后续处理，因为转固后会影响 返回的数据，导致后续出错。
+    	   */
+    	PurchaseInVO billVo = (PurchaseInVO)billVo_source.clone();
     	String pk_org = billVo.getParentVO().getPk_org();
     	PurchaseInBodyVO[] bodyvos = billVo.getBodys();
     	// 表体物料pk集合
@@ -89,7 +94,6 @@ public class N_45_SIGN extends AbstractCompiler2 {
 		  NCLocator.getInstance().lookup(IPurchaseInMaintain.class)
 				  .generateFixedAsset(voList_arr);
       }
-      
       /***END***/
       
       return inVOs;
