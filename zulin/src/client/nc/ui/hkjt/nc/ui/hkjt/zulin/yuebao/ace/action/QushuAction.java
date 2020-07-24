@@ -161,6 +161,7 @@ public class QushuAction extends NCAction {
 			String ht_pk_room = htVO.getPk_room();			// 房间号pk
 			
 			String srxm_name = htVO.getVdef03();	// 收入项目-名称
+//			String srxm_pk = htVO.getPk_srxm();		// 收入项目-pk
 			
 			Integer yb_days = 0;
 			
@@ -246,9 +247,10 @@ public class QushuAction extends NCAction {
 			// 同时 对 YuebaoBVO 进行封装处理
 			// 按 客户##房间号##单价  汇总
 			// 改为  按 客户pk##房号pk  汇总
+			// 改为  按 客户pk##房号pk##收入项目name 	汇总（2020年7月17日13:46:08）
 			{
 //				String key = ht_pk_customer + "##" + ht_pk_room + "##" + ht_danjia.toString();
-				String key = ht_pk_customer + "##" + ht_pk_room;
+				String key = ht_pk_customer + "##" + ht_pk_room + "##" + srxm_name;
 				YuebaoBVO yuebaoBVO = MAP_yuebaoBVO.get(key);
 				if(yuebaoBVO==null)
 				{
@@ -359,7 +361,11 @@ public class QushuAction extends NCAction {
 				for(int i=0;i<list_TZ.size();i++)
 				{
 					QueryHtVO queryHtVO = list_TZ.get(i);
-					String key = queryHtVO.getPk_customer() + "##" + queryHtVO.getPk_room();
+					// 原始的收入项目名称
+					String srxm_name = queryHtVO.getVdef03().replaceFirst("调整", "");
+					String key = queryHtVO.getPk_customer() +
+							"##" + queryHtVO.getPk_room() +
+							"##" + srxm_name;
 					
 					YuebaoBVO yuebaoBVO = MAP_yuebaoBVO.get(key);
 					if(yuebaoBVO!=null)
@@ -396,14 +402,16 @@ public class QushuAction extends NCAction {
 		{
 			StringBuffer querySQL_SK = 
 				new StringBuffer(" select ")
-						.append(" a.pk_customer ")				// 客户pk
-						.append(",a.pk_room ")					// 房间pk
-						.append(",sum(a.skje) skje ")			// 收款金额
-						.append(",max(a.pk_quyu) pk_quyu ")		// 区域pk
-						.append(",max(a.pk_dept) pk_dept ")		// 部门pk
-						.append(",max(cust.name) vdef01 ")		// 客户-name
-						.append(",max(room.name) vdef02 ")		// 房间-name
-						.append(",max(quyu.name) vdef04 ")		// 区域-name
+						.append(" a.pk_customer ")				// 0、客户pk
+						.append(",a.pk_room ")					// 1、房间pk
+						.append(",sum(a.skje) skje ")			// 2、收款金额
+						.append(",max(a.pk_quyu) pk_quyu ")		// 3、区域pk
+						.append(",max(a.pk_dept) pk_dept ")		// 4、部门pk
+						.append(",max(cust.name) vdef01 ")		// 5、客户-name
+						.append(",max(room.name) vdef02 ")		// 6、房间-name
+						.append(",max(quyu.name) vdef04 ")		// 7、区域-name
+						.append(",a.srxm_name ")				// 8、收入项目-name
+						.append(",a.srxm_pk ")					// 9、收入项目-pk
 						.append(" from (")
 						// 蓝字收款单
 							.append(" select ")
@@ -412,6 +420,8 @@ public class QushuAction extends NCAction {
 							.append(",max(s.vdef15) pk_quyu ")	// 区域pk
 							.append(",max(s.depid)  pk_dept ")	// 部门pk
 							.append(",sum(gb.money_cr) skje ")	// 收款金额
+							.append(",srxm.name srxm_name ")	// 收入项目name
+							.append(",srxm.pk_defdoc srxm_pk ")	// 收入项目pk
 							.append(" from ar_gatherbill g ")
 							.append(" inner join ar_gatheritem gb on g.pk_gatherbill = gb.pk_gatherbill ")
 							.append(" left join ct_sale s on gb.top_billid = s.pk_ct_sale ")
@@ -422,7 +432,7 @@ public class QushuAction extends NCAction {
 							.append(" and srxm.name not like '%押金%' ")		// 不取押金的收款
 							.append(" and substr(gb.busidate,1,10) between '"+str_yb_ksrq+"' and '"+str_yb_jsrq+"' ")
 							.append(" and s.pk_org = '"+pk_org+"' ")
-							.append(" group by s.pk_customer,s.vdef16 ")	// Group By  客户+房号
+							.append(" group by s.pk_customer,s.vdef16,srxm.name,srxm.pk_defdoc ")	// Group By  客户+房号+收入项目
 						// 红冲收款单
 						.append(" union all ")
 							.append(" select ")
@@ -431,6 +441,8 @@ public class QushuAction extends NCAction {
 							.append(",max(s.vdef15) pk_quyu ")	// 区域pk
 							.append(",max(s.depid)  pk_dept ")	// 部门pk
 							.append(",sum(gb.money_cr) skje ")	// 收款金额
+							.append(",srxm.name srxm_name ")	// 收入项目name
+							.append(",srxm.pk_defdoc srxm_pk ")	// 收入项目pk
 							.append(" from ar_gatherbill g ")
 							.append(" inner join ar_gatheritem gb on g.pk_gatherbill = gb.pk_gatherbill ")
 							.append(" left join ar_gatheritem gb_lan ")
@@ -443,12 +455,12 @@ public class QushuAction extends NCAction {
 							.append(" and srxm.name not like '%押金%' ")		// 不取押金的收款
 							.append(" and substr(gb.busidate,1,10) between '"+str_yb_ksrq+"' and '"+str_yb_jsrq+"' ")
 							.append(" and s.pk_org = '"+pk_org+"' ")
-							.append(" group by s.pk_customer,s.vdef16 ")	// Group By  客户+房号
+							.append(" group by s.pk_customer,s.vdef16,srxm.name,srxm.pk_defdoc ")	// Group By  客户+房号+收入项目
 						.append(" ) a ")
 						.append(" left join bd_customer cust on a.pk_customer = cust.pk_customer ")	// 客户
 						.append(" left join bd_defdoc room on a.pk_room = room.pk_defdoc ")			// 房号
 						.append(" left join bd_defdoc quyu on a.pk_quyu = quyu.pk_defdoc ")			// 区域
-						.append(" group by a.pk_customer,a.pk_room  ")
+						.append(" group by a.pk_customer,a.pk_room,a.srxm_name,a.srxm_pk  ")	// Group By  客户+房号+收入项目
 			;
 			ArrayList list_SK = (ArrayList)iUAPQueryBS.executeQuery(
 					querySQL_SK.toString()
@@ -459,15 +471,20 @@ public class QushuAction extends NCAction {
 				for( int i=0;i<list_SK.size();i++ )
 				{
 					Object[] obj = (Object[])list_SK.get(i);
-					// 客户##房间号
-					String key = obj[0]+"##"+obj[1];
+					// key = 客户##房间号##收入项目
+					String srxm_name = PuPubVO.getString_TrimZeroLenAsNull(obj[8]).replaceFirst("调整", "");
+					String key = obj[0] + "##" + obj[1] + "##" + srxm_name;
 					
 					UFDouble skje = PuPubVO.getUFDouble_NullAsZero(obj[2]);		// 收款金额
 					
 					YuebaoBVO yuebaoBVO = MAP_yuebaoBVO.get(key);
 					if(yuebaoBVO!=null)
 					{
-						yuebaoBVO.setBqskje(skje);
+						/**
+						 * 2020年7月24日13:55:15
+						 * 一个合同有多个收费项目，所以改为叠加。
+						 */
+						yuebaoBVO.setBqskje(skje.add(PuPubVO.getUFDouble_NullAsZero(yuebaoBVO.getBqskje())));
 					}
 					else
 					{ /**
@@ -486,6 +503,8 @@ public class QushuAction extends NCAction {
 						yuebaoBVO.setVbdef02(PuPubVO.getString_TrimZeroLenAsNull(obj[6]));		// 房间-name
 						yuebaoBVO.setVbdef04(PuPubVO.getString_TrimZeroLenAsNull(obj[7]));		// 区域-name
 						yuebaoBVO.setVbdef05(PuPubVO.getString_TrimZeroLenAsNull(obj[4]));		// 部门pk
+						yuebaoBVO.setVbdef03(PuPubVO.getString_TrimZeroLenAsNull(obj[8]));		// 收入项目name
+						yuebaoBVO.setSrxm(PuPubVO.getString_TrimZeroLenAsNull(obj[9]));			// 收入项目pk
 						
 						MAP_yuebaoBVO.put(key, yuebaoBVO);	// 放到缓存里
 					}
@@ -502,21 +521,21 @@ public class QushuAction extends NCAction {
 			
 			StringBuffer querySQL_QC = 
 				new StringBuffer(" select ")
-						.append(" yb.pk_cutomer ")		// 客户pk
-						.append(",yb.roomno ")			// 房间pk
-						.append(",sum(yb.qmyskye) ")	// 期末余额
+						.append(" yb.pk_cutomer ")		// 0、客户pk
+						.append(",yb.roomno ")			// 1、房间pk
+						.append(",sum(yb.qmyskye) ")	// 2、期末余额
 						
-						.append(",max(yb.vbdef01) ")	// vbdef01 客户名称
-						.append(",max(yb.vbdef02) ")	// vbdef02 房间号
-						.append(",max(yb.vbdef03) ")	// vbdef03 收入项目
-						.append(",max(yb.vbdef04) ")	// vbdef04 区域名称
+						.append(",max(yb.vbdef01) ")	// 3、vbdef01 客户名称
+						.append(",max(yb.vbdef02) ")	// 4、vbdef02 房间号
+						.append(",yb.vbdef03 ")			// 5、vbdef03 收入项目name
+						.append(",max(yb.vbdef04) ")	// 6、vbdef04 区域名称
 						
-						.append(",max(yb.vbdef05) ")	// vbdef05 部门pk
-						.append(",max(yb.vbdef07) ")	// vbdef07 实际合同金额
-						.append(",max(yb.quyu) ")		// 区域pk
-						.append(",max(yb.mianji) ")		// 面积
-						.append(",max(yb.danjia) ")		// 单价
-						.append(",max(yb.srxm) ")		// 收入项目pk
+						.append(",max(yb.vbdef05) ")	// 7、vbdef05 部门pk
+						.append(",max(yb.vbdef07) ")	// 8、vbdef07 实际合同金额
+						.append(",max(yb.quyu) ")		// 9、区域pk
+						.append(",max(yb.mianji) ")		// 10、面积
+						.append(",max(yb.danjia) ")		// 11、单价
+						.append(",yb.srxm ")			// 12、收入项目pk
 						
 						.append(" from hk_zulin_yuebao y ")
 						.append(" inner join hk_zulin_yuebao_b yb on y.pk_hk_zulin_yuebao = yb.pk_hk_zulin_yuebao ")
@@ -524,7 +543,7 @@ public class QushuAction extends NCAction {
 						.append(" and y.vbilltypecode = 'HK37' ")
 						.append(" and y.yearmonth = '"+syqj+"' ")
 						.append(" and y.pk_org = '"+pk_org+"' ")
-						.append(" group by yb.pk_cutomer,yb.roomno ")	// Group By  客户+房号
+						.append(" group by yb.pk_cutomer,yb.roomno,yb.vbdef03,yb.srxm ")	// Group By  客户+房号+收入项目
 						.append(" having sum(yb.qmyskye) <> 0.00 ")		// 取 余额不为0的
 			;
 			ArrayList list_QC = (ArrayList)iUAPQueryBS.executeQuery(
@@ -539,9 +558,10 @@ public class QushuAction extends NCAction {
 					
 					String pk_cutomer = PuPubVO.getString_TrimZeroLenAsNull(obj[0]);
 					String roomno = PuPubVO.getString_TrimZeroLenAsNull(obj[1]);
+					String srxm_name = PuPubVO.getString_TrimZeroLenAsNull(obj[5]);
 					
-					// 客户##房间号
-					String key = pk_cutomer+"##"+roomno;
+					// 客户##房间号##收入项目name
+					String key = pk_cutomer + "##" + roomno + "##" + srxm_name;
 					
 					UFDouble qcye = PuPubVO.getUFDouble_NullAsZero(obj[2]);		// 期初余额
 					
@@ -557,23 +577,9 @@ public class QushuAction extends NCAction {
 						yuebaoBVO.setRoomno(roomno);				// 房间
 						yuebaoBVO.setQcyskye(qcye);					// 期初余额
 						
-						/**
-						 *  .append(",max(yb.vbdef01) ")	// vbdef01 客户名称	3
-							.append(",max(yb.vbdef02) ")	// vbdef02 房间号		4
-							.append(",max(yb.vbdef03) ")	// vbdef03 收入项目	5
-							.append(",max(yb.vbdef04) ")	// vbdef04 区域名称	6
-							
-							.append(",max(yb.vbdef05) ")	// vbdef05 部门pk		7
-							.append(",max(yb.vbdef07) ")	// vbdef07 实际合同金额	8
-							.append(",max(yb.quyu) ")		// 区域pk			9
-							.append(",max(yb.mianji) ")		// 面积				10
-							.append(",max(yb.danjia) ")		// 单价				11
-							.append(",max(yb.srxm) ")		// 收入项目pk			12
-						 */
-						
 						yuebaoBVO.setMianji(PuPubVO.getUFDouble_NullAsZero(obj[10]));			// 面积
 						yuebaoBVO.setDanjia(PuPubVO.getUFDouble_NullAsZero(obj[11]));			// 单价
-						yuebaoBVO.setSrxm(PuPubVO.getString_TrimZeroLenAsNull(obj[12]));			// 收入项目pk
+						yuebaoBVO.setSrxm(PuPubVO.getString_TrimZeroLenAsNull(obj[12]));		// 收入项目pk
 						yuebaoBVO.setQuyu(PuPubVO.getString_TrimZeroLenAsNull(obj[9]));			// 区域
 						yuebaoBVO.setVbdef01(PuPubVO.getString_TrimZeroLenAsNull(obj[3]));		// 客户名称
 						yuebaoBVO.setVbdef02(PuPubVO.getString_TrimZeroLenAsNull(obj[4]));		// 房间号
@@ -596,11 +602,13 @@ public class QushuAction extends NCAction {
 		{
 			StringBuffer querySQL_TZ = 
 				new StringBuffer(" select ")
-					.append(" tzb.vbdef11 ")
-					.append(",tzb.vbdef12 ")
-					.append(",tzb.dytzje ")
+					.append(" tzb.vbdef11 ")	// 0、客户
+					.append(",tzb.vbdef12 ")	// 1、房间号
+					.append(",tzb.dytzje ")		// 2、调整金额
+					.append(",srxm.name ")		// 3、收入项目name
 					.append(" from hk_zulin_tiaozheng tz ")
 					.append(" inner join hk_zulin_tiaozheng_b tzb on tz.pk_hk_zulin_tiaozheng = tzb.pk_hk_zulin_tiaozheng ")
+					.append(" left join bd_defdoc srxm on tzb.vbdef20 = srxm.pk_defdoc ")	// 收入项目
 					.append(" where tz.dr=0 and tzb.dr=0 ")
 					.append(" and tz.vbilltypecode = 'HK38' ")	// 单据类型过滤
 					.append(" and tz.ibillstatus = 1 ")			// 只取 审核通过的
@@ -620,9 +628,10 @@ public class QushuAction extends NCAction {
 					
 					String pk_cutomer = PuPubVO.getString_TrimZeroLenAsNull(obj[0]);
 					String roomno = PuPubVO.getString_TrimZeroLenAsNull(obj[1]);
+					String srxm_name = PuPubVO.getString_TrimZeroLenAsNull(obj[3]);
 					
-					// 客户##房间号
-					String key = pk_cutomer+"##"+roomno;
+					// 客户##房间号##收入项目
+					String key = pk_cutomer + "##" + roomno + "##" + srxm_name;
 					
 					UFDouble tzje = PuPubVO.getUFDouble_NullAsZero(obj[2]);		// 调整金额
 					
