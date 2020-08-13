@@ -491,7 +491,7 @@ public class HkjtReportImpl implements HkjtReportITF {
 									.append(",ia_detailledger.cbilltypecode ")	// 2、类型
 									.append(",ia_detailledger.fdispatchflag ")	// 3、0-入库  1-出库
 									.append(",ia_detailledger.nnum ")			// 4、数量
-									.append(",case when fpricemodeflag = 5 then nplanedprice else nprice end nprice ")	// 5、单价
+									.append(",case when ia_detailledger.fpricemodeflag = 5 then ia_detailledger.nplanedprice else ia_detailledger.nprice end nprice ")	// 5、单价
 									.append(",ia_detailledger.nmny ")			// 6、金额
 									.append(",ia_detailledger.cdeptid ")		// 7、部门id
 									.append(",ia_detailledger.cdeptvid ")		// 8、部门vid
@@ -542,12 +542,12 @@ public class HkjtReportImpl implements HkjtReportITF {
 									.append(",ia_detailledger.vbdef19 ")//51、表体自定义-19
 									.append(",ia_detailledger.vbdef20 ")//52、表体自定义-20
 									
-//									.append(",ia_detailledger.vbdef1 ")			//13、餐饮类型
-//									.append(",ia_detailledger.vbdef3 ")			//14、出库类别
-//									.append(",ia_detailledger.vbdef3 ")			//15、需求部门
+									.append(",ia_detailledger.cprojectid ")//53、项目
+									.append(",ia_i6bill_b.ccbsnodeid ")//54、CBS
 									
-									.append(" from ia_detailledger ")
-									.append(" inner join ia_calcrange on ia_detailledger.ccalcrangeid = ia_calcrange.ccalcrangeid ")
+									.append(" from ia_detailledger ")	// 核算明细表
+									.append(" inner join ia_calcrange on ia_detailledger.ccalcrangeid = ia_calcrange.ccalcrangeid ")	// 存货维度表
+									.append(" left join ia_i6bill_b on (ia_i6bill_b.cbill_bid = ia_detailledger.cbill_bid and ia_i6bill_b.cbillid = ia_detailledger.cbillid and ia_i6bill_b.dr = 0)")	// 材料出库单-子表
 									.append(" where ")
 									.append(" ia_detailledger.dr = 0 ")
 									.append(" and ia_detailledger.caccountperiod >= '"+yyyymm_begin+"' and ia_detailledger.caccountperiod <= '"+yyyymm_end+"' ")
@@ -713,6 +713,8 @@ public class HkjtReportImpl implements HkjtReportITF {
 											iaBVO.setPk_group(pk_group);
 											iaBVO.setPk_org(pk_org);
 											iaBVO.setAttributeValue("pseudocolumn", 0);
+											iaBVO.setCprojectid(PuPubVO.getString_TrimZeroLenAsNull(value[53])); // 项目 2020年7月28日19:56:59
+											iaBVO.setCcbsnodeid(PuPubVO.getString_TrimZeroLenAsNull(value[54])); // CBS 2020年7月29日10:08:37
 											/**
 											 * HK 2020年1月16日13:58:54
 											 * 增加赋值，
