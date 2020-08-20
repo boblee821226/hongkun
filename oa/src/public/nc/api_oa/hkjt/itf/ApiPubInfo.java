@@ -6,7 +6,7 @@ import nc.api_oa.hkjt.vo.ActionVO;
 import nc.api_oa.hkjt.vo.ApprovalFlowQueryVO;
 import nc.api_oa.hkjt.vo.ApprovalFlowWorkVO;
 import nc.api_oa.hkjt.vo.BillTypeVO;
-import nc.api_oa.hkjt.vo._263X.JKVO;
+import nc.api_oa.hkjt.vo._263X.JkVO;
 import nc.api_oa.hkjt.vo._264X.BxVO;
 
 public class ApiPubInfo {
@@ -47,9 +47,8 @@ public class ApiPubInfo {
 	{
 		BILLTYPE.put(BILLTYPE_DOC, null);	// 用于更新档案数据
 		BILLTYPE.put(BILLTYPE_TEST, null);	// 用于测试
-//		BILLTYPE.put("HK37", new BillTypeVO("租赁月报", nc.vo.hkjt.zulin.yuebao.YuebaoBillVO.class));
-		BILLTYPE.put("263X", new BillTypeVO("借款单", JKVO.class));
-		BILLTYPE.put("264X", new BillTypeVO("报销单", JKVO.class));
+		BILLTYPE.put("263X", new BillTypeVO("借款单", JkVO.class));
+		BILLTYPE.put("264X", new BillTypeVO("报销单", BxVO.class));
 		
 		ACTION.put(ACTION_QUY_COUNT, new ActionVO("工作流数量", ApprovalFlowQueryVO.class));
 		ACTION.put(ACTION_QUY_DO, new ActionVO("待我审批", ApprovalFlowQueryVO.class));
@@ -61,13 +60,16 @@ public class ApiPubInfo {
 		ACTION.put(ACTION_APPROVE, new ActionVO("审核", ApprovalFlowWorkVO.class));
 		ACTION.put(ACTION_UNAPPROVE, new ActionVO("弃审", ApprovalFlowWorkVO.class));
 		ACTION.put(ACTION_UNSAVEBILL, new ActionVO("收回", ApprovalFlowWorkVO.class));
-		ACTION.put(ACTION_DELETE, new ActionVO("删除", ApprovalFlowWorkVO.class));
 		
-		ACTION.put(ACTION_SAVEBASE, null);
+		ACTION.put(ACTION_DELETE, null);
+//		ACTION.put(ACTION_SAVEBASE, null);
 		ACTION.put(ACTION_WRITE, null);
 		
-		ACTION.put(ACTION_WRITE + "#263X", new ActionVO("新增", JKVO[].class));	// 借款单VO
+		ACTION.put(ACTION_WRITE + "#263X", new ActionVO("新增", JkVO[].class));	// 借款单VO
 		ACTION.put(ACTION_WRITE + "#264X", new ActionVO("新增", BxVO[].class));	// 报销单VO
+		
+		ACTION.put(ACTION_DELETE + "#263X", new ActionVO("删除", JkVO[].class));	// 借款单VO
+		ACTION.put(ACTION_DELETE + "#264X", new ActionVO("删除", BxVO[].class));	// 报销单VO
 		
 	}
 	

@@ -7,6 +7,7 @@ import nc.api_oa.hkjt.itf.ApiPubInfo;
 import nc.api_oa.hkjt.vo._264X.BxVO;
 import nc.bs.framework.common.InvocationInfoProxy;
 import nc.bs.framework.common.NCLocator;
+import nc.itf.arap.pub.IBXBillPublic;
 import nc.itf.uap.pf.IplatFormEntry;
 import nc.vo.pub.BusinessException;
 import nc.vo.pub.lang.UFBoolean;
@@ -23,6 +24,14 @@ public class N264XService {
 			iplatFormEntry = (IplatFormEntry) NCLocator.getInstance().lookup(IplatFormEntry.class.getName());
 		}
 		return iplatFormEntry;
+	}
+	
+	private IBXBillPublic iBXBillPublic;
+	private IBXBillPublic getIBXBillPublic() {
+		if (iBXBillPublic == null) {
+			iBXBillPublic = (IBXBillPublic) NCLocator.getInstance().lookup(IBXBillPublic.class.getName());
+		}
+		return iBXBillPublic;
 	}
 	/**
 	 * @param account
@@ -43,86 +52,17 @@ public class N264XService {
 			billVOs[i] = getBxVO(param[i], account, billType);
 		}
 		/**
-		 * 循环处理
+		 * 循环处理：保存、审核
 		 */
 		for (int i = 0; i < billVOs.length; i++) {
 			nc.vo.ep.bx.BXVO billVO = billVOs[i];
 			// 保存(提交)
-			Object saveRes = getIplatFormEntry().processAction("WRITE", "264X", null, billVO, null, null);
+//			Object saveRes = getIplatFormEntry().processAction("WRITE", "264X-Cxx-01", null, billVO, null, null);
+			nc.vo.ep.bx.JKBXVO[] saveRes = getIBXBillPublic().save(new nc.vo.ep.bx.JKBXVO[]{billVO});
+			billVO = (nc.vo.ep.bx.BXVO)saveRes[0];
 			// 审核
-			Object approveRes = getIplatFormEntry().processAction("APPROVE", "264X", null, ((nc.vo.ep.bx.BXVO[])saveRes)[0], null, null);
+//			Object approveRes = getIplatFormEntry().processAction("APPROVE", "264X", null, ((nc.vo.ep.bx.BXVO[])saveRes)[0], null, null);
 		}
-		
-//		/**
-//		 * 进行保存
-//		 */
-//		Object res = getIplatFormEntry().processAction(action, "264X", null, billVOs[0], null, null);
-//		
-//		if (res != null && res instanceof PfProcessBatchRetObject) {
-//			PfProcessBatchRetObject resRet = (PfProcessBatchRetObject)res;
-//			String errMsg = resRet.getExceptionMsg();
-//			if (PuPubVO.getString_TrimZeroLenAsNull(errMsg) != null) {
-//				throw new BusinessException(errMsg);
-//			}
-//			
-//			/**
-//			 * 审核
-//			 */
-//			nc.vo.ep.bx.BXVO[] saveVOs = (nc.vo.ep.bx.BXVO[])resRet.getRetObj();
-//			Object approveRes = getIplatFormEntry().processAction("APPROVE", "264X", null, saveVOs[0], null, null);
-//			System.out.println(approveRes);
-			
-//			Object approveRes = getIplatFormEntry().processBatch("APPROVE", "264X", null, saveVOs, null, null);
-//			if (approveRes != null && approveRes instanceof PfProcessBatchRetObject) {
-//				PfProcessBatchRetObject approveResRet = (PfProcessBatchRetObject)approveRes;
-//				String approveErrMsg = approveResRet.getExceptionMsg();
-//				if (PuPubVO.getString_TrimZeroLenAsNull(approveErrMsg) != null) {
-//					throw new BusinessException(approveErrMsg);
-//				} else {
-//					throw new BusinessException("审核时错误");
-//				}
-//			}
-			
-//			/**
-//			 * 提交
-//			 * 动作脚本不支持多个单据，所以只能循环调用。
-//			 */
-//			nc.vo.ep.bx.BXVO[] writeVOs = (nc.vo.ep.bx.BXVO[])resRet.getRetObj();
-//			for (nc.vo.ep.bx.BXVO item : writeVOs) {
-//				Object saveRes = getIplatFormEntry().processAction("SAVE", billType, null, item, null, null);
-//				System.out.println(saveRes);
-//			}
-			
-//			Object saveRes = getIplatFormEntry().processBatch("SAVE", billType, null, writeVOs, null, null);
-//			if (saveRes != null && saveRes instanceof PfProcessBatchRetObject) {
-//				PfProcessBatchRetObject saveResRet = (PfProcessBatchRetObject)saveRes;
-//				String saveErrMsg = saveResRet.getExceptionMsg();
-//				if (PuPubVO.getString_TrimZeroLenAsNull(saveErrMsg) != null) {
-//					throw new BusinessException(saveErrMsg);
-//				}
-//				/**
-//				 * 审核
-//				 */
-//				nc.vo.ep.bx.BXVO[] saveVOs = (nc.vo.ep.bx.BXVO[])saveResRet.getRetObj();
-//				Object approveRes = getIplatFormEntry().processBatch("APPROVE", billType, null, saveVOs, null, null);
-//				if (approveRes != null && approveRes instanceof PfProcessBatchRetObject) {
-//					PfProcessBatchRetObject approveResRet = (PfProcessBatchRetObject)approveRes;
-//					String approveErrMsg = approveResRet.getExceptionMsg();
-//					if (PuPubVO.getString_TrimZeroLenAsNull(approveErrMsg) != null) {
-//						throw new BusinessException(approveErrMsg);
-//					}
-//					
-//					} else {
-//						throw new BusinessException("审核时错误");
-//					}
-//				
-//			} else {
-//				throw new BusinessException("提交时错误");
-//			}
-			
-//		} else {
-//			throw new BusinessException("保存时错误");
-//		}
 		
 		return null;
 	}
@@ -254,6 +194,7 @@ public class N264XService {
 		distHVO.setDjrq(djrq);			// 单据日期
 		distHVO.setDjzt(1);				// 单据状态
 		distHVO.setDr(0);
+		
 		distHVO.setPk_group(pk_group);	// 集团
 		distHVO.setDwbm(pk_org);		// 公司
 		distHVO.setDwbm_v(pk_org_v);	// 公司v
@@ -306,7 +247,7 @@ public class N264XService {
 		distHVO.setCustomer(kh);			// 客户
 		distHVO.setHbbm(gys);				// 供应商
 		
-		distHVO.setSpzt(3);			// 审批状态（3=提交，-1=自由）（保存时设置为提交状态）
+		distHVO.setSpzt(-1);			// 审批状态（3=提交，-1=自由）（保存时设置为提交状态）
 		distHVO.setSxbz(0);			// 生效标志
 		distHVO.setSzxmid(szxm);	// 收支项目
 		
@@ -340,7 +281,7 @@ public class N264XService {
 			) 
 			throws BusinessException {
 		String account = param.get("account");	// 账套
-		String dkfsStr = srcBVO.getDkfs();
+		String dkfsStr = srcBVO.getDkfs();		// 抵扣方式
 		String dkfs = ApiPubInfo.CACHE_DOC.get(account).get("bd_defdoc_dkfs").get(dkfsStr).get("id");
 		String szxm = srcBVO.getZcxm();			// 收支项目
 		UFDouble jshj = PuPubVO.getUFDouble_NullAsZero(srcBVO.getJshjje());	// 价税合计

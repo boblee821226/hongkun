@@ -353,7 +353,9 @@ public class BillServlet extends HttpServlet {
 			&&  paramData.trim().length()>0
 			){
 				if (action != null) {
-					if (ApiPubInfo.ACTION_WRITE.equals(action)) { // 保存的 需要根据单据类型，取找到VO
+					if (ApiPubInfo.ACTION_WRITE.equals(action)
+					 || ApiPubInfo.ACTION_DELETE.equals(action)
+					) { // 保存、删除的 需要根据单据类型，取找到VO
 						String[] bt = billType.split("-"); // 交易类型类似于263X-Cxx-01，只取前面的单据类型编码来做判断。
 						dataObj = MAPPER.readValue(paramData, ApiPubInfo.ACTION.get(action + "#" + bt[0]).getParamClass());
 					} else { // 其它的，都是固定VO

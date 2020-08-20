@@ -5,26 +5,26 @@ import java.io.Serializable;
 /**
  * ½è¿îBillVO
  */
-public class JKVO implements Serializable {
+public class JkVO implements Serializable {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = -3354893476018303383L;
 
-	private JKHeaderVO head;
-	private JKBusItemVO[] items;
+	private JkHeadVO head;
+	private JkItemVO[] items;
 	
-	public JKHeaderVO getHead() {
+	public JkHeadVO getHead() {
 		return head;
 	}
-	public void setHead(JKHeaderVO head) {
+	public void setHead(JkHeadVO head) {
 		this.head = head;
 	}
-	public JKBusItemVO[] getItems() {
+	public JkItemVO[] getItems() {
 		return items;
 	}
-	public void setItems(JKBusItemVO[] items) {
+	public void setItems(JkItemVO[] items) {
 		this.items = items;
 	}
 	

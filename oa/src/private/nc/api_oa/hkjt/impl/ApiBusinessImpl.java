@@ -6,7 +6,9 @@ import nc.api_oa.hkjt.impl.service.ApprovalFlowWorkService;
 import nc.api_oa.hkjt.impl.service.DocService;
 import nc.api_oa.hkjt.impl.service.PublicService;
 import nc.api_oa.hkjt.impl.service._263X.N263XService;
+import nc.api_oa.hkjt.impl.service._263X.N263XServiceDELETE;
 import nc.api_oa.hkjt.impl.service._264X.N264XService;
+import nc.api_oa.hkjt.impl.service._264X.N264XServiceDELETE;
 import nc.api_oa.hkjt.itf.ApiBusinessItf;
 import nc.api_oa.hkjt.itf.ApiPubInfo;
 import nc.api_oa.hkjt.vo.ActionVO;
@@ -91,8 +93,26 @@ public class ApiBusinessImpl implements ApiBusinessItf {
 		 || action.equals(ApiPubInfo.ACTION_SAVEBASE)
 		) {
 			// 根据单据类型 去 判断，调用哪个处理类。
-//			return N263XService.doAction(account, billType, paramObj, action, userId);
-			return new N264XService().doAction(account, billType, paramObj, action, userId);
+			if (billType.startsWith("263X")) {
+				return new N263XService().doAction(account, billType, paramObj, action, userId);
+			} else if (billType.startsWith("264X")) {
+				return new N264XService().doAction(account, billType, paramObj, action, userId);
+			} else {
+				throw new BusinessException("不支持的类型");
+			}
+		}
+		/**
+		 * 删除
+		 */
+		if (action.equals(ApiPubInfo.ACTION_DELETE)) {
+			// 根据单据类型 去 判断，调用哪个处理类。
+			if (billType.startsWith("263X")) {
+				return new N263XServiceDELETE().doAction(account, billType, paramObj, action, userId);
+			} else if (billType.startsWith("264X")) {
+				return new N264XServiceDELETE().doAction(account, billType, paramObj, action, userId);
+			} else {
+				throw new BusinessException("不支持的类型");
+			}
 		}
 		/**
 		 * 查询审批流数量（待我审批、我已审批、待我提交、我已提交）
