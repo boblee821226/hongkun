@@ -92,6 +92,11 @@
 				<ref bean="separatorAction" />
 				<ref bean="reverseAction" />
 				<!-- END -->
+				<!-- HK 2020年8月26日14:12:50 -->
+				<!-- 审批中修改 -->
+				<ref bean="separatorAction" />
+				<ref bean="billEditAction" />
+				<!-- END -->
 			</list>
 		</property>
 
@@ -271,6 +276,17 @@
 		<property name="copyActionProcessor" ref="reverseActionProcessor" />
 	</bean>
 	<bean id="reverseActionProcessor" class="nc.ui.pmpub.action.processor.DefaultReverseActionProcessor" />
+	<!-- END -->
+	
+	<!-- 审批中修改 -->
+	<!-- HK 2020年8月26日10:15:44 -->
+	<bean id="billEditAction" class="nc.ui.pm.action.BillEditAction">
+		<property name="model"><ref bean="manageAppModel"/></property>
+		<property name="editor"><ref bean="billFormEditor"/></property>
+		<property name="powercheck" value="true" />
+		<property name="billType" value="4D83" />
+		<property name="billCodeName" value="bill_code"></property>
+	</bean>
 	<!-- END -->
 
 	<!-- 查询按钮 -->
