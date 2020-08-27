@@ -278,7 +278,7 @@
 	<bean id="reverseActionProcessor" class="nc.ui.pmpub.action.processor.DefaultReverseActionProcessor" />
 	<!-- END -->
 	
-	<!-- 审批中修改 -->
+	<!-- 审批中修改：费用审批单-->
 	<!-- HK 2020年8月26日10:15:44 -->
 	<bean id="billEditAction" class="nc.ui.pm.action.BillEditAction">
 		<property name="model"><ref bean="manageAppModel"/></property>
