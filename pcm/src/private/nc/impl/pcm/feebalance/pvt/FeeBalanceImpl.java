@@ -106,7 +106,7 @@ public class FeeBalanceImpl extends BillBaseImpl<FeeBalanceBillVO> implements
 		BaseDAO dao = new BaseDAO();
 		for (FeeBalanceBillVO billVO : billVOs) {
 			for (ISuperVO childvo : billVO.getChildren(billVO.getMetaData().getChildren()[0])) {
-				String bid = childvo.getAttributeValue("def20").toString();
+				String bid = PuPubVO.getString_TrimZeroLenAsNull(childvo.getAttributeValue("def20"));
 				if (bid == null) continue;	// 如果不是红冲的，则不进行下面的判断
 				String benId = childvo.getAttributeValue("pk_feebalance_b").toString();
 				UFDouble mny = PuPubVO.getUFDouble_NullAsZero(childvo.getAttributeValue("money"));
