@@ -56,26 +56,28 @@ public class N263XServiceDELETE {
 			nc.vo.ep.bx.JKVO billVO = billVOs[i];
 			if (billVO == null) throw new BusinessException("单据不存在");
 			Integer spzt = billVO.getParentVO().getSpzt();	// 1=审批通过，3=提交，-1=自由
-			if (1 == spzt) { // 弃审
-				Object res = getIplatFormEntry().processAction("UNAPPROVE"+userId, "263X", null, billVO, null, null);
-				nc.vo.erm.common.MessageVO msgVO = ((nc.vo.erm.common.MessageVO[])res)[0];
-				if (!msgVO.isSuccess()) {
-					throw new BusinessException(msgVO.getErrorMessage());
-				}
-				billVO = (nc.vo.ep.bx.JKVO)msgVO.getSuccessVO();
-				spzt = billVO.getParentVO().getSpzt();
-			}
+//			if (1 == spzt) { // 弃审
+//				Object res = getIplatFormEntry().processAction("UNAPPROVE"+userId, billType, null, billVO, null, null);
+//				nc.vo.erm.common.MessageVO msgVO = ((nc.vo.erm.common.MessageVO[])res)[0];
+//				if (!msgVO.isSuccess()) {
+//					throw new BusinessException(msgVO.getErrorMessage());
+//				}
+//				billVO = (nc.vo.ep.bx.JKVO)msgVO.getSuccessVO();
+//				spzt = billVO.getParentVO().getSpzt();
+//			}
 			if (3 == spzt) { // 收回
-				Object res = getIplatFormEntry().processAction("UNSAVE", "263X", null, billVO, null, null);
+				Object res = getIplatFormEntry().processAction("UNSAVE", billType, null, billVO, null, null);
 				billVO = (nc.vo.ep.bx.JKVO)res;
 				spzt = billVO.getParentVO().getSpzt();
 			}
 			if (-1 == spzt) { // 删除
-				Object res = getIplatFormEntry().processAction("DELETE", "263X", null, billVO, new JKBXVO[]{billVO}, null);
+				Object res = getIplatFormEntry().processAction("DELETE", billType, null, billVO, new JKBXVO[]{billVO}, null);
 				nc.vo.erm.common.MessageVO msgVO = ((nc.vo.erm.common.MessageVO[])res)[0];
 				if (!msgVO.isSuccess()) {
 					throw new BusinessException(msgVO.getErrorMessage());
 				}
+			} else {
+				throw new BusinessException("状态不对，无法删除。");
 			}
 		}
 		

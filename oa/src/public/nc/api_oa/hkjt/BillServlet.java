@@ -25,6 +25,7 @@ import nc.api_oa.hkjt.vo.RequestParamVO;
 import nc.api_oa.hkjt.vo.ResponseResultVO;
 import nc.bs.framework.common.InvocationInfoProxy;
 import nc.bs.framework.common.NCLocator;
+import nc.bs.uap.lock.PKLock;
 import nc.vo.pub.BusinessException;
 import nc.vo.pub.lang.UFDate;
 
@@ -188,7 +189,7 @@ public class BillServlet extends HttpServlet {
 	/**
 	 * 封装，返回。
 	 */
-	protected String doAction(RequestParamVO paramVO)throws Exception{
+	protected String doAction(RequestParamVO paramVO) throws Exception{
 		
 		ResponseResultVO resultVO = new ResponseResultVO();
 		
@@ -202,10 +203,13 @@ public class BillServlet extends HttpServlet {
 			resultVO.setCode(200);
 			resultVO.setMsg("ok");
 			
-		}catch(Exception ex)
+		} catch(Exception ex)
 		{
 			resultVO.setCode(500);
 			resultVO.setMsg(ex.getMessage());
+		} finally {
+			// 接口执行完毕后：释放锁
+			PKLock.getInstance().releaseDynamicLocks();
 		}
 		return MAPPER.writeValueAsString(resultVO);
 	}

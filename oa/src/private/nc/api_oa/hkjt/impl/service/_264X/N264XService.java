@@ -56,10 +56,13 @@ public class N264XService {
 		 */
 		for (int i = 0; i < billVOs.length; i++) {
 			nc.vo.ep.bx.BXVO billVO = billVOs[i];
-			// 保存(提交)
+			// 保存
 //			Object saveRes = getIplatFormEntry().processAction("WRITE", "264X-Cxx-01", null, billVO, null, null);
-			nc.vo.ep.bx.JKBXVO[] saveRes = getIBXBillPublic().save(new nc.vo.ep.bx.JKBXVO[]{billVO});
-			billVO = (nc.vo.ep.bx.BXVO)saveRes[0];
+			nc.vo.ep.bx.JKBXVO[] writeRes = getIBXBillPublic().save(new nc.vo.ep.bx.JKBXVO[]{billVO});
+			billVO = (nc.vo.ep.bx.BXVO)writeRes[0];
+			// 提交
+			Object saveRes = getIplatFormEntry().processAction("SAVE", billType, null, billVO, null, null);
+			billVO = (nc.vo.ep.bx.BXVO)saveRes;
 			// 审核
 //			Object approveRes = getIplatFormEntry().processAction("APPROVE", "264X", null, ((nc.vo.ep.bx.BXVO[])saveRes)[0], null, null);
 		}
@@ -77,11 +80,22 @@ public class N264XService {
 			) 
 			throws BusinessException {
 		/**
+		 * 单据类型
+		 */
+		HashMap<String, String> djlx_MAP = new HashMap<>();
+		djlx_MAP.put("264X-Cxx-01", "1001N51000000004LSR8");	// 日常费用审批单
+		djlx_MAP.put("264X-Cxx-02", "1001N51000000004MN92");	// 往来付款审批单
+		djlx_MAP.put("264X-Cxx-03", "1001N51000000004MN9R");	// 工资福利审批单
+		djlx_MAP.put("264X-Cxx-04", "1001N51000000004MNGQ");	// 工程付款审批单
+		djlx_MAP.put("264X-Cxx-05", "1001N5100000006NLZTC");	// 分摊费用审批单
+		/**
 		 * 表头表头共享变量
 		 */
 		HashMap<String,String> param = new HashMap<>();
 		param.put("account", account); // 账套
 		param.put("szxm", srcBillVO.getItems()[0].getZcxm()); // 收支项目：表体第一行的 赋值给表头
+		param.put("billTypeCode", billType);			// 单据类型code
+		param.put("billTypeId", djlx_MAP.get(billType));// 单据类型id
 		/***END***/
 		nc.vo.ep.bx.BXVO distBillVO = new nc.vo.ep.bx.BXVO();
 		nc.vo.ep.bx.BXHeaderVO distHVO = getBxHeadVO(srcBillVO.getHead(), param);
@@ -106,8 +120,10 @@ public class N264XService {
 			)
 			throws BusinessException {
 		String account = param.get("account");		// 账套
-		String billTypeCode = "264X-Cxx-01";		// 单据类型code
-		String billTypeId = "1001N51000000004LSR8";	// 单据类型id
+		String billTypeCode = param.get("billTypeCode");// 单据类型code
+		String billTypeId = param.get("billTypeId");	// 单据类型id
+//		String billTypeCode = "264X-Cxx-01";		// 单据类型code
+//		String billTypeId = "1001N51000000004LSR8";	// 单据类型id
 		UFDouble spje = PuPubVO.getUFDouble_NullAsZero(srcHVO.getSpje());	// 金额
 		UFDateTime currTime = new UFDateTime();	// 当前时间
 		String djbh = srcHVO.getDjbh();			// 单据编号
@@ -154,25 +170,25 @@ public class N264XService {
 		String url = srcHVO.getUrl();	// url
 		
 		if (0 == skdx) { // 员工
-//			gys = null;
-//			kh = null;
-//			custaccount = null;
 			String skrStr = srcHVO.getSkr();
 			skr = ApiPubInfo.CACHE_DOC.get(account).get("bd_psndoc").get(skrStr).get("id");
 			skyhzh = srcHVO.getGryhzh();
 		} else if (1 == skdx) {	// 供应商
-//			skr = null;
-//			skyhzh = null;
-//			kh = null;
 			gys = srcHVO.getGys();
 			custaccount = srcHVO.getKsyhzh();
 		} else if (2 == skdx) {	// 客户
-//			skr = null;
-//			skyhzh = null;
-//			gys = null;
 			kh = srcHVO.getKh();
 			custaccount = srcHVO.getKsyhzh();
 		}
+		
+		/**
+		 * 工程付款 专属
+		 */
+		String kgrq = srcHVO.getKgrq();		// 开工日期
+		String jgrq = srcHVO.getJgrq();		// 竣工日期
+		String gcwxsqd = srcHVO.getGcwxsqd();	// 工程维修申请单
+		String xmmc = srcHVO.getXmmc();	// 项目名称
+		/***END***/
 		
 		nc.vo.ep.bx.BXHeaderVO distHVO = new nc.vo.ep.bx.BXHeaderVO();
 		distHVO.setBbhl(UFDouble.ONE_DBL);			// 本币汇率 1
@@ -255,6 +271,10 @@ public class N264XService {
 		distHVO.setZyx18("1001N51000000011M2L4"); // 是否结算中心付款（暂时默认为否）
 		distHVO.setZyx26(url);	// url
 		
+		distHVO.setZyx16(kgrq);	// 开工日期
+		distHVO.setZyx17(jgrq);	// 竣工日期
+		distHVO.setZyx1(xmmc);	// 项目名称
+		
 		/**
 		 * param
 		 */
@@ -282,7 +302,10 @@ public class N264XService {
 			throws BusinessException {
 		String account = param.get("account");	// 账套
 		String dkfsStr = srcBVO.getDkfs();		// 抵扣方式
-		String dkfs = ApiPubInfo.CACHE_DOC.get(account).get("bd_defdoc_dkfs").get(dkfsStr).get("id");
+		String dkfs = null;
+		if (dkfsStr != null) {
+			dkfs = ApiPubInfo.CACHE_DOC.get(account).get("bd_defdoc_dkfs").get(dkfsStr).get("id");
+		}
 		String szxm = srcBVO.getZcxm();			// 收支项目
 		UFDouble jshj = PuPubVO.getUFDouble_NullAsZero(srcBVO.getJshjje());	// 价税合计
 		UFDouble sl = PuPubVO.getUFDouble_NullAsZero(srcBVO.getSl());		// 税率
@@ -299,14 +322,25 @@ public class N264XService {
 		Integer skdx = PuPubVO.getInteger_NullAs(param.get("skdx"),0);
 		String bxr = param.get("bxr");
 		Integer rowno = PuPubVO.getInteger_NullAs(param.get("rowno"),0);
+		String billTypeCode = PuPubVO.getString_TrimZeroLenAsNull(param.get("billTypeCode"));
 		
 		nc.vo.ep.bx.BXBusItemVO distBVO = new nc.vo.ep.bx.BXBusItemVO();
-		distBVO.setDefitem12(sl.toString());	// 税率
-		distBVO.setDefitem13(wsje.toString());	// 无税金额
-		distBVO.setDefitem15(se.toString());	// 税额
+		
+		distBVO.setDefitem5(sxsm);				// 事项说明
 		distBVO.setDefitem7(jshj.toString());	// 价税合计
-		distBVO.setDefitem14(dkfs);		// 抵扣方式
-		distBVO.setDefitem5(sxsm);		// 事项说明
+		
+		if ("264X-Cxx-04".equals(billTypeCode)) {
+			distBVO.setDefitem20(sl.toString());	// 税率
+			distBVO.setDefitem23(wsje.toString());	// 无税金额
+			distBVO.setDefitem22(se.toString());	// 税额
+			distBVO.setDefitem21(dkfs);				// 抵扣方式
+		} else {
+			distBVO.setDefitem12(sl.toString());	// 税率
+			distBVO.setDefitem13(wsje.toString());	// 无税金额
+			distBVO.setDefitem15(se.toString());	// 税额
+			distBVO.setDefitem14(dkfs);				// 抵扣方式
+		}
+		
 		distBVO.setDwbm(pk_org);		// 公司
 		distBVO.setDeptid(pk_dept);		// 部门
 		distBVO.setDr(0);

@@ -56,17 +56,28 @@ public class N264XServiceDELETE {
 			nc.vo.ep.bx.BXVO billVO = billVOs[i];
 			if (billVO == null) throw new BusinessException("单据不存在");
 			Integer spzt = billVO.getParentVO().getSpzt();	// 1=审批通过，3=提交，-1=自由
-			if (1 == spzt) { // 弃审
-				Object res = getIplatFormEntry().processAction("UNAPPROVE", "264X", null, billVO, null, null);
-				billVO = ((nc.vo.ep.bx.BXVO[])res)[0];
-			}
+//			if (1 == spzt) { // 弃审
+//				Object res = getIplatFormEntry().processAction("UNAPPROVE"+userId, billType, null, billVO, null, null);
+//				nc.vo.erm.common.MessageVO msgVO = ((nc.vo.erm.common.MessageVO[])res)[0];
+//				if (!msgVO.isSuccess()) {
+//					throw new BusinessException(msgVO.getErrorMessage());
+//				}
+//				billVO = (nc.vo.ep.bx.BXVO)msgVO.getSuccessVO();
+//				spzt = billVO.getParentVO().getSpzt();
+//			}
 			if (3 == spzt) { // 收回
-				Object res = getIplatFormEntry().processAction("UNSAVE", "264X", null, billVO, null, null);
-				billVO = ((nc.vo.ep.bx.BXVO[])res)[0];
+				Object res = getIplatFormEntry().processAction("UNSAVE", billType, null, billVO, null, null);
+				billVO = (nc.vo.ep.bx.BXVO)res;
+				spzt = billVO.getParentVO().getSpzt();
 			}
 			if (-1 == spzt) { // 删除
-				Object res = getIplatFormEntry().processAction("DELETE", "264X", null, billVO, null, null);
-				billVO = ((nc.vo.ep.bx.BXVO[])res)[0];
+				Object res = getIplatFormEntry().processAction("DELETE", billType, null, billVO, new JKBXVO[]{billVO}, null);
+				nc.vo.erm.common.MessageVO msgVO = ((nc.vo.erm.common.MessageVO[])res)[0];
+				if (!msgVO.isSuccess()) {
+					throw new BusinessException(msgVO.getErrorMessage());
+				}
+			} else {
+				throw new BusinessException("状态不对，无法删除。");
 			}
 		}
 		
@@ -95,7 +106,7 @@ public class N264XServiceDELETE {
 		 * (pk_org = '0001N510000000001SXL' AND djrq = '2020-08-19 00:00:00' AND djbh = 'jk-20200819-06' and QCBZ='N' and DR = 0 and djlxbm = '264X-Cxx-01')
 		 */
 		StringBuffer whereSQL = 
-		new StringBuffer(" ( ")
+		new StringBuffer(" where ( ")
 				.append(" pk_org = '").append(pk_org).append("' ")
 				.append(" and djrq = '").append(djrq).append("' ")
 				.append(" and djbh = '").append(djbh).append("' ")

@@ -29,6 +29,13 @@ public class BxHeadVO implements Serializable {
 	private String gys;			// 收款-供应商 y
 	private String kh;			// 收款-客户 y
 	private String ksyhzh;		// 收款-客商-银行账户 y
+	/**
+	 * 工程付款
+	 */
+	private String kgrq;	// 开工日期
+	private String jgrq;	// 竣工日期
+	private String gcwxsqd;	// 工程维修申请单
+	private String xmmc;	// 项目名称
 	
 	private String url;	// oa路径
 	
@@ -133,6 +140,30 @@ public class BxHeadVO implements Serializable {
 	}
 	public void setKsyhzh(String ksyhzh) {
 		this.ksyhzh = ksyhzh;
+	}
+	public String getKgrq() {
+		return kgrq;
+	}
+	public void setKgrq(String kgrq) {
+		this.kgrq = kgrq;
+	}
+	public String getJgrq() {
+		return jgrq;
+	}
+	public void setJgrq(String jgrq) {
+		this.jgrq = jgrq;
+	}
+	public String getGcwxsqd() {
+		return gcwxsqd;
+	}
+	public void setGcwxsqd(String gcwxsqd) {
+		this.gcwxsqd = gcwxsqd;
+	}
+	public String getXmmc() {
+		return xmmc;
+	}
+	public void setXmmc(String xmmc) {
+		this.xmmc = xmmc;
 	}
 	public String getUrl() {
 		return url;

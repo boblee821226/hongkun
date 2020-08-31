@@ -62,11 +62,14 @@ public class N263XService {
 		 */
 		for (int i = 0; i < billVOs.length; i++) {
 			nc.vo.ep.bx.JKVO billVO = billVOs[i];
-			// 保存(提交)
+			// 保存
 //			Object saveRes = getIplatFormEntry().processAction("WRITE", "263X-Cxx-01", null, billVO, null, null);
 //			billVO = ((nc.vo.ep.bx.JKVO[])saveRes)[0];
-			nc.vo.ep.bx.JKBXVO[] saveRes = getIBXBillPublic().save(new nc.vo.ep.bx.JKBXVO[]{billVO});
-			billVO = (nc.vo.ep.bx.JKVO)saveRes[0];
+			nc.vo.ep.bx.JKBXVO[] writeRes = getIBXBillPublic().save(new nc.vo.ep.bx.JKBXVO[]{billVO});
+			billVO = (nc.vo.ep.bx.JKVO)writeRes[0];
+			// 提交
+			Object saveRes = getIplatFormEntry().processAction("SAVE", billType, null, billVO, null, null);
+			billVO = (nc.vo.ep.bx.JKVO)saveRes;
 			/**
 			 * 审核
 			 * 需要赋值，跟审批相关的字段
