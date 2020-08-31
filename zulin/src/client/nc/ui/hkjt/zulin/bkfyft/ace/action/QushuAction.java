@@ -116,7 +116,8 @@ public class QushuAction extends NCAction {
 				.append(" htb.vbdef1 pk_srxm ")	// 支出项目pk
 				.append(",szxm.name vdef03 ")	// 支出项目name
 				.append(",substr(htb.vbdef3,1,10) ksrq ")	// 合同开始日期
-				.append(",case when ht.actualinvalidate is null then substr(htb.vbdef4,1,10) else substr(ht.actualinvalidate,1,10) end jsrq ")	// 合同结束日期
+//				.append(",case when ht.actualinvalidate is null then substr(htb.vbdef4,1,10) else substr(ht.actualinvalidate,1,10) end jsrq ")	// 合同结束日期
+				.append(",case when nvl(ht.invallidate,'~') = '~' then substr(htb.vbdef4,1,10) else substr(ht.invallidate,1,10) end jsrq ")	// 合同结束日期
 				.append(",htb.norigmny vdef11 ")	// 无税金额
 				.append(",htb.norigtaxmny vdef12 ")	// 含税金额
 				.append(",ht.depid vdef05 ")	// 部门pk
@@ -178,7 +179,7 @@ public class QushuAction extends NCAction {
 				.append(" and '"+str_yb_ksrq+"' <= substr(nvl(replace(ht.actualinvalidate, '~', ''), '2099-12-31'), 1, 10) ")	// 合同终止日期 来 判断计费时点（终止的那天 要算租金的）
 			.append(" and substr(htb.vbdef3,1,10) <= substr(nvl(replace(ht.actualinvalidate, '~', ''), '2099-12-31'), 1, 10) ")	// 合同明细的开始日期 要小于等于 合同终止日期
 				.append(whereSql_zeren) // 责任凭证的sql
-//				.append(" and ht.vbillcode like 'aaabbb%' ")	// 测试
+//				.append(" and ht.vbillcode like '050820190801%' ")	// 测试
 		;
 		
 		IUAPQueryBS iUAPQueryBS = (IUAPQueryBS)NCLocator.getInstance().lookup(IUAPQueryBS.class.getName()); 
