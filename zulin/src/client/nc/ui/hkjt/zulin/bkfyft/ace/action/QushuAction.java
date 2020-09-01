@@ -176,8 +176,10 @@ public class QushuAction extends NCAction {
 				.append("	or ")
 				.append("		(substr(htb.vbdef3, 1, 10) > '"+str_yb_ksrq+"' and substr(htb.vbdef4, 1, 10) < '"+str_yb_jsrq+"') ")
 				.append(" ) ")
-				.append(" and '"+str_yb_ksrq+"' <= substr(nvl(replace(ht.actualinvalidate, '~', ''), '2099-12-31'), 1, 10) ")	// 合同终止日期 来 判断计费时点（终止的那天 要算租金的）
-			.append(" and substr(htb.vbdef3,1,10) <= substr(nvl(replace(ht.actualinvalidate, '~', ''), '2099-12-31'), 1, 10) ")	// 合同明细的开始日期 要小于等于 合同终止日期
+//				.append(" and '"+str_yb_ksrq+"' <= substr(nvl(replace(ht.actualinvalidate, '~', ''), '2099-12-31'), 1, 10) ")	// 合同终止日期 来 判断计费时点（终止的那天 要算租金的）
+//				.append(" and substr(htb.vbdef3,1,10) <= substr(nvl(replace(ht.actualinvalidate, '~', ''), '2099-12-31'), 1, 10) ")	// 合同明细的开始日期 要小于等于 合同终止日期
+				.append(" and '"+str_yb_ksrq+"' <= substr(nvl(replace(ht.invallidate, '~', ''), '2099-12-31'), 1, 10) ")	// 合同终止日期 来 判断计费时点（终止的那天 要算租金的）
+				.append(" and substr(htb.vbdef3,1,10) <= substr(nvl(replace(ht.invallidate, '~', ''), '2099-12-31'), 1, 10) ")	// 合同明细的开始日期 要小于等于 合同终止日期
 				.append(whereSql_zeren) // 责任凭证的sql
 //				.append(" and ht.vbillcode like '050820190801%' ")	// 测试
 		;
