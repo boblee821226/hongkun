@@ -147,11 +147,9 @@
 		</property>
 		<property name="actions">
 			<list>
-				<ref bean="addAction" />
-				<ref bean="editAction" />
+				<!--<ref bean="editAction" />
 				<ref bean="deleteScriptAction" />
 				<ref bean="defaultQueryAction" />
-				<ref bean="copyAction" />
 				<ref bean="separatorAction" />
 				<ref bean="defaultRefreshAction" />
 				<ref bean="separatorAction" />
@@ -162,19 +160,17 @@
 				<ref bean="separatorAction" />
 				<ref bean="linkQueryAction" />
 				<ref bean="separatorAction" />
-				<ref bean="metaDataBasedPrintAction" />
-				<ref bean="metaDataBasedPrintActiona" />
-				<ref bean="outputAction" />
-				<ref bean="separatorAction" />
-				<ref bean="pFApproveStatusInfoAction" />
+				<ref bean="outputAction" />-->
+				<!--<ref bean="separatorAction" />-->
+				<!--<ref bean="pFApproveStatusInfoAction" />-->
 
 			</list>
 		</property>
 		
 		<property name="editActions">
 			<list>
-				<ref bean="saveScriptAction" />
-				<ref bean="cancelAction" />
+				<!--<ref bean="saveScriptAction" />
+				<ref bean="cancelAction" />-->
 				
 			</list>
 		</property>
@@ -188,6 +184,73 @@
 		</property>
 		-->
 	</bean>
+
+	<!-- BEGIN 卡片  与  列表  要设置不同的按钮 HK 2020年7月30日19:26:09-->
+	<bean id="toftpanelActionContributors" class="nc.ui.uif2.actions.ActionContributors">
+		<property name="contributors">
+			<list>
+				<ref bean="actionsOfList" />
+				<ref bean="actionsOfCard" />
+			</list>
+		</property>
+	</bean>
+	<!-- 列表的按钮 -->
+	<bean id="actionsOfList" class="nc.ui.uif2.actions.StandAloneToftPanelActionContainer">
+		<constructor-arg ref="billListView" />
+		<property name="actions">
+			<list>
+				<ref bean="editAction" />
+				<ref bean="deleteScriptAction" />
+				<ref bean="defaultQueryAction" />
+				<ref bean="separatorAction" />
+				<ref bean="defaultRefreshAction" />
+				<ref bean="separatorAction" />
+				<ref bean="commitScriptAction" />
+				<ref bean="unCommitScriptAction" />
+				<ref bean="approveScriptAction" />
+				<ref bean="uNApproveScriptAction" />
+				<ref bean="separatorAction" />
+				<ref bean="linkQueryAction" />
+				<ref bean="separatorAction" />
+				<ref bean="outputAction" />
+			</list>
+		</property>
+	</bean>
+	<!-- 卡片的按钮 -->
+	<bean id="actionsOfCard" class="nc.ui.uif2.actions.StandAloneToftPanelActionContainer">
+		<constructor-arg ref="billForm" />
+		<property name="actions">
+			<list>
+				<ref bean="editAction" />
+				<ref bean="deleteScriptAction" />
+				<ref bean="defaultQueryAction" />
+				<ref bean="separatorAction" />
+				<ref bean="refreshCardAction" />
+				<ref bean="separatorAction" />
+				<ref bean="commitScriptAction" />
+				<ref bean="unCommitScriptAction" />
+				<ref bean="approveScriptAction" />
+				<ref bean="uNApproveScriptAction" />
+				<ref bean="separatorAction" />
+				<ref bean="linkQueryAction" />
+				<ref bean="separatorAction" />
+				<ref bean="outputAction" />
+			</list>
+		</property>
+		<property name="editActions" ref="normEditAction" />
+		<property name="model" ref="bmModel" />
+	</bean>
+	<!-- 编辑状态的按钮 -->
+	<bean id="normEditAction" class="java.util.ArrayList">
+		<constructor-arg>
+			<list>
+				<ref bean="saveScriptAction" />
+				<ref bean="cancelAction" />
+			</list>
+		</constructor-arg>
+	</bean>
+	<!-- END 卡片列表 按钮分开 -->
+
 	
 	<!-- 打开节点监听 newadd-->
 	<bean id="InitDataListener" class="nc.ui.pubapp.uif2app.model.DefaultFuncNodeInitDataListener">
@@ -195,8 +258,6 @@
 		<property name="context" ref="context"></property>
 		<property name="voClassName" value="nc.vo.hkjt.store.lvyun.out.LyOutStoreBillVO"/>
 	</bean>
-
-
 
 	<!-- ClosingListener 编辑态关闭节点时提示是否保存//newadd***************************************************-->
 	<!-- 节点关闭前校验 -->
@@ -268,7 +329,11 @@
 		<property name="billType" value="HK46"></property>
 	</bean>
 
-
+	<!-- 卡片刷新动作 HK 2020年7月30日19:28:40 -->
+	<bean id="refreshCardAction" class="nc.ui.pubapp.uif2app.actions.RefreshSingleAction">
+		<property name="model" ref="bmModel" />
+	</bean>
+	<!-- END -->
 
 	<!-- Action部分 ***********************************************************-->
 	<!--======= 动作：[newActions] [新增] ===========-->
@@ -341,6 +406,11 @@
 		<property name="filledUpInFlow" value="true" />
 		<property name="actionName" value="SAVE" />
 		<property name="exceptionHandler"><ref bean="exceptionHandler" /></property>
+		<!--<property name="interceptor">
+			<bean class="nc.ui.hkjt.store.lvyun_out.ace.action.interceptor.RefreshInterceptor">
+				<property name="refreshSingleAction" ref="refreshCardAction" />
+			</bean>
+		</property>-->
 	</bean>
 
 	<!--======= 动作：[newActions] [收回] ===========-->
@@ -376,6 +446,7 @@
 	<!--======= 动作：[newActions] [联查单据] ===========-->
 	<bean id="linkQueryAction" class="nc.ui.pubapp.uif2app.actions.LinkQueryAction">
 		<property name="model"><ref bean="bmModel"/></property>
+		<property name="billType" value="HK46" /><!--联查需要设置本单据的单据类型 2020年7月29日23:37:16-->
 		<property name="exceptionHandler"><ref bean="exceptionHandler" /></property>
 	</bean>
 
@@ -439,7 +510,6 @@
 		<constructor-arg><ref bean="container"/></constructor-arg>
 		<property name="context"><ref bean="context" /></property>
 	</bean>
-	
 	
 	<!-- 批量保存校验服务类 -->
 </beans>

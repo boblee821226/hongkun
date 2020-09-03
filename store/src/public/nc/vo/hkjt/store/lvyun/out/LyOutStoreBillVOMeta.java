@@ -9,7 +9,7 @@ public class LyOutStoreBillVOMeta extends AbstractBillMeta {
   private void init() {
     this.setParent(nc.vo.hkjt.store.lvyun.out.LyOutStoreHVO.class);
     this.addChildren(nc.vo.hkjt.store.lvyun.out.LyOutStoreBVO.class);
-    this.addChildren(nc.vo.hkjt.store.lvyun.out.LyOutStoreDVO.class);
     this.addChildren(nc.vo.hkjt.store.lvyun.out.LyOutStoreCVO.class);
+    this.addChildren(nc.vo.hkjt.store.lvyun.out.LyOutStoreDVO.class);
   }
 }
