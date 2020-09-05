@@ -352,6 +352,14 @@ public class BillServlet extends HttpServlet {
 
 		try
 		{
+			/**
+			 * TEST 类型的，传参设置为空
+			 */
+			if(ApiPubInfo.BILLTYPE_TEST.equals(billType)) {
+				paramData = null;
+			}
+			/***END***/
+			
 			if( paramData !=null
 			&& !paramData.equals("null")
 			&&  paramData.trim().length()>0
