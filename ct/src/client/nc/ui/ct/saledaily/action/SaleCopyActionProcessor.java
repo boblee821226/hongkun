@@ -254,6 +254,8 @@ public class SaleCopyActionProcessor implements
 //    parentVO.setValdate(null);			// HK（2018年10月12日14:58:51） 去掉清空 计划生效日期
 //    parentVO.setInvallidate(null);		// HK（2018年10月12日14:58:51） 去掉清空 计划终止日期
 
+    parentVO.setVdef19(null);	// HK（2020年9月5日15:45:49）清空：租金确认截止日
+    
     // 设置版本信息
     this.setHeadVID(parentVO);
   }
