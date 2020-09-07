@@ -8,10 +8,6 @@ import nc.api_oa.hkjt.itf.ApiPubInfo;
 import nc.api_oa.hkjt.vo._263X.JkVO;
 import nc.bs.framework.common.InvocationInfoProxy;
 import nc.bs.framework.common.NCLocator;
-import nc.bs.pub.pflock.PfBusinessLock;
-import nc.bs.pub.pflock.VOConsistenceCheck;
-import nc.bs.pub.pflock.VOLockData;
-import nc.bs.uap.lock.PKLock;
 import nc.itf.arap.pub.IBXBillPublic;
 import nc.itf.uap.pf.IplatFormEntry;
 import nc.vo.pub.BusinessException;
@@ -122,6 +118,11 @@ public class N263XService {
 			, String account
 			, String billType
 			) throws BusinessException {
+		/**
+		 * 先查询，是否存在单据
+		 */
+		nc.vo.ep.bx.JKVO dbVO = N263XServiceQUERY.getJkVO(srcBillVO, account, billType);
+		if (dbVO != null) throw new BusinessException("单据已存在，不能重复保存。");
 		/**
 		 * 表头表头共享变量
 		 */

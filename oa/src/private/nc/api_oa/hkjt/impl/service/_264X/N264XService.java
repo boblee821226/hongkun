@@ -1,8 +1,9 @@
 package nc.api_oa.hkjt.impl.service._264X;
 
+import hd.vo.pub.tools.PuPubVO;
+
 import java.util.HashMap;
 
-import hd.vo.pub.tools.PuPubVO;
 import nc.api_oa.hkjt.itf.ApiPubInfo;
 import nc.api_oa.hkjt.vo._264X.BxVO;
 import nc.bs.framework.common.InvocationInfoProxy;
@@ -14,7 +15,6 @@ import nc.vo.pub.lang.UFBoolean;
 import nc.vo.pub.lang.UFDate;
 import nc.vo.pub.lang.UFDateTime;
 import nc.vo.pub.lang.UFDouble;
-import nc.vo.uap.pf.PfProcessBatchRetObject;
 
 public class N264XService {
 	
@@ -79,6 +79,11 @@ public class N264XService {
 			, String billType
 			) 
 			throws BusinessException {
+		/**
+		 * 先查询，是否存在单据
+		 */
+		nc.vo.ep.bx.BXVO dbVO = N264XServiceQUERY.getBxVO(srcBillVO, account, billType);
+		if (dbVO != null) throw new BusinessException("单据已存在，不能重复保存。");
 		/**
 		 * 单据类型
 		 */
