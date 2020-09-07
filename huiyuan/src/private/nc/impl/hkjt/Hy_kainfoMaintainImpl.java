@@ -1,10 +1,14 @@
 package nc.impl.hkjt;
 
+import java.util.HashMap;
+
+import nc.bs.hkjt.huiyuan.workplugin.HuiyuanPlugin;
 import nc.impl.pub.ace.AceHy_kainfoPubServiceImpl;
+import nc.itf.hkjt.IHy_kainfoMaintain;
 import nc.ui.querytemplate.querytree.IQueryScheme;
 import nc.vo.hkjt.huiyuan.kainfo.KainfoBillVO;
-import nc.itf.hkjt.IHy_kainfoMaintain;
 import nc.vo.pub.BusinessException;
+import nc.vo.pub.pa.CurrEnvVO;
 
 public class Hy_kainfoMaintainImpl extends AceHy_kainfoPubServiceImpl
 		implements IHy_kainfoMaintain {
@@ -55,6 +59,14 @@ public class Hy_kainfoMaintainImpl extends AceHy_kainfoPubServiceImpl
 	public KainfoBillVO[] unapprove(KainfoBillVO[] clientFullVOs,
 			KainfoBillVO[] originBills) throws BusinessException {
 		return super.pubunapprovebills(clientFullVOs, originBills);
+	}
+
+	@Override
+	public Object execHuiyuanPlugin(
+			  CurrEnvVO context
+			, HashMap<String,Object> param
+			, Object other) throws BusinessException {
+		return new HuiyuanPlugin().executeTask(context);
 	}
 
 }

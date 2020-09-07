@@ -159,7 +159,11 @@
 				<ref bean="uNApproveScriptAction" />
 				<ref bean="separatorAction" />
 				<ref bean="outputAction" />
-
+				<!-- HK 2020年9月7日18:02:37 -->
+				<!-- 会员卡取数 -->
+				<ref bean="separatorAction" />
+				<ref bean="qushuAction" />
+				<!-- END -->
 			</list>
 		</property>
 		
@@ -480,7 +484,16 @@
 		<constructor-arg><ref bean="container"/></constructor-arg>
 		<property name="context"><ref bean="context" /></property>
 	</bean>
-	
-	
 	<!-- 批量保存校验服务类 -->
+	
+	<!-- HK 2020年9月7日17:54:56 -->
+	<!-- 会员卡取数 -->
+	<bean id="qushuAction" class="nc.ui.hkjt.huiyuan.kainfo.ace.action.QushuAction">
+		<property name="model"><ref bean="bmModel"/></property>
+		<property name="editor"><ref bean="billForm"/></property>
+		<property name="listview"><ref bean="billListView"/></property>
+		<property name="exceptionHandler"><ref bean="exceptionHandler" /></property>
+	</bean>
+	<!-- END -->
+	
 </beans>
