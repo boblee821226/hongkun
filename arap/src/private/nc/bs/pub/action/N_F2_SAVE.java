@@ -5,10 +5,15 @@
 
 package nc.bs.pub.action;
 
+import hd.vo.pub.tools.PuPubVO;
+
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Hashtable;
 
 import nc.bs.arap.actions.N_BASE_ACTION;
 import nc.bs.dao.BaseDAO;
+import nc.jdbc.framework.processor.ArrayListProcessor;
 import nc.vo.arap.gathering.AggGatheringBillVO;
 import nc.vo.arap.gathering.GatheringBillItemVO;
 import nc.vo.fipub.exception.ExceptionHandler;
@@ -44,17 +49,54 @@ public class N_F2_SAVE extends N_BASE_ACTION{
 			 * 将 def10 更新到 备注
 			 * 2019年1月23日17:43:00
 			 * 改为 def30
+			 * 2020年9月8日19:36:58
+			 * 改成 【客商名称+期间+收费项目】  期间从 水电费录入单上取得
 			 */
 			{
 				GatheringBillItemVO[] bVOs = (GatheringBillItemVO[])paraVo.m_preValueVo.getChildrenVO();
+				ArrayList<String> pk_sdflr_b_list = new ArrayList<>();
+				// 第一次循环表体，获得所有的 录入单表体id
 				for( GatheringBillItemVO bVO : bVOs )
 	        	{
-	        		String def30 = bVO.getDef30();
-	        		if(def30!=null&&!"~".equals(def30))
-	        		{
-	        			bVO.setScomment(def30);
-	        		}
+					String pk_sdflr_b = PuPubVO.getString_TrimZeroLenAsNull(bVO.getDef29());
+					if (pk_sdflr_b != null && !"~".equals(pk_sdflr_b)) {
+						pk_sdflr_b_list.add(pk_sdflr_b);
+					}
 	        	}
+				// 查询、封装摘要
+				if (!pk_sdflr_b_list.isEmpty()) {
+					StringBuffer querySQL = 
+					new StringBuffer("select ")
+							.append(" sb.pk_hk_zulin_sdflr_b ")
+							.append(",cust.name || '【' || substr(s.vdef01,1,10) || '至' || substr(s.vdef02,1,10) || '】' || sfxm.name ")
+							.append(" from hk_zulin_sdflr s ")
+							.append(" inner join hk_zulin_sdflr_b sb on s.pk_hk_zulin_sdflr = sb.pk_hk_zulin_sdflr ")
+							.append(" left join bd_customer cust on sb.pk_cust = cust.pk_customer ")
+							.append(" left join bd_defdoc sfxm on sb.pk_sfxm = sfxm.pk_defdoc ")
+							.append(" where s.dr = 0 and sb.dr = 0 ")
+							.append(" and sb.pk_hk_zulin_sdflr_b in ").append(PuPubVO.getSqlInByList(pk_sdflr_b_list))
+					;
+					BaseDAO dao = new BaseDAO();
+					ArrayList list = (ArrayList)dao.executeQuery(querySQL.toString(), new ArrayListProcessor());
+					HashMap<String,String> ZY_MAP = new HashMap<>();
+					if (list != null && !list.isEmpty()) {
+						for (Object itemObj : list) {
+							Object[] item = (Object[])itemObj;
+							ZY_MAP.put(
+									  PuPubVO.getString_TrimZeroLenAsNull(item[0])
+									, PuPubVO.getString_TrimZeroLenAsNull(item[1]));
+						}
+					}
+					// 第二次循环表体，给摘要赋值
+					for( GatheringBillItemVO bVO : bVOs )
+		        	{
+						String pk_sdflr_b = PuPubVO.getString_TrimZeroLenAsNull(bVO.getDef29());
+						if (pk_sdflr_b != null && !"~".equals(pk_sdflr_b)) {
+							String zy = ZY_MAP.get(pk_sdflr_b);
+							bVO.setScomment(zy);
+						}
+		        	}
+				}
 			}
 			/***END***/
 
