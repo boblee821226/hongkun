@@ -11,6 +11,7 @@ import nc.bs.framework.common.NCLocator;
 import nc.itf.arap.pub.IBXBillPublic;
 import nc.itf.uap.pf.IplatFormEntry;
 import nc.vo.pub.BusinessException;
+import nc.vo.pub.VOStatus;
 import nc.vo.pub.lang.UFBoolean;
 import nc.vo.pub.lang.UFDate;
 import nc.vo.pub.lang.UFDateTime;
@@ -109,9 +110,18 @@ public class N264XService {
 			param.put("rowno", ""+(i+1));
 			distBVOs[i] = getBxItemVO(srcBillVO.getItems()[i], param);
 		}
+		nc.vo.erm.costshare.CShareDetailVO[] distSVOs = null;
+		if (srcBillVO.getShares() != null && srcBillVO.getShares().length > 0) {
+			distSVOs = new nc.vo.erm.costshare.CShareDetailVO[srcBillVO.getShares().length];
+			for (int i = 0; i < srcBillVO.getShares().length; i++) {
+				param.put("rowno", ""+(i+1));
+				distSVOs[i] = getBxShareVO(srcBillVO.getShares()[i], param);
+			}
+		}
 		
 		distBillVO.setParentVO(distHVO);
-		distBillVO.setChildrenVO(distBVOs);
+		distBillVO.setChildrenVO(distBVOs);		// 明细
+		distBillVO.setcShareDetailVo(distSVOs);	// 分摊页签
 		return distBillVO;
 	}
 	
@@ -140,6 +150,7 @@ public class N264XService {
 		String fycdbmStr = srcHVO.getFycdbm();	// 费用承担部门
 		String szgsStr = srcHVO.getSzgs();		// 所在公司
 		String szbmStr = srcHVO.getSzbm();		// 所在部门
+		UFBoolean isShare = PuPubVO.getUFBoolean_NullAs(srcHVO.getFt(), UFBoolean.FALSE);	// 是否分摊
 		HashMap<String,String> org_map = ApiPubInfo.CACHE_DOC.get(account).get("org_orgs").get(szgsStr);
 		String pk_org = org_map.get("id");
 		String pk_org_v = org_map.get("vid");
@@ -249,7 +260,7 @@ public class N264XService {
 		
 		distHVO.setFlexible_flag(UFBoolean.FALSE);
 		distHVO.setIscheck(UFBoolean.FALSE);
-		distHVO.setIscostshare(UFBoolean.FALSE);
+		distHVO.setIscostshare(isShare);	// 是否分摊
 		distHVO.setIsexpamt(UFBoolean.FALSE);
 		distHVO.setIsexpedited(UFBoolean.FALSE);
 		distHVO.setIsinitgroup(UFBoolean.FALSE);
@@ -283,6 +294,7 @@ public class N264XService {
 		/**
 		 * param
 		 */
+		param.put("pk_group", pk_group);// 集团
 		param.put("pk_org", pk_org);	// 公司
 		param.put("pk_dept", pk_dept);	// 部门
 		param.put("skr", skr);			// 收款人
@@ -378,5 +390,71 @@ public class N264XService {
 		distBVO.setZfybje(jshj);
 		
 		return distBVO;
+	}
+	
+	/**
+	 * 翻译 费用分摊vo
+	 */
+	private nc.vo.erm.costshare.CShareDetailVO getBxShareVO(
+			  nc.api_oa.hkjt.vo._264X.BxShareVO srcSVO
+			, HashMap<String,String> param 
+			) 
+			throws BusinessException {
+		/**
+		 *  assume_amount=600.00
+			assume_dept=1001N5100000006VD3BB
+			assume_org=0001N510000000001SXL
+			bbhl=1
+			bbje=600.00
+			dr=0
+			globalbbhl=0.00000000
+			globalbbje=0.00000000
+			groupbbhl=0.00000000
+			groupbbje=0.00000000
+			hbbm=1001N510000000000NW6
+			pk_group=0001N510000000000EGY
+			pk_iobsclass=1001N5100000000EYKBS
+			share_ratio=60.00
+		 */
+		String account = param.get("account");	// 账套
+		UFDouble cdje = PuPubVO.getUFDouble_NullAsZero(srcSVO.getCdje());	// 承担金额
+		UFDouble ftbl = PuPubVO.getUFDouble_NullAsZero(srcSVO.getFtbl());	// 分摊比例
+		String cdgsStr = srcSVO.getCdgs();	// 承担公司
+		HashMap<String,String> cdgs_map = ApiPubInfo.CACHE_DOC.get(account).get("org_orgs").get(cdgsStr);
+		String cdgs = cdgs_map.get("id");
+		String cdbmStr = srcSVO.getCdbm();	// 承担部门
+		HashMap<String,String> cdbm_map = ApiPubInfo.CACHE_DOC.get(account).get("org_dept").get(cdbmStr);
+		String cdbm = cdbm_map.get("id");
+		String zcxm = srcSVO.getZcxm();			// 收支项目
+		String kh = param.get("kh");			// 客户
+		String gys = param.get("gys");			// 供应商
+		String pk_group = param.get("pk_group");// 集团
+		/**
+		 * 
+		 * HashMap<String,String> dept_map = ApiPubInfo.CACHE_DOC.get(account).get("org_dept").get(szbmStr);
+		String pk_dept = dept_map.get("id");
+		String pk_dept_v = dept_map.get("vid");
+		HashMap<String,String> fycdgs_map = ApiPubInfo.CACHE_DOC.get(account).get("org_orgs").get(fycdgsStr);
+		String fycdgs = fycdgs_map.get("id");
+		 */
+		nc.vo.erm.costshare.CShareDetailVO distSVO = new nc.vo.erm.costshare.CShareDetailVO();
+		distSVO.setAssume_amount(cdje);
+		distSVO.setAssume_dept(cdbm);
+		distSVO.setAssume_org(cdgs);
+		distSVO.setBbhl(UFDouble.ONE_DBL);
+		distSVO.setBbje(cdje);
+		distSVO.setDr(0);
+		distSVO.setGlobalbbhl(UFDouble.ZERO_DBL);
+		distSVO.setGlobalbbje(UFDouble.ZERO_DBL);
+		distSVO.setGroupbbhl(UFDouble.ZERO_DBL);
+		distSVO.setGroupbbje(UFDouble.ZERO_DBL);
+		distSVO.setHbbm(gys);
+		distSVO.setCustomer(kh);
+		distSVO.setPk_group(pk_group);
+		distSVO.setShare_ratio(ftbl);
+		distSVO.setPk_iobsclass(zcxm);
+		distSVO.setStatus(VOStatus.NEW);	// 设置vo状态为NEW，才能进行保存
+		
+		return distSVO;
 	}
 }

@@ -15,6 +15,7 @@ public class BxVO implements Serializable {
 
 	private BxHeadVO head;
 	private BxItemVO[] items;
+	private BxShareVO[] shares;
 	
 	public BxHeadVO getHead() {
 		return head;
@@ -27,6 +28,12 @@ public class BxVO implements Serializable {
 	}
 	public void setItems(BxItemVO[] items) {
 		this.items = items;
+	}
+	public BxShareVO[] getShares() {
+		return shares;
+	}
+	public void setShares(BxShareVO[] shares) {
+		this.shares = shares;
 	}
 	
 }

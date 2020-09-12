@@ -14,7 +14,7 @@ public class JkHeadVO implements Serializable {
 
 	private String djbh;	// 单号 y
 	private String djrq;	// 单据日期（yyyy-MM-dd） y
-	private Float spje;		// 合计金额 y
+	private Double spje;	// 合计金额 y
 	private String jsfs;	// 结算方式 y
 	private String fycdgs;	// 费用承担公司 y
 	private String fycdbm;	// 费用承担部门 y
@@ -39,10 +39,10 @@ public class JkHeadVO implements Serializable {
 	public void setDjrq(String djrq) {
 		this.djrq = djrq;
 	}
-	public Float getSpje() {
+	public Double getSpje() {
 		return spje;
 	}
-	public void setSpje(Float spje) {
+	public void setSpje(Double spje) {
 		this.spje = spje;
 	}
 	public String getJsfs() {

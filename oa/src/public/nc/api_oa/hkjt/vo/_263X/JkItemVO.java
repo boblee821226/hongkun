@@ -14,7 +14,7 @@ public class JkItemVO implements Serializable {
 
 	private String jkxm;	// 收支项目
 	private String sxsm;	// 事项说明
-	private Float je;		// 金额
+	private Double je;		// 金额
 	
 	public String getJkxm() {
 		return jkxm;
@@ -28,10 +28,10 @@ public class JkItemVO implements Serializable {
 	public void setSxsm(String sxsm) {
 		this.sxsm = sxsm;
 	}
-	public Float getJe() {
+	public Double getJe() {
 		return je;
 	}
-	public void setJe(Float je) {
+	public void setJe(Double je) {
 		this.je = je;
 	}
 

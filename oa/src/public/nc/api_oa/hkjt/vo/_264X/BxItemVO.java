@@ -14,11 +14,11 @@ public class BxItemVO implements Serializable {
 
 	private String zcxm;		// 收支项目
 	private String sxsm;		// 事项说明
-	private Float jshjje;		// 价税合计金额
-	private Float sl;		// 税率
+	private Double jshjje;		// 价税合计金额
+	private Double sl;		// 税率
 	private String dkfs;	// 抵扣方式
-	private Float se;		// 税额
-	private Float wsje;		// 无税金额
+	private Double se;		// 税额
+	private Double wsje;		// 无税金额
 	
 	public String getZcxm() {
 		return zcxm;
@@ -32,16 +32,16 @@ public class BxItemVO implements Serializable {
 	public void setSxsm(String sxsm) {
 		this.sxsm = sxsm;
 	}
-	public Float getJshjje() {
+	public Double getJshjje() {
 		return jshjje;
 	}
-	public void setJshjje(Float jshjje) {
+	public void setJshjje(Double jshjje) {
 		this.jshjje = jshjje;
 	}
-	public Float getSl() {
+	public Double getSl() {
 		return sl;
 	}
-	public void setSl(Float sl) {
+	public void setSl(Double sl) {
 		this.sl = sl;
 	}
 	public String getDkfs() {
@@ -50,16 +50,16 @@ public class BxItemVO implements Serializable {
 	public void setDkfs(String dkfs) {
 		this.dkfs = dkfs;
 	}
-	public Float getSe() {
+	public Double getSe() {
 		return se;
 	}
-	public void setSe(Float se) {
+	public void setSe(Double se) {
 		this.se = se;
 	}
-	public Float getWsje() {
+	public Double getWsje() {
 		return wsje;
 	}
-	public void setWsje(Float wsje) {
+	public void setWsje(Double wsje) {
 		this.wsje = wsje;
 	}
 

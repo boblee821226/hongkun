@@ -14,7 +14,7 @@ public class BxHeadVO implements Serializable {
 
 	private String djbh;	// 单号 y
 	private String djrq;	// 单据日期（yyyy-MM-dd） y
-	private Float spje;		// 合计金额 y
+	private Double spje;	// 合计金额 y
 	private String xght;	// 相关合同 y
 	private String jsfs;	// 结算方式 y
 	private String djbt;	// 单据标题 y
@@ -36,6 +36,10 @@ public class BxHeadVO implements Serializable {
 	private String jgrq;	// 竣工日期
 	private String gcwxsqd;	// 工程维修申请单
 	private String xmmc;	// 项目名称
+	/**
+	 * 分摊费用
+	 */
+	private Boolean ft;	// 是否分摊
 	
 	private String url;	// oa路径
 	
@@ -51,10 +55,10 @@ public class BxHeadVO implements Serializable {
 	public void setDjrq(String djrq) {
 		this.djrq = djrq;
 	}
-	public Float getSpje() {
+	public Double getSpje() {
 		return spje;
 	}
-	public void setSpje(Float spje) {
+	public void setSpje(Double spje) {
 		this.spje = spje;
 	}
 	public String getXght() {
@@ -170,6 +174,12 @@ public class BxHeadVO implements Serializable {
 	}
 	public void setUrl(String url) {
 		this.url = url;
+	}
+	public Boolean getFt() {
+		return ft;
+	}
+	public void setFt(Boolean ft) {
+		this.ft = ft;
 	}
 	
 }
