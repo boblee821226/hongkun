@@ -121,7 +121,7 @@ public class ImpLvyunData implements IBackgroundWorkPlugin {
 				"0001N5100000000UVI5I"	// 太申18
 		};
 		String[] date_list = new String[]{
-			"2020-07-09",
+			"2020-09-12",
 		};
 		
 		param.put("pk_org", pk_org_list);
@@ -802,13 +802,67 @@ public class ImpLvyunData implements IBackgroundWorkPlugin {
 							String vbdef04 = PuPubVO.getString_TrimZeroLenAsNull(bVO.getVbdef04());
 							ArrayList<RzmxBVO> zhangdanVOs = MAP_ZHANGDAN.get(vbdef04);
 							if (zhangdanVOs != null && zhangdanVOs.size() > 0) {
-								for (RzmxBVO zdVO : zhangdanVOs) {
-									RzmxBVO zdVO_clone = (RzmxBVO)zdVO.clone();
-									zdVO_clone.setVbmemo("NC生成8："+zdVO_clone.getVbmemo());
-									zdVO_clone.setCharge(zdVO_clone.getCharge().multiply(-1.00));
-									zdVO_clone.setVrowno("" + (((rowCount++)+1) * 10));
-									bVO_list_temp.add(zdVO_clone);
-								}
+								
+//								if (zhangdanVOs.size() > 1){
+									/**
+									 * 如果 消费是多行，则进行分摊。先判断 消费总额 与 免费总额，是否一致。
+									 * 如果 一致，则按照消费金额 去抵扣。
+									 * 如果 不一致，则按照比例 去 抵扣。（尾差处理）
+									 */
+									// 第一次循环，计算消费总额
+									UFDouble charge_total = UFDouble.ZERO_DBL;
+									for (int k = 0; k < zhangdanVOs.size(); k++) {
+										RzmxBVO zdVO = zhangdanVOs.get(k);
+										charge_total = charge_total.add(zdVO.getCharge());
+									}
+									// 第二次循环，进行抵扣或分摊。
+									UFDouble free_totale = bVO.getPayment();
+									if (charge_total.compareTo(free_totale) == 0) {
+										// 如果 消费 与 免费 一致,则直接取数。
+										for (RzmxBVO zdVO : zhangdanVOs) {
+											RzmxBVO zdVO_clone = (RzmxBVO)zdVO.clone();
+											zdVO_clone.setVbmemo("NC生成8："+zdVO_clone.getVbmemo());
+											zdVO_clone.setCharge(zdVO_clone.getCharge().multiply(-1.00));
+											zdVO_clone.setVrowno("" + (((rowCount++)+1) * 10));
+											bVO_list_temp.add(zdVO_clone);
+										}
+									} else {
+										// 否则 不一致，进行按比例 抵扣。
+										charge_total = free_totale;	// 待分摊的 消费 = 免费
+										UFDouble charge_use = UFDouble.ZERO_DBL;	// 已经分摊的消费合计
+										for (int k = 0; k < zhangdanVOs.size(); k++) {
+											RzmxBVO zdVO = zhangdanVOs.get(k);
+											RzmxBVO zdVO_clone = (RzmxBVO)zdVO.clone();
+											UFDouble banci = null;
+											if (k == zhangdanVOs.size()-1) {
+												// 如果是最后一笔，则直接用余额
+												banci = charge_total.sub(charge_use);
+											} else {
+												// 非最后一笔，则按比例分摊。本行的消费/消费总额*免费总额
+												banci = zdVO_clone.getCharge().div(charge_total).multiply(free_totale).setScale(2, UFDouble.ROUND_HALF_UP);
+											}
+											zdVO_clone.setVbmemo("NC生成8："+zdVO_clone.getVbmemo());
+											zdVO_clone.setCharge(banci.multiply(-1.00));
+											zdVO_clone.setVrowno("" + (((rowCount++)+1) * 10));
+											bVO_list_temp.add(zdVO_clone);
+											charge_use = charge_use.add(banci);
+										}
+									}
+//								} else {
+//									for (RzmxBVO zdVO : zhangdanVOs) {
+//										RzmxBVO zdVO_clone = (RzmxBVO)zdVO.clone();
+//										zdVO_clone.setVbmemo("NC生成8："+zdVO_clone.getVbmemo());
+//										/**
+//										 * HK 2020年9月14日17:18:26
+//										 * NC生8 跟 7 的金额是一致的
+//										 */
+//	//									zdVO_clone.setCharge(zdVO_clone.getCharge().multiply(-1.00));
+//										zdVO_clone.setCharge(bVO_clone.getPayment());
+//										/***END***/
+//										zdVO_clone.setVrowno("" + (((rowCount++)+1) * 10));
+//										bVO_list_temp.add(zdVO_clone);
+//									}
+//								}
 							}
 						}
 						/**
