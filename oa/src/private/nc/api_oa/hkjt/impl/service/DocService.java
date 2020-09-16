@@ -166,6 +166,40 @@ public class DocService {
 				ApiPubInfo.CACHE_DOC.get(account).get(TABLE).put(name, value);
 			}
 		}
+		{// 结算方式
+			/**
+			 * select 
+			    code
+			   ,name
+			   ,pk_balatype id
+			   from bd_balatype
+			  where 11 = 11
+			    and (enablestate = 2)
+			  order by code
+			 */
+			String TABLE = "bd_balatype";
+			StringBuffer querySQL = 
+			new StringBuffer("select ")
+					.append(" pk_balatype ")
+					.append(",code ")
+					.append(",name ")
+					.append(" from bd_balatype ")
+					.append(" where enablestate = 2 ")
+			;
+			ArrayList list = (ArrayList)dao.executeQuery(querySQL.toString(), new ArrayListProcessor());
+			ApiPubInfo.CACHE_DOC.get(account).put(TABLE, new HashMap<String,HashMap<String,String>>());
+			for (Object obj : list) {
+				Object[] row = (Object[])obj;
+				String id 	= PuPubVO.getString_TrimZeroLenAsNull(row[0]);
+				String code = PuPubVO.getString_TrimZeroLenAsNull(row[1]);
+				String name = PuPubVO.getString_TrimZeroLenAsNull(row[2]);
+				HashMap<String,String> value = new HashMap<String,String>();
+				value.put(ID, id);
+				value.put(CODE, code);
+				value.put(NAME, name);
+				ApiPubInfo.CACHE_DOC.get(account).get(TABLE).put(name, value);
+			}
+		}
 		return "更新档案成功";
 	}
 	

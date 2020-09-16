@@ -167,7 +167,8 @@ public class N264XService {
 		String userId = InvocationInfoProxy.getInstance().getUserId();
 		String zdrStr = srcHVO.getZdr();	// 制单人
 		String zdr = ApiPubInfo.CACHE_DOC.get(account).get("bd_psndoc").get(zdrStr).get("id");
-		String jsfs = srcHVO.getJsfs();		// 结算方式
+		String jsfsStr = srcHVO.getJsfs();	// 结算方式
+		String jsfs = ApiPubInfo.CACHE_DOC.get(account).get("bd_balatype").get(jsfsStr).get("id");
 		String szxm = param.get("szxm");	// 收支项目
 		String skdxStr = srcHVO.getSkdx();	// 收款对象：0员工 1供应商 2客户
 		Integer skdx = 0;

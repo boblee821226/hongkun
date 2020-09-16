@@ -17,6 +17,7 @@ import nc.api_oa.hkjt.vo.ActionVO;
 import nc.api_oa.hkjt.vo.ApprovalFlowQueryVO;
 import nc.api_oa.hkjt.vo.ApprovalFlowWorkVO;
 import nc.api_oa.hkjt.vo.LoginVO;
+import nc.bs.hkjt.srgk.lvyun.workplugin.ImpLvyunData;
 import nc.bs.hkjt.store.lvyun_out.workplugin.ImpLvyunOutData;
 import nc.vo.pub.BusinessException;
 import nc.vo.pub.pa.CurrEnvVO;
@@ -52,17 +53,21 @@ public class ApiBusinessImpl implements ApiBusinessItf {
 		 */
 		if (ApiPubInfo.BILLTYPE_TEST.equals(billType)) {
 			// TODO 测试代码
-			CurrEnvVO context = new CurrEnvVO();
-			context.setPk_orgs(new String[]{
-//					"0001N510000000001SY3", // 朗丽兹 9
-//					"0001N510000000001SY5", // 康西 11
-//					"0001N510000000001SY7", // 西山温泉 10
-//					"0001N510000000001SY1", // 学院路16
-					"0001N5100000000UVI5I"	// 太申18
-			});
-			context.getKeyMap().put("bdate", "2020-08-26");
-			context.getKeyMap().put("edate", "2020-08-26");
-			Object res = new ImpLvyunOutData().executeTask(context);
+//			CurrEnvVO context = new CurrEnvVO();
+//			context.setPk_orgs(new String[]{
+////					"0001N510000000001SY3", // 朗丽兹 9
+////					"0001N510000000001SY5", // 康西 11
+////					"0001N510000000001SY7", // 西山温泉 10
+////					"0001N510000000001SY1", // 学院路16
+//					"0001N5100000000UVI5I"	// 太申18
+//			});
+//			context.getKeyMap().put("bdate", "2020-08-26");
+//			context.getKeyMap().put("edate", "2020-08-26");
+//			Object res = new ImpLvyunOutData().executeTask(context);
+			
+			/** 绿云-入账明细 **/
+			Object res = new ImpLvyunData().executeTest(null);
+			
 			return res;
 		}
 		/**
