@@ -89,6 +89,7 @@ public class N264XServiceQUERY {
 		BxHeadVO srcHVO = srcBillVO.getHead();
 		String szgsStr = srcHVO.getSzgs();		// 所在公司
 		HashMap<String,String> org_map = ApiPubInfo.CACHE_DOC.get(account).get("org_orgs").get(szgsStr);
+		if (org_map == null) {throw new BusinessException("公司档案不匹配：" + szgsStr);}
 		String pk_org = org_map.get("id");
 		String djrq = srcHVO.getDjrq();
 		String djbh = srcHVO.getDjbh();

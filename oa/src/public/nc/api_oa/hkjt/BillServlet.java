@@ -156,13 +156,13 @@ public class BillServlet extends HttpServlet {
 		}
 
 		// 返回
-		String data = "增删改";
-		ServletOutputStream outputStream = resp.getOutputStream();//获取OutputStream输出流
-		resp.setHeader("content-type", "text/html;charset=UTF-8");//通过设置响应头控制浏览器以UTF-8的编码显示数据，如果不加这句话，那么浏览器显示的将是乱码
-		byte[] dataByteArr = data.getBytes("UTF-8");//将字符转换成字节数组，指定以UTF-8编码进行转换
-		outputStream.write(dataByteArr);//使用OutputStream流向客户端输出字节数组
-		outputStream.flush();
-		outputStream.close();
+//		String data = "增删改";
+//		ServletOutputStream outputStream = resp.getOutputStream();//获取OutputStream输出流
+//		resp.setHeader("content-type", "text/html;charset=UTF-8");//通过设置响应头控制浏览器以UTF-8的编码显示数据，如果不加这句话，那么浏览器显示的将是乱码
+//		byte[] dataByteArr = data.getBytes("UTF-8");//将字符转换成字节数组，指定以UTF-8编码进行转换
+//		outputStream.write(dataByteArr);//使用OutputStream流向客户端输出字节数组
+//		outputStream.flush();
+//		outputStream.close();
 	}
 	
 	/**
@@ -353,9 +353,12 @@ public class BillServlet extends HttpServlet {
 		try
 		{
 			/**
-			 * TEST 类型的，传参设置为空
+			 * TEST、INIT 类型的，传参设置为空
 			 */
 			if(ApiPubInfo.BILLTYPE_TEST.equals(billType)) {
+				paramData = null;
+			}
+			if(ApiPubInfo.BILLTYPE_INIT.equals(billType)) {
 				paramData = null;
 			}
 			/***END***/

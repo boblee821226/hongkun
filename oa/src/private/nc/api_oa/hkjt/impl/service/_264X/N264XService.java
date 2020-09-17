@@ -151,24 +151,47 @@ public class N264XService {
 		String szgsStr = srcHVO.getSzgs();		// 所在公司
 		String szbmStr = srcHVO.getSzbm();		// 所在部门
 		UFBoolean isShare = PuPubVO.getUFBoolean_NullAs(srcHVO.getFt(), UFBoolean.FALSE);	// 是否分摊
-		HashMap<String,String> org_map = ApiPubInfo.CACHE_DOC.get(account).get("org_orgs").get(szgsStr);
-		String pk_org = org_map.get("id");
-		String pk_org_v = org_map.get("vid");
-		String fkyhzh = org_map.get("account");		// 付款银行账户
-		HashMap<String,String> dept_map = ApiPubInfo.CACHE_DOC.get(account).get("org_dept").get(szbmStr);
-		String pk_dept = dept_map.get("id");
-		String pk_dept_v = dept_map.get("vid");
+		HashMap<String,String> szgs_map = ApiPubInfo.CACHE_DOC.get(account).get("org_orgs").get(szgsStr);
+		if (szgs_map == null) {throw new BusinessException("公司档案不匹配：" + szgsStr);}
+		String pk_org = szgs_map.get("id");
+		String pk_org_v = szgs_map.get("vid");
+		String fkyhzh = szgs_map.get("account");		// 付款银行账户
+		HashMap<String,String> szbm_map = ApiPubInfo.CACHE_DOC.get(account).get("org_dept").get(szbmStr);
+		if (szbm_map == null) {throw new BusinessException("部门档案不匹配：" + szbmStr);}
+		String pk_dept = szbm_map.get("id");
+		String pk_dept_v = szbm_map.get("vid");
 		HashMap<String,String> fycdgs_map = ApiPubInfo.CACHE_DOC.get(account).get("org_orgs").get(fycdgsStr);
+		if (fycdgs_map == null) {throw new BusinessException("公司档案不匹配：" + fycdgsStr);}
 		String fycdgs = fycdgs_map.get("id");
 		String fycdgs_v = fycdgs_map.get("vid");
 		HashMap<String,String> fycdbm_map = ApiPubInfo.CACHE_DOC.get(account).get("org_dept").get(fycdbmStr);
+		if (fycdbm_map == null) {throw new BusinessException("部门档案不匹配：" + fycdbmStr);}
 		String fycdbm = fycdbm_map.get("id");
 		String fycdbm_v = fycdbm_map.get("vid");
 		String userId = InvocationInfoProxy.getInstance().getUserId();
 		String zdrStr = srcHVO.getZdr();	// 制单人
-		String zdr = ApiPubInfo.CACHE_DOC.get(account).get("bd_psndoc").get(zdrStr).get("id");
+		HashMap<String,String> zdr_map = ApiPubInfo.CACHE_DOC.get(account).get("bd_psndoc").get(zdrStr);
+		if (zdr_map == null) {throw new BusinessException("人员档案不匹配：" + zdrStr);}
+		String zdr = zdr_map.get("id");
+//		String jsfsStr = srcHVO.getJsfs();	// 结算方式
+//		HashMap<String,String> jsfs_map = ApiPubInfo.CACHE_DOC.get(account).get("bd_balatype").get(jsfsStr);
+//		if (jsfs_map == null) {throw new BusinessException("结算方式不匹配：" + jsfsStr);}
+//		String jsfs = jsfs_map.get("id");
+		/**
+		 * HK 2020年9月17日19:07:30
+		 * 结算方式需要匹配接收两种模式，name 和 pk
+		 * 如果长度为 20，就认为是pk
+		 * 不为 20，就认为是 name
+		 */
 		String jsfsStr = srcHVO.getJsfs();	// 结算方式
-		String jsfs = ApiPubInfo.CACHE_DOC.get(account).get("bd_balatype").get(jsfsStr).get("id");
+		String jsfs = null;
+		if (jsfsStr != null && jsfsStr.length() == 20) {
+			jsfs = jsfsStr;
+		} else {
+			HashMap<String,String> jsfs_map = ApiPubInfo.CACHE_DOC.get(account).get("bd_balatype").get(jsfsStr);
+			if (jsfs_map == null) {throw new BusinessException("结算方式不匹配：" + jsfsStr);}
+			jsfs = jsfs_map.get("id");
+		}
 		String szxm = param.get("szxm");	// 收支项目
 		String skdxStr = srcHVO.getSkdx();	// 收款对象：0员工 1供应商 2客户
 		Integer skdx = 0;
@@ -188,7 +211,9 @@ public class N264XService {
 		
 		if (0 == skdx) { // 员工
 			String skrStr = srcHVO.getSkr();
-			skr = ApiPubInfo.CACHE_DOC.get(account).get("bd_psndoc").get(skrStr).get("id");
+			HashMap<String,String> skr_map = ApiPubInfo.CACHE_DOC.get(account).get("bd_psndoc").get(skrStr);
+			if (skr_map == null) {throw new BusinessException("人员档案不匹配：" + skrStr);}
+			skr = skr_map.get("id");
 			skyhzh = srcHVO.getGryhzh();
 		} else if (1 == skdx) {	// 供应商
 			gys = srcHVO.getGys();
@@ -322,7 +347,9 @@ public class N264XService {
 		String dkfsStr = srcBVO.getDkfs();		// 抵扣方式
 		String dkfs = null;
 		if (dkfsStr != null) {
-			dkfs = ApiPubInfo.CACHE_DOC.get(account).get("bd_defdoc_dkfs").get(dkfsStr).get("id");
+			HashMap<String,String> dkfs_map = ApiPubInfo.CACHE_DOC.get(account).get("bd_defdoc_dkfs").get(dkfsStr);
+			if (dkfs_map == null) {throw new BusinessException("抵扣方式不匹配：" + dkfsStr);}
+			dkfs = dkfs_map.get("id");
 		}
 		String szxm = srcBVO.getZcxm();			// 收支项目
 		UFDouble jshj = PuPubVO.getUFDouble_NullAsZero(srcBVO.getJshjje());	// 价税合计
@@ -422,9 +449,11 @@ public class N264XService {
 		UFDouble ftbl = PuPubVO.getUFDouble_NullAsZero(srcSVO.getFtbl());	// 分摊比例
 		String cdgsStr = srcSVO.getCdgs();	// 承担公司
 		HashMap<String,String> cdgs_map = ApiPubInfo.CACHE_DOC.get(account).get("org_orgs").get(cdgsStr);
+		if (cdgs_map == null) {throw new BusinessException("公司档案不匹配：" + cdgsStr);}
 		String cdgs = cdgs_map.get("id");
 		String cdbmStr = srcSVO.getCdbm();	// 承担部门
 		HashMap<String,String> cdbm_map = ApiPubInfo.CACHE_DOC.get(account).get("org_dept").get(cdbmStr);
+		if (cdbm_map == null) {throw new BusinessException("部门档案不匹配：" + cdbmStr);}
 		String cdbm = cdbm_map.get("id");
 		String zcxm = srcSVO.getZcxm();			// 收支项目
 		String kh = param.get("kh");			// 客户
