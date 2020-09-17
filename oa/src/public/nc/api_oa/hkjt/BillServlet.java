@@ -353,12 +353,13 @@ public class BillServlet extends HttpServlet {
 		try
 		{
 			/**
-			 * TEST、INIT 类型的，传参设置为空
+			 * TEST、INIT、DOC 类型的，传参设置为空
 			 */
 			if(ApiPubInfo.BILLTYPE_TEST.equals(billType)) {
 				paramData = null;
-			}
-			if(ApiPubInfo.BILLTYPE_INIT.equals(billType)) {
+			} else if(ApiPubInfo.BILLTYPE_INIT.equals(billType)) {
+				paramData = null;
+			} else if(ApiPubInfo.BILLTYPE_DOC.equals(billType)) {
 				paramData = null;
 			}
 			/***END***/
