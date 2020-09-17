@@ -35,8 +35,12 @@ public class OaHttpUtil {
 		参数 appid：36ac4080-6bc5-4b1a-a061-ae4810112d6e
 		参数loginid：传手机号
 	 */
-	private static String baseUrl = "http://111.204.181.93:93";
-	private static String appid = "36ac4080-6bc5-4b1a-a061-ae4810112d6e";
+	/** 测试 **/
+//	private static String baseUrl = "http://111.204.181.93:93";
+//	private static String appid = "36ac4080-6bc5-4b1a-a061-ae4810112d6e";
+	/** 正式 **/
+	private static String baseUrl = "http://39.102.46.51";
+	private static String appid = "02b76fba-8121-428f-8628-642507e6fe71";
 	
 	public static String getToken(String loginid) {
         String url = baseUrl + "/ssologin/getToken";
