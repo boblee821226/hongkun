@@ -146,46 +146,44 @@ public class N264XService {
 		String djbt = srcHVO.getDjbt();			// 单据标题
 		String bz = "1002Z0100000000001K1";		// 币种
 		String pk_group = InvocationInfoProxy.getInstance().getGroupId();	// 集团
-		String fycdgsStr = srcHVO.getFycdgs();	// 费用承担公司
+		String fycdgsStr = srcHVO.getFycdgs();	// 费用承担公司（除了人员所在公司，其它的都用费用承担公司）
 		String fycdbmStr = srcHVO.getFycdbm();	// 费用承担部门
-		String szgsStr = srcHVO.getSzgs();		// 所在公司
+		String szgsStr = srcHVO.getSzgs();		// 所在公司（只是 人员所在公司）
 		String szbmStr = srcHVO.getSzbm();		// 所在部门
 		UFBoolean isShare = PuPubVO.getUFBoolean_NullAs(srcHVO.getFt(), UFBoolean.FALSE);	// 是否分摊
 		HashMap<String,String> szgs_map = ApiPubInfo.CACHE_DOC.get(account).get("org_orgs").get(szgsStr);
-		if (szgs_map == null) {throw new BusinessException("公司档案不匹配：" + szgsStr);}
-		String pk_org = szgs_map.get("id");
-		String pk_org_v = szgs_map.get("vid");
-		String fkyhzh = szgs_map.get("account");		// 付款银行账户
+		if (szgs_map == null) {throw new BusinessException("所在公司不匹配：" + szgsStr);}
+		String szgs = szgs_map.get("id");
+		String szgs_v = szgs_map.get("vid");
 		HashMap<String,String> szbm_map = ApiPubInfo.CACHE_DOC.get(account).get("org_dept").get(szbmStr);
-		if (szbm_map == null) {throw new BusinessException("部门档案不匹配：" + szbmStr);}
-		String pk_dept = szbm_map.get("id");
-		String pk_dept_v = szbm_map.get("vid");
+		if (szbm_map == null) {throw new BusinessException("所在部门不匹配：" + szbmStr);}
+		String szbm = szbm_map.get("id");
+		String szbm_v = szbm_map.get("vid");
 		HashMap<String,String> fycdgs_map = ApiPubInfo.CACHE_DOC.get(account).get("org_orgs").get(fycdgsStr);
-		if (fycdgs_map == null) {throw new BusinessException("公司档案不匹配：" + fycdgsStr);}
+		if (fycdgs_map == null) {throw new BusinessException("费用承担公司不匹配：" + fycdgsStr);}
 		String fycdgs = fycdgs_map.get("id");
 		String fycdgs_v = fycdgs_map.get("vid");
+		String fkyhzh = fycdgs_map.get("account");		// 付款银行账户
 		HashMap<String,String> fycdbm_map = ApiPubInfo.CACHE_DOC.get(account).get("org_dept").get(fycdbmStr);
-		if (fycdbm_map == null) {throw new BusinessException("部门档案不匹配：" + fycdbmStr);}
+		if (fycdbm_map == null) {throw new BusinessException("费用承担部门不匹配：" + fycdbmStr);}
 		String fycdbm = fycdbm_map.get("id");
 		String fycdbm_v = fycdbm_map.get("vid");
 		String userId = InvocationInfoProxy.getInstance().getUserId();
 		String zdrStr = srcHVO.getZdr();	// 制单人
 		HashMap<String,String> zdr_map = ApiPubInfo.CACHE_DOC.get(account).get("bd_psndoc").get(zdrStr);
-		if (zdr_map == null) {throw new BusinessException("人员档案不匹配：" + zdrStr);}
+		if (zdr_map == null) {throw new BusinessException("制单人不匹配：" + zdrStr);}
 		String zdr = zdr_map.get("id");
-//		String jsfsStr = srcHVO.getJsfs();	// 结算方式
-//		HashMap<String,String> jsfs_map = ApiPubInfo.CACHE_DOC.get(account).get("bd_balatype").get(jsfsStr);
-//		if (jsfs_map == null) {throw new BusinessException("结算方式不匹配：" + jsfsStr);}
-//		String jsfs = jsfs_map.get("id");
 		/**
 		 * HK 2020年9月17日19:07:30
 		 * 结算方式需要匹配接收两种模式，name 和 pk
 		 * 如果长度为 20，就认为是pk
 		 * 不为 20，就认为是 name
 		 */
-		String jsfsStr = srcHVO.getJsfs();	// 结算方式
+		String jsfsStr = PuPubVO.getString_TrimZeroLenAsNull(srcHVO.getJsfs());	// 结算方式
 		String jsfs = null;
-		if (jsfsStr != null && jsfsStr.length() == 20) {
+		if (jsfsStr == null) {
+			// 接口传过来为空，不做处理
+		} else if (jsfsStr.length() == 20) {
 			jsfs = jsfsStr;
 		} else {
 			HashMap<String,String> jsfs_map = ApiPubInfo.CACHE_DOC.get(account).get("bd_balatype").get(jsfsStr);
@@ -212,15 +210,29 @@ public class N264XService {
 		if (0 == skdx) { // 员工
 			String skrStr = srcHVO.getSkr();
 			HashMap<String,String> skr_map = ApiPubInfo.CACHE_DOC.get(account).get("bd_psndoc").get(skrStr);
-			if (skr_map == null) {throw new BusinessException("人员档案不匹配：" + skrStr);}
+			if (skr_map == null) {throw new BusinessException("收款人不匹配：" + skrStr);}
 			skr = skr_map.get("id");
 			skyhzh = srcHVO.getGryhzh();
 		} else if (1 == skdx) {	// 供应商
 			gys = srcHVO.getGys();
 			custaccount = srcHVO.getKsyhzh();
+			// 收款人
+			String skrStr = PuPubVO.getString_TrimZeroLenAsNull(srcHVO.getSkr());
+			if (skrStr != null) {
+				HashMap<String,String> skr_map = ApiPubInfo.CACHE_DOC.get(account).get("bd_psndoc").get(skrStr);
+				if (skr_map == null) {throw new BusinessException("收款人不匹配：" + skrStr);}
+				skr = skr_map.get("id");
+			}
 		} else if (2 == skdx) {	// 客户
 			kh = srcHVO.getKh();
 			custaccount = srcHVO.getKsyhzh();
+			// 收款人：可为空，如果为空就不做翻译
+			String skrStr = PuPubVO.getString_TrimZeroLenAsNull(srcHVO.getSkr());
+			if (skrStr != null) {
+				HashMap<String,String> skr_map = ApiPubInfo.CACHE_DOC.get(account).get("bd_psndoc").get(skrStr);
+				if (skr_map == null) {throw new BusinessException("收款人不匹配：" + skrStr);}
+				skr = skr_map.get("id");
+			}
 		}
 		
 		/**
@@ -254,20 +266,24 @@ public class N264XService {
 		distHVO.setDr(0);
 		
 		distHVO.setPk_group(pk_group);	// 集团
-		distHVO.setDwbm(pk_org);		// 公司
-		distHVO.setDwbm_v(pk_org_v);	// 公司v
-		distHVO.setPk_org(pk_org);
-		distHVO.setPk_org_v(pk_org_v);
-		distHVO.setPk_payorg(pk_org);
-		distHVO.setPk_payorg_v(pk_org_v);
-		distHVO.setPk_fiorg(pk_org);
+		distHVO.setPk_org(fycdgs);
+		distHVO.setPk_org_v(fycdgs_v);
+		distHVO.setPk_payorg(fycdgs);
+		distHVO.setPk_payorg_v(fycdgs_v);
+		distHVO.setPk_fiorg(fycdgs);
 		distHVO.setFydwbm(fycdgs);		// 费用承担公司
 		distHVO.setFydwbm_v(fycdgs_v);
 		
-		distHVO.setDeptid(pk_dept);		// 部门
-		distHVO.setDeptid_v(pk_dept_v);	// 部门v
 		distHVO.setFydeptid(fycdbm);	// 费用承担部门
 		distHVO.setFydeptid_v(fycdbm_v);
+		
+		/**
+		 * 人员：所在组织、部门
+		 */
+		distHVO.setDwbm(szgs);			// 所在公司
+		distHVO.setDwbm_v(szgs_v);		// 所在公司v
+		distHVO.setDeptid(szbm);		// 所在部门
+		distHVO.setDeptid_v(szbm_v);	// 所在部门v
 		
 		distHVO.setCjkbbje(UFDouble.ZERO_DBL);
 		distHVO.setCjkybje(UFDouble.ZERO_DBL);
@@ -321,8 +337,8 @@ public class N264XService {
 		 * param
 		 */
 		param.put("pk_group", pk_group);// 集团
-		param.put("pk_org", pk_org);	// 公司
-		param.put("pk_dept", pk_dept);	// 部门
+		param.put("pk_org", fycdgs);	// 公司
+		param.put("pk_dept", fycdbm);	// 部门
 		param.put("skr", skr);			// 收款人
 		param.put("kh", kh);			// 客户
 		param.put("gys", gys);			// 供应商
@@ -449,11 +465,11 @@ public class N264XService {
 		UFDouble ftbl = PuPubVO.getUFDouble_NullAsZero(srcSVO.getFtbl());	// 分摊比例
 		String cdgsStr = srcSVO.getCdgs();	// 承担公司
 		HashMap<String,String> cdgs_map = ApiPubInfo.CACHE_DOC.get(account).get("org_orgs").get(cdgsStr);
-		if (cdgs_map == null) {throw new BusinessException("公司档案不匹配：" + cdgsStr);}
+		if (cdgs_map == null) {throw new BusinessException("承担公司不匹配：" + cdgsStr);}
 		String cdgs = cdgs_map.get("id");
 		String cdbmStr = srcSVO.getCdbm();	// 承担部门
 		HashMap<String,String> cdbm_map = ApiPubInfo.CACHE_DOC.get(account).get("org_dept").get(cdbmStr);
-		if (cdbm_map == null) {throw new BusinessException("部门档案不匹配：" + cdbmStr);}
+		if (cdbm_map == null) {throw new BusinessException("承担部门不匹配：" + cdbmStr);}
 		String cdbm = cdbm_map.get("id");
 		String zcxm = srcSVO.getZcxm();			// 收支项目
 		String kh = param.get("kh");			// 客户
