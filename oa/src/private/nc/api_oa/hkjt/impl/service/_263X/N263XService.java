@@ -2,6 +2,7 @@ package nc.api_oa.hkjt.impl.service._263X;
 
 import hd.vo.pub.tools.PuPubVO;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import nc.api_oa.hkjt.itf.ApiPubInfo;
@@ -46,18 +47,28 @@ public class N263XService {
 	public Object doAction(String account, String billType, Object paramObj, String action, String userId) 
 			throws BusinessException  {
 		JkVO[] param = (JkVO[])paramObj;
-		nc.vo.ep.bx.JKVO[] billVOs = new nc.vo.ep.bx.JKVO[param.length];
+//		nc.vo.ep.bx.JKVO[] billVOs = new nc.vo.ep.bx.JKVO[param.length];
+		ArrayList<nc.vo.ep.bx.JKVO> billVOlist = new ArrayList<>();
 		/**
 		 * VO转换
 		 */
 		for (int i = 0; i < param.length; i++) {
-			billVOs[i] = getJkVO(param[i], account, billType);
+			/**
+			 * 先查询，是否存在单据
+			 */
+			nc.vo.ep.bx.JKVO dbVO = N263XServiceQUERY.getJkVO(param[i], account, billType);
+			if (dbVO != null) {
+				// 如果存在，就不需要再保存，直接返回200
+			} else {
+				nc.vo.ep.bx.JKVO billVO = getJkVO(param[i], account, billType);
+				billVOlist.add(billVO);
+			}
 		}		
 		/**
 		 * 循环处理：保存、审核
 		 */
-		for (int i = 0; i < billVOs.length; i++) {
-			nc.vo.ep.bx.JKVO billVO = billVOs[i];
+		for (int i = 0; i < billVOlist.size(); i++) {
+			nc.vo.ep.bx.JKVO billVO = billVOlist.get(i);
 			// 保存
 //			Object saveRes = getIplatFormEntry().processAction("WRITE", "263X-Cxx-01", null, billVO, null, null);
 //			billVO = ((nc.vo.ep.bx.JKVO[])saveRes)[0];
@@ -118,11 +129,6 @@ public class N263XService {
 			, String account
 			, String billType
 			) throws BusinessException {
-		/**
-		 * 先查询，是否存在单据
-		 */
-		nc.vo.ep.bx.JKVO dbVO = N263XServiceQUERY.getJkVO(srcBillVO, account, billType);
-		if (dbVO != null) throw new BusinessException("单据已存在，不能重复保存。");
 		/**
 		 * 表头表头共享变量
 		 */
