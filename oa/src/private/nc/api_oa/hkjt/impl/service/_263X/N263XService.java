@@ -192,6 +192,8 @@ public class N263XService {
 		HashMap<String,String> zdr_map = ApiPubInfo.CACHE_DOC.get(account).get("bd_psndoc").get(zdrStr);
 		if (zdr_map == null) {throw new BusinessException("制单人不匹配：" + zdrStr);}
 		String zdr = zdr_map.get("id");
+		String zdrUserId = PuPubVO.getString_TrimZeroLenAsNull(zdr_map.get("userId"));
+		if (zdrUserId == null) zdrUserId = ApiPubInfo.USER;
 		/**
 		 * HK 2020年9月17日19:07:30
 		 * 结算方式需要匹配接收两种模式，name 和 pk
@@ -238,8 +240,8 @@ public class N263XService {
 		distHVO.setBzbm(bz);		// 币种-人民币
 		
 		distHVO.setCreationtime(currTime);	// 创建时间
-		distHVO.setCreator(userId);		// 创建人
-		distHVO.setOperator(userId);	// 操作员
+		distHVO.setCreator(zdrUserId);		// 创建人
+		distHVO.setOperator(userId);		// 操作员
 		
 		distHVO.setDjbh(djbh);				// 单据编号
 		distHVO.setDjdl("jk");				// 单据大类-报销

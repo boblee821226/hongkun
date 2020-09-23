@@ -48,7 +48,9 @@ public class DocService {
 					.append(",bd_psndoc.pk_psndoc ")
 					.append(",bd_psndoc.code ")
 					.append(",bd_psndoc.name ")
+					.append(",sm_user.cuserid ")
 					.append(" from bd_psndoc ")
+					.append(" left join sm_user on bd_psndoc.pk_psndoc = sm_user.pk_psndoc ")
 					.append(" where nvl(bd_psndoc.glbdef26,'~') <> '~' ")
 			;
 			ArrayList list = (ArrayList)dao.executeQuery(querySQL.toString(), new ArrayListProcessor());
@@ -59,10 +61,12 @@ public class DocService {
 				String id 	= PuPubVO.getString_TrimZeroLenAsNull(row[1]);
 				String code = PuPubVO.getString_TrimZeroLenAsNull(row[2]);
 				String name = PuPubVO.getString_TrimZeroLenAsNull(row[3]);
+				String userId = PuPubVO.getString_TrimZeroLenAsNull(row[4]);
 				HashMap<String,String> value = new HashMap<String,String>();
 				value.put(ID, id);
 				value.put(CODE, code);
 				value.put(NAME, name);
+				value.put("userId", userId);
 				ApiPubInfo.CACHE_DOC.get(account).get(TABLE).put(lcId, value);
 			}
 		}

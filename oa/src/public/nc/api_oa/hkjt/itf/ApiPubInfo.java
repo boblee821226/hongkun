@@ -10,7 +10,10 @@ import nc.api_oa.hkjt.vo._263X.JkVO;
 import nc.api_oa.hkjt.vo._264X.BxVO;
 
 public class ApiPubInfo {
-	
+	/**
+	 * 系统参数
+	 */
+	public static String USER = "NC_USER0000000000000";
 	/**
 	 * 单据类型
 	 * （经过测试后，所支持的单据类型）
