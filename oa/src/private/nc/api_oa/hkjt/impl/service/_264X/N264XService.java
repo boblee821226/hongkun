@@ -398,16 +398,12 @@ public class N264XService {
 		distBVO.setDefitem5(sxsm);				// 事项说明
 		distBVO.setDefitem7(jshj.toString());	// 价税合计
 		
-		if ("264X-Cxx-04".equals(billTypeCode)) {
+		// 非 分摊的 报销单，才进行赋值。
+		if (!"264X-Cxx-05".equals(billTypeCode)) {
 			distBVO.setDefitem20(sl.toString());	// 税率
-			distBVO.setDefitem23(wsje.toString());	// 无税金额
-			distBVO.setDefitem22(se.toString());	// 税额
 			distBVO.setDefitem21(dkfs);				// 抵扣方式
-		} else {
-			distBVO.setDefitem12(sl.toString());	// 税率
-			distBVO.setDefitem13(wsje.toString());	// 无税金额
-			distBVO.setDefitem15(se.toString());	// 税额
-			distBVO.setDefitem14(dkfs);				// 抵扣方式
+			distBVO.setDefitem22(se.toString());	// 税额
+			distBVO.setDefitem23(wsje.toString());	// 无税金额
 		}
 		
 		distBVO.setDwbm(pk_org);		// 公司
@@ -471,6 +467,8 @@ public class N264XService {
 		String account = param.get("account");	// 账套
 		UFDouble cdje = PuPubVO.getUFDouble_NullAsZero(srcSVO.getCdje());	// 承担金额
 		UFDouble ftbl = PuPubVO.getUFDouble_NullAsZero(srcSVO.getFtbl());	// 分摊比例
+		Double se = srcSVO.getSe();	// 税额
+		Double sl = srcSVO.getSl();	// 税率
 		String cdgsStr = srcSVO.getCdgs();	// 承担公司
 		HashMap<String,String> cdgs_map = ApiPubInfo.CACHE_DOC.get(account).get("org_orgs").get(cdgsStr);
 		if (cdgs_map == null) {throw new BusinessException("承担公司不匹配：" + cdgsStr);}
@@ -508,6 +506,8 @@ public class N264XService {
 		distSVO.setShare_ratio(ftbl);
 		distSVO.setPk_iobsclass(zcxm);
 		distSVO.setStatus(VOStatus.NEW);	// 设置vo状态为NEW，才能进行保存
+		distSVO.setDefitem1(sl == null ? null : sl.toString());	// 税率
+		distSVO.setDefitem2(se == null ? null : se.toString());	// 税额
 		
 		return distSVO;
 	}
