@@ -10,6 +10,7 @@ public class PosStoreDetail implements Serializable {
 
 	private String articleCode;	// 商品编码
 	private String number;		// 入库数量
+	private String price;		// 单价
 	
 	public String getArticleCode() {
 		return articleCode;
@@ -22,6 +23,12 @@ public class PosStoreDetail implements Serializable {
 	}
 	public void setNumber(String number) {
 		this.number = number;
+	}
+	public String getPrice() {
+		return price;
+	}
+	public void setPrice(String price) {
+		this.price = price;
 	}
 	
 }

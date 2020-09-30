@@ -13,9 +13,12 @@ public class GcSignUtils {
 	 * √ÿ‘ø
 	 * ”Î appKey «≈‰Ã◊µƒ
 	 */
-	public static final String hotelGroupCode = "GCBZG";
-	public static final String appKey = "12000";
-	public static final String SECRET = "526198bf3d36a545d9b16cf934e90bc5";
+//	public static final String hotelGroupCode = "GCBZG";
+//	public static final String appKey = "12000";
+//	public static final String SECRET = "526198bf3d36a545d9b16cf934e90bc5";
+	public static final String hotelGroupCode = "HKG";
+	public static final String appKey = "12528";
+	public static final String SECRET = "314524d7a7442ddf3705461d7148bcd0";
     public static final String UTF8 = "UTF-8";
     public static final String FORMAT = "json";
     public static final String V = "4.0";
