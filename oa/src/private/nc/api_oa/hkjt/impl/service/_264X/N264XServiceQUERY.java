@@ -91,7 +91,7 @@ public class N264XServiceQUERY {
 		HashMap<String,String> org_map = ApiPubInfo.CACHE_DOC.get(account).get("org_orgs").get(szgsStr);
 		if (org_map == null) {throw new BusinessException("公司档案不匹配：" + szgsStr);}
 		String pk_org = org_map.get("id");
-		String djrq = srcHVO.getDjrq();
+//		String djrq = srcHVO.getDjrq();
 		String djbh = srcHVO.getDjbh();
 		/**
 		 * 根据条件查询出 报销单。
@@ -101,7 +101,7 @@ public class N264XServiceQUERY {
 		StringBuffer whereSQL = 
 		new StringBuffer(" where ( ")
 				.append(" pk_org = '").append(pk_org).append("' ")
-				.append(" and djrq = '").append(djrq).append("' ")
+//				.append(" and djrq = '").append(djrq).append("' ")
 				.append(" and djbh = '").append(djbh).append("' ")
 				.append(" and QCBZ = 'N' and DR = 0 ")
 				.append(" and djlxbm = '").append(billType).append("' ")
