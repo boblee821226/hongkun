@@ -197,16 +197,16 @@ public class HuiyuanPlugin implements IBackgroundWorkPlugin {
 	{
 		String[] pk_orgs = {
 //			"0001N510000000001SY7"	// 西山
-			"0001N510000000001SXV"	// 国际
+//			"0001N510000000001SXV"	// 国际
 //			"0001N510000000001SXX"	// "牡丹"
-//			"0001N510000000001SY1", // "康福瑞酒店"
+			"0001N510000000001SY1", // "康福瑞酒店"
 //			"0001N510000000001SY3",	// "朗丽兹"
 //			"0001N510000000001SY5", // "康福瑞"
 				
 		};
 		
-		UFDate bdate = PuPubVO.getUFDate("2020-06-23");
-		UFDate edate = PuPubVO.getUFDate("2020-06-23");
+		UFDate bdate = PuPubVO.getUFDate("2020-10-08");
+		UFDate edate = PuPubVO.getUFDate("2020-10-08");
 		
 		try
 		{
@@ -435,6 +435,14 @@ public class HuiyuanPlugin implements IBackgroundWorkPlugin {
 								.append(" left join hk_huiyuan_kadangan ka_y on kainfo.sourcememberid = ka_y.ka_code and nvl(ka_y.dr,0)=0 ")	// 源卡档案
 								.append(" left join hk_huiyuan_kaxing kaxing_y on ka_y.pk_hk_huiyuan_kaxing = kaxing_y.pk_hk_huiyuan_kaxing ")	// 源卡型
 								.append(" where (1=1) ")
+								/**
+								 * HK 2020年10月9日17:26:37
+								 * 不取 微会员 的卡型的数据
+								 * 金贵有一个卡型叫【微会员】，是记录金贵商城会员信息的，今后不会发生任何的会员卡账务，但是每天的会员卡信息表，把这个卡型取过来了，导致我们会员卡信息表不能保存。设置一下，让会员卡信息表直接不取这个卡型就可以了。
+								 * 不取 why 开头的会员卡
+								 */
+								.append(" and kainfo.memberid not like 'why%' ")
+								/***END***/
 								.append(" order by kainfo.feeindate ")
 				;
 				ArrayList<KainfoBVO> list_kainfo_insert = (ArrayList<KainfoBVO>)getBaseDAO().executeQuery(query_kainfo_insert.toString(), new BeanListProcessor(KainfoBVO.class));
