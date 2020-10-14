@@ -82,12 +82,12 @@ public class SapplyBillQueryAction extends
     	if ("4K".equals(this.getDestBilltype())) {
     		// HK 2020年9月28日22:46:01
     		// 适配 转库 拉 出库申请
-    		transtypecode = "ic_sapply_h.vtrantypecode = '4455-Cxx-10'";
+    		transtypecode = " ic_sapply_h.vtrantypecode = '4455-Cxx-01' ";
     	} else {
     		transtypecode = this.getTranstypeSql(this.getDestBilltype());
     		// HK 2020年9月28日23:04:20
     		// 标准单据的拉单，排除 转二级库这个类型
-    		transtypecode += "ic_sapply_h.vtrantypecode <> '4455-Cxx-10'";
+    		transtypecode += " and ic_sapply_h.vtrantypecode <> '4455-Cxx-01' ";
     	}
     }
     catch (BusinessException ex) {
