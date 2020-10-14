@@ -209,9 +209,11 @@ public class PuModifyAction extends EditAction {
           /**
            * HK 2020年4月7日17:10:35
            * 增加字段，变更时可编辑
+           * 01、责任凭证
+           * 01、部门分摊
            */
           , CtPuVO.VHKFIELD01
-//          , CtPuVO.VHKFIELD02
+          , CtPuVO.VHKFIELD02
 //          , CtPuVO.VHKFIELD03
 //          , CtPuVO.VHKFIELD04
 //          , CtPuVO.VHKFIELD05
