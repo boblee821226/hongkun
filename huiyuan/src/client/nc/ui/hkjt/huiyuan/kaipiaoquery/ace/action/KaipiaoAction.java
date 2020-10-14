@@ -4,6 +4,8 @@ import hd.vo.pub.tools.PuPubVO;
 
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
+import java.util.HashMap;
+import java.util.Map;
 
 import nc.desktop.ui.WorkbenchEnvironment;
 import nc.funcnode.ui.FuncletInitData;
@@ -74,6 +76,21 @@ public class KaipiaoAction extends NCAction {
 		 */
 		for( int i=0;i<selectRows.length;i++ )
 		{
+			/**
+			 * HK 2020年9月29日22:56:02
+			 * 如果卡型是  丽兹商务通分卡   不能开票
+			 */
+			Map<String, String> cannotKaiPiao = new HashMap<>();
+			cannotKaiPiao.put("丽兹商务通分卡", "丽兹商务通分卡");
+			String kaXing = PuPubVO.getString_TrimZeroLenAsNull(
+					this.getListview().getBillListPanel().getHeadBillModel().getValueAt(selectRows[i], "kaxing_name")
+					);
+			if (cannotKaiPiao.containsKey(kaXing)) {
+				MessageDialog.showErrorDlg(this.getListview(), "", "该卡型，不能开票。");
+				return ; 
+			}
+			/***END***/
+			
 			UFDouble sykpje = PuPubVO.getUFDouble_ZeroAsNull(
 					this.getListview().getBillListPanel().getHeadBillModel().getValueAt(selectRows[i], "sykpje")
 					);
