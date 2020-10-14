@@ -183,8 +183,8 @@ public class ImpZhangDanBill implements IBackgroundWorkPlugin {
 		};//西山
 		
 		String[] dateP = new String[]{
-			"2020-01-26",
-			"2020-01-26"
+			"2020-10-08",
+			"2020-10-08"
 		};
 		
 		HashMap<String,String> infoMap=getDefaultInfo(pk_orgs[0]);//得到配置表信息
@@ -364,7 +364,8 @@ public class ImpZhangDanBill implements IBackgroundWorkPlugin {
 				 * 2019年5月16日11:07:50
 				 * 2020年1月20日12:10:36
 				 */
-//				 +" and aa.BillId in ('SN202001190152-06') "
+//				 +" and aa.BillId in ('SN202010080132-06') "
+//				 +" and aa.BillId in ('SN202010080169-06-302') "
 				 /***END***/
 				;
 			
@@ -1396,7 +1397,7 @@ public void insertVOS(ArrayList vos)throws BusinessException{
 			UFDouble sumXiaoFei=UFDouble.ZERO_DBL;//各张卡消费金额合计
 			UFDouble sumXiaoFei_sj=UFDouble.ZERO_DBL;//各张卡实际金额合计
 			for (String str : cards) {
-				Pattern p = Pattern.compile(str.replaceAll("\\(", "\\\\(").replaceAll("\\)", "\\\\)")+"\\s*消费:\\s*(-?\\d+)(\\.\\d+)?");
+				Pattern p = Pattern.compile(str.replaceAll("\\(", "\\\\(").replaceAll("\\)", "\\\\)")+"\\s*\\S*\\s*消费:\\s*(-?\\d+)(\\.\\d+)?");
 		        Matcher m = p.matcher(context);
 		        boolean flag=false;//是否匹配到
 		        context_after.append(str+" ");//卡类型
