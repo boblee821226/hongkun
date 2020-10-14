@@ -143,6 +143,7 @@ public class QushuAction extends NCAction {
 				.append(",to_number(nvl(replace(replace(sl.name,'~',''),'%',''),'0.0')) vdef14 ")		// 税率
 //				.append(",ht.vhkfield01 vdef21 ") // 生成责任凭证
 //				.append(",'N' vdef21 ") // 生成责任凭证
+				.append(",ht.vhkfield02 vdef22 ")	// 部门分摊
 				.append(" from ct_pu ht ")		// 合同表头
 				.append(" inner join ct_pu_b htb on ht.pk_ct_pu = htb.pk_ct_pu ")	// 合同表体
 				.append(" left join bd_defdoc fplx on ht.vdef3 = fplx.pk_defdoc ")	// 发票类型
@@ -357,7 +358,7 @@ public class QushuAction extends NCAction {
 					yuebaoBVO.setVbdef10(htVO.getVdef10());		// 合同号
 					yuebaoBVO.setVbdef09(zthtTs.toString());	// 整体合同天数
 //					yuebaoBVO.setCsourcetypecode(htVO.getVdef21());	// 生成责任凭证 csourcetypecode
-					
+					yuebaoBVO.setCsourcebillid(htVO.getVdef22());	// 部门分摊
 				}
 				else
 				{
@@ -416,12 +417,13 @@ public class QushuAction extends NCAction {
 			// 也就是59621.4/1.05=56782.29
 			StringBuffer querySQL_FK = 
 			new StringBuffer(" select ")
-					.append(" a.pk_customer ")				// 0客户pk
-					.append(",a.vdef10 ")					// 1房间pk
-					.append(",sum(a.fkje) fkje ")			// 2付款金额
-					.append(",max(a.fplx) ")				// 3发票类型
-					.append(",max(a.sl) ") 					// 4税率
-					.append(",max(a.gys_name) vdef01 ")		// 5对方-name
+					.append(" a.pk_customer ")				// 0、客户pk
+					.append(",a.vdef10 ")					// 1、房间pk
+					.append(",sum(a.fkje) ")				// 2、付款金额
+					.append(",max(a.fplx) ")				// 3、发票类型
+					.append(",max(a.sl) ") 					// 4、税率
+					.append(",max(a.gys_name) ")			// 5、对方-name
+					.append(",max(a.bmft) bmft ")			// 6、部门分摊
 					.append(" from (")
 					// 蓝字付款单、红冲付款单，src字段都是合同，所以可以统一处理
 						.append(" select ")
@@ -430,7 +432,8 @@ public class QushuAction extends NCAction {
 						.append(",sum(fkb.money_de) fkje ")		// 付款金额
 						.append(",max(fplx.name) fplx ")		// 发票类型name
 						.append(",max(to_number(nvl(replace(replace(sl.name,'~',''),'%',''),'0.0'))) sl ")		// 税率
-						.append(",max(gys.name) gys_name ")	// 供应商名称
+						.append(",max(gys.name) gys_name ")		// 供应商名称
+						.append(",max(ht.vhkfield02) bmft ")	// 部门分摊
 						.append(" from ap_paybill fk ")
 						.append(" inner join ap_payitem fkb on fk.pk_paybill = fkb.pk_paybill ")
 						.append(" inner join ct_pu ht on fkb.src_billid = ht.pk_ct_pu ")
@@ -491,6 +494,7 @@ public class QushuAction extends NCAction {
 						yuebaoBVO.setPk_cutomer(PuPubVO.getString_TrimZeroLenAsNull(obj[0]));	// 客户pk
 						yuebaoBVO.setVbdef10(PuPubVO.getString_TrimZeroLenAsNull(obj[1]));		// 合同号
 						yuebaoBVO.setVbdef01(PuPubVO.getString_TrimZeroLenAsNull(obj[5])); 		// 对方名称
+						yuebaoBVO.setCsourcebillid(PuPubVO.getString_TrimZeroLenAsNull(obj[6]));// 部门分摊
 						
 						MAP_yuebaoBVO.put(key, yuebaoBVO);	// 放到缓存里
 					}
@@ -507,22 +511,24 @@ public class QushuAction extends NCAction {
 			
 			StringBuffer querySQL_QC = 
 				new StringBuffer(" select ")
-						.append(" yb.pk_cutomer ")		// 客户pk
-						.append(",yb.vbdef10 ")			// 合同号
-						.append(",sum(yb.qmyskye) ")	// 期末余额
+						.append(" yb.pk_cutomer ")		// 0、客户pk
+						.append(",yb.vbdef10 ")			// 1、合同号
+						.append(",sum(yb.qmyskye) ")	// 2、期末余额
 						
-						.append(",max(yb.vbdef01) ")	// vbdef01 客户名称
-						.append(",max(yb.vbdef02) ")	// vbdef02 房间号
-						.append(",max(yb.vbdef03) ")	// vbdef03 收入项目
-						.append(",max(yb.vbdef04) ")	// vbdef04 区域名称
+						.append(",max(yb.vbdef01) ")	// 3、vbdef01 客户名称
+						.append(",max(yb.vbdef02) ")	// 4、vbdef02 房间号
+						.append(",max(yb.vbdef03) ")	// 5、vbdef03 收入项目
+						.append(",max(yb.vbdef04) ")	// 6、vbdef04 区域名称
 						
-						.append(",max(yb.vbdef05) ")	// vbdef05 部门pk
-						.append(",max(yb.vbdef07) ")	// vbdef07 实际合同金额
-						.append(",max(yb.quyu) ")		// 区域pk
-						.append(",max(yb.mianji) ")		// 面积
-						.append(",max(yb.danjia) ")		// 单价
-						.append(",max(yb.srxm) ")		// 收入项目pk
-						.append(",max(yb.vbdef09) ")	// 未摊销天数
+						.append(",max(yb.vbdef05) ")	// 7、vbdef05 部门pk
+						.append(",max(yb.vbdef07) ")	// 8、vbdef07 实际合同金额
+						.append(",max(yb.quyu) ")		// 9区域pk
+						.append(",max(yb.mianji) ")		// 10、面积
+						.append(",max(yb.danjia) ")		// 11、单价
+						.append(",max(yb.srxm) ")		// 12、收入项目pk
+						.append(",max(yb.vbdef09) ")	// 13、未摊销天数
+						
+						.append(",max(yb.csourcebillid) ")	// 14、部门分摊
 						
 						.append(" from hk_zulin_yuebao y ")
 						.append(" inner join hk_zulin_yuebao_b yb on y.pk_hk_zulin_yuebao = yb.pk_hk_zulin_yuebao ")
@@ -532,7 +538,7 @@ public class QushuAction extends NCAction {
 						.append(whereSql_zeren_sy)	// 按 是否责任凭证，取上月的余额
 						.append(" and y.yearmonth = '"+syqj+"' ")
 						.append(" and y.pk_org = '"+pk_org+"' ")
-						.append(" group by yb.pk_cutomer, yb.vbdef10 ")	// Group By  客户+房号
+						.append(" group by yb.pk_cutomer, yb.vbdef10 ")	// Group By  对方+合同号
 						.append(" having sum(yb.qmyskye) <> 0.00 ")		// 取 余额不为0的
 			;
 			ArrayList list_QC = (ArrayList)iUAPQueryBS.executeQuery(
@@ -582,6 +588,7 @@ public class QushuAction extends NCAction {
 						yuebaoBVO.setVbdef09(ls_wtxts.toString());	// 未摊销天数
 						yuebaoBVO.setVbdef10(vbdef10);	// 合同号
 						yuebaoBVO.setVbmemo("【上期有余额，本期无发生】");	// 备注
+						yuebaoBVO.setCsourcebillid(PuPubVO.getString_TrimZeroLenAsNull(obj[14]));// 部门分摊
 						
 						MAP_yuebaoBVO.put(key, yuebaoBVO);
 					}
@@ -738,6 +745,7 @@ public class QushuAction extends NCAction {
 				.append(",max(gys.name) vdef01 ")			// 对方name
 //				.append(",max(to_number(nvl(replace(ht.vdef20,'~',''),'0.0'))) vdef14 ")// 印花税率
 				.append(",max(to_number(nvl(replace(yhssl.name,'‰',''),'0.0'))) vdef14 ")// 印花税率
+				.append(",max(ht.vhkfield02) vdef22 ")	// 部门分摊
 				.append(" from ct_pu ht ")		// 合同表头
 				.append(" inner join ct_pu_b htb on ht.pk_ct_pu = htb.pk_ct_pu ")		// 合同表体
 				.append(" left join bd_inoutbusiclass szxm on htb.vbdef1 = szxm.pk_inoutbusiclass ")	// 收支项目
@@ -827,7 +835,8 @@ public class QushuAction extends NCAction {
 				yuebaoBVO.setVbdef07(htVO.getVdef07());		// 实际合同金额
 				yuebaoBVO.setVbdef10(htVO.getVdef10());		// 合同号
 //					yuebaoBVO.setVbdef09(zthtTs.toString());	// 整体合同天数
-
+				yuebaoBVO.setCsourcebillid(htVO.getVdef22());	// 部门分摊
+				
 				MAP_yuebaoBVO.put(key, yuebaoBVO);
 			}
 		}

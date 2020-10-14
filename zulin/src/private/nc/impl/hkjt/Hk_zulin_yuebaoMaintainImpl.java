@@ -2,8 +2,12 @@ package nc.impl.hkjt;
 
 import hd.vo.pub.tools.PuPubVO;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Vector;
 
+import nc.bs.dao.BaseDAO;
 import nc.bs.framework.common.InvocationInfoProxy;
 import nc.bs.framework.common.NCLocator;
 import nc.bs.logging.Logger;
@@ -11,6 +15,7 @@ import nc.bs.pf.pub.PfDataCache;
 import nc.bs.uap.lock.PKLock;
 import nc.impl.pub.ace.AceHk_zulin_yuebaoPubServiceImpl;
 import nc.itf.hkjt.IHk_zulin_yuebaoMaintain;
+import nc.jdbc.framework.processor.ArrayListProcessor;
 import nc.pubitf.fip.service.IFipBillQueryService;
 import nc.pubitf.fip.service.IFipMessageService;
 import nc.ui.querytemplate.querytree.IQueryScheme;
@@ -107,6 +112,26 @@ public class Hk_zulin_yuebaoMaintainImpl extends AceHk_zulin_yuebaoPubServiceImp
 			// 去除 当月收入 为空的数据（当期 确认收入天数为0）。
 			Vector<YuebaoBVO> ybbvos_v_final = new Vector<YuebaoBVO>();
 			
+			// 查询出部门pk
+			Map<String,String> bm_MAP = new HashMap<>();
+			if ("HK43".equals(billType)) {
+				StringBuffer bmQuerySQL = 
+					new StringBuffer("select name, pk_dept from org_dept ")
+							.append(" where enablestate = 2 ")
+							.append(" and dr = 0 ")
+							.append(" and pk_org = '").append(pk_org).append("' ");
+				BaseDAO dao = new BaseDAO();
+				ArrayList list = (ArrayList)dao.executeQuery(bmQuerySQL.toString(), new ArrayListProcessor());
+				if (list != null && !list.isEmpty()) {
+					for (Object item : list) {
+						Object[] obj = (Object[])item;
+						String deptName = PuPubVO.getString_TrimZeroLenAsNull(obj[0]);
+						String deptPk = PuPubVO.getString_TrimZeroLenAsNull(obj[1]);
+						bm_MAP.put(deptName, deptPk);
+					}
+				}
+			}
+			
 			for(YuebaoBVO bvo : ybbvos)
 			{// 封装凭证所需要的数据 (2029房间25天租金收入)
 				
@@ -151,7 +176,6 @@ public class Hk_zulin_yuebaoMaintainImpl extends AceHk_zulin_yuebaoPubServiceImp
 					;
 				}
 				
-				
 				bvo.setVbdef06(zhaiyao);	// 用自定义项6 存放摘要
 				
 				/**
@@ -161,7 +185,16 @@ public class Hk_zulin_yuebaoMaintainImpl extends AceHk_zulin_yuebaoPubServiceImp
 				bvo.setDysrqrje( pzje );
 				/***END***/
 				
-				ybbvos_v_final.add(bvo);
+				/**
+				 * HK 2020年10月13日22:16:52
+				 * 成本月报，需要根据 部门分摊
+				 */
+				if ("HK43".equals(billType)) {
+					ybbvos_v_final = this.fentan_bm(ybbvos_v_final, bm_MAP, bvo);
+				} else {
+					// 否则，直接添加
+					ybbvos_v_final.add(bvo);
+				}
 				
 			}
 			
@@ -174,6 +207,51 @@ public class Hk_zulin_yuebaoMaintainImpl extends AceHk_zulin_yuebaoPubServiceImp
 
 		}
 		return null;
+	}
+	
+	/**
+	 * HK 2020年10月13日23:09:34
+	 * 按部门比例分摊
+	 */
+	private Vector<YuebaoBVO> fentan_bm(Vector<YuebaoBVO> ybbvos_v_final, Map<String,String> bm_MAP, YuebaoBVO yuebaoBVO) throws BusinessException {
+		
+		String bmft = PuPubVO.getString_TrimZeroLenAsNull(yuebaoBVO.getCsourcebillid());	// 部门分摊 字符串
+		if (bmft == null || "~".equals(bmft)) { // 如果部门分摊 为空，直接返回
+			ybbvos_v_final.add(yuebaoBVO);
+			return ybbvos_v_final;
+		}
+		/**
+		 * 进行分摊处理
+		 */
+		// 1、将 逗号 转换成 半角，去掉空格
+		bmft = bmft.replaceAll("，", ",").replaceAll(" ", "");
+		// 2、拆分
+		String[] chaifen_1 = bmft.split(",");
+		UFDouble fentan = yuebaoBVO.getDysrqrje();	// 待分摊总额
+		UFDouble total_fentan = UFDouble.ZERO_DBL;	// 累计分摊金额
+		for (int i = 0; i < chaifen_1.length; i++) {
+			String itemStr = chaifen_1[i];
+			String[] chaifen_2 = itemStr.split("=");
+			String bm = chaifen_2[0];	// 部门name
+			UFDouble bl = PuPubVO.getUFDouble_NullAsZero(chaifen_2[1]);	// 比例
+			
+			String bmPk = bm_MAP.get(bm);
+			if (bmPk == null) throw new BusinessException(yuebaoBVO.getVbdef10() + "："+bm+" 不存在。");
+			UFDouble benci = fentan.multiply(bl).setScale(2, UFDouble.ROUND_HALF_UP);
+			if (i == chaifen_1.length - 1) {
+				// 若是最后一笔，则反算
+				benci = fentan.sub(total_fentan);
+			}
+			total_fentan = total_fentan.add(benci);	// 叠加  累计分摊金额
+			
+			// 生成vo
+			YuebaoBVO bvo = (YuebaoBVO)yuebaoBVO.clone();
+			bvo.setDysrqrje(benci);
+			bvo.setVbdef05(bmPk);
+			ybbvos_v_final.add(bvo);
+		}
+
+		return ybbvos_v_final;
 	}
 	
 	private void sendVoucher(YuebaoHVO ybHVO,YuebaoBVO[] ybBVOs,int flag) throws BusinessException{
