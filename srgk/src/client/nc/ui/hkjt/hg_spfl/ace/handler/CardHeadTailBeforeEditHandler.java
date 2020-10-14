@@ -22,6 +22,21 @@ IAppEventHandler<CardHeadTailBeforeEditEvent>{
 		if(SpflHVO.PK_DEPT.equals(e.getKey())){//部门
 			new DeptFilterUtils().resetDeptRefSql(e);
 		}
+		else if(SpflHVO.VDEF1.equals(e.getKey())) {// 仓库
+			String pk_org = e.getBillCardPanel().getHeadItem("pk_org")
+					.getValueObject().toString();
+			String pk_group = e.getBillCardPanel().getHeadItem("pk_group")
+					.getValueObject().toString();
+			UIRefPane storPane = (UIRefPane) e.getBillCardPanel()
+					.getHeadItem(e.getKey()).getComponent();
+			storPane.setPk_org(pk_org);
+//			deptpane.setMultiSelectedEnabled(true);
+//			storPane.getRefModel().setAddEnvWherePart(false);
+//			storPane.getRefModel().setWherePart(
+//					" pk_group='" + pk_group + "' and  pk_org = '" + pk_org
+//							+ "' and nvl(dr,0)=0");
+		
+		}
 		else if( SpflHVO.PK_HK_SRGK_HG_SRXM.equals(e.getKey()) ){//收入项目 
 			
 			try {
