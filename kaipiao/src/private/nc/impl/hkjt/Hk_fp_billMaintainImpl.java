@@ -10,6 +10,7 @@ import nc.bs.hkjt.srgk.huiguan.zhangdan.workplugin.ImpZhangDanBill;
 import nc.bs.hkjt.srgk.jiudian.workplugin.ImpJiudianData;
 import nc.bs.hkjt.srgk.jiudian.workplugin.ImpJiudianData_xr;
 import nc.bs.hkjt.srgk.lvyun.workplugin.ImpLvyunData;
+import nc.bs.hkjt.store.lvyun_out.workplugin.ImpLvyunOutData;
 import nc.bs.hkjt.zulin.workplugin.ZnjjsPlugin;
 import nc.bs.uap.lock.PKLock;
 import nc.impl.pub.ace.AceHk_fp_billPubServiceImpl;
@@ -256,8 +257,6 @@ public class Hk_fp_billMaintainImpl extends AceHk_fp_billPubServiceImpl
 				result_2 = dao.executeUpdate(updateSQL_2.toString());
 			}
 		
-		
-		
 		return result_1+result_2;
 	}
 
@@ -275,8 +274,8 @@ public class Hk_fp_billMaintainImpl extends AceHk_fp_billPubServiceImpl
 		/**
 		 * ª·‘±≤‚ ‘
 		 */
-//		HuiyuanPlugin hy = new HuiyuanPlugin();
-//		Object result = hy.executeTest(obj);
+		HuiyuanPlugin hy = new HuiyuanPlugin();
+		Object result = hy.executeTest(obj);
 		
 		/**
 		 * Œ˜»Ì≤‚ ‘
@@ -299,8 +298,14 @@ public class Hk_fp_billMaintainImpl extends AceHk_fp_billPubServiceImpl
 		/**
 		 * ¬Ã‘∆≤‚ ‘
 		 */
-		ImpLvyunData lvyun = new ImpLvyunData();
-		Object result = lvyun.executeTest(obj);
+//		ImpLvyunData lvyun = new ImpLvyunData();
+//		Object result = lvyun.executeTest(obj);
+		
+		/**
+		 * ¬Ã‘∆≥ˆø‚≤‚ ‘
+		 */
+//		ImpLvyunOutData lvyunOut = new ImpLvyunOutData();
+//		Object result = lvyunOut.executeTest(obj);
 		
 		return result;
 	}
