@@ -84,6 +84,10 @@
 	          <value>pk_ct_pu_b</value>
 	          <value>pk_ct_pu_exp</value>
 	          <value>pk_ct_pu_payment</value>
+	          <!--HK 2020年10月15日10:52:01-->
+	          <!--部门分摊（合同条款）增加合计行-->
+	          <value>pk_ct_pu_term</value>
+	          <!--END-->
 	       </list>
 	    </property> 
 		<property name="templateContainer" ref="templateContainer"></property>
@@ -133,6 +137,10 @@
 	          <value>pk_ct_pu_b</value>
 	          <value>pk_ct_pu_exp</value>
 	          <value>pk_ct_pu_payment</value>
+	          <!--HK 2020年10月15日10:52:01-->
+	          <!--部门分摊（合同条款）增加合计行-->
+	          <value>pk_ct_pu_term</value>
+	          <!--END-->
 	       </list>
 	    </property> 
 		<property name="userdefitemPreparator" ref="userdefAndMarAsstCardPreparator" />
