@@ -119,7 +119,7 @@ public class ScZnjjmAction extends NCAction {
 			UFDouble yq_bl  = PuPubVO.getUFDouble_ValueAsValue( getEditor().getBillCardPanel().getBodyValueAt(row, "yq_bl") );
 			UFDouble yq_mny = PuPubVO.getUFDouble_ValueAsValue( getEditor().getBillCardPanel().getBodyValueAt(row, "yq_mny") );
 			// 应收金额
-			UFDouble ys_mny = PuPubVO.getUFDouble_ValueAsValue( getEditor().getBillCardPanel().getBodyValueAt(row, "vbdef02") );
+			UFDouble ys_mny = PuPubVO.getUFDouble_NullAsZero( getEditor().getBillCardPanel().getBodyValueAt(row, "vbdef02") );
 			// 实际逾期金额 = 逾期金额 - 应收金额
 			yq_mny = yq_mny.sub(ys_mny).setScale(2, UFDouble.ROUND_HALF_UP);
 			
