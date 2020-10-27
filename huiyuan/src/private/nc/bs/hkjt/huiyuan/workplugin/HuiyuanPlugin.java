@@ -196,17 +196,17 @@ public class HuiyuanPlugin implements IBackgroundWorkPlugin {
 	public Object executeTest(Object obj) throws BusinessException
 	{
 		String[] pk_orgs = {
-//			"0001N510000000001SY7"	// 西山
+			"0001N510000000001SY7"	// 西山
 //			"0001N510000000001SXV"	// 国际
 //			"0001N510000000001SXX"	// "牡丹"
-			"0001N510000000001SY1", // "康福瑞酒店"
+//			"0001N510000000001SY1", // "康福瑞酒店"
 //			"0001N510000000001SY3",	// "朗丽兹"
 //			"0001N510000000001SY5", // "康福瑞"
 				
 		};
 		
-		UFDate bdate = PuPubVO.getUFDate("2020-10-08");
-		UFDate edate = PuPubVO.getUFDate("2020-10-08");
+		UFDate bdate = PuPubVO.getUFDate("2020-09-23");
+		UFDate edate = PuPubVO.getUFDate("2020-09-26");
 		
 		try
 		{
@@ -214,7 +214,9 @@ public class HuiyuanPlugin implements IBackgroundWorkPlugin {
 //			importCika_info(pk_orgs,bdate,edate,"2019-01-06 23:57:31","2019-01-07 23:57:35");
 			// 同步 会员卡信息
 //			importHuiyuanka_info(pk_orgs,bdate,edate,"2019-02-26 00:03:27","2019-02-27 00:13:43");
-			importHuiyuanka_info(pk_orgs,bdate,edate,null,null);
+//			importHuiyuanka_info(pk_orgs,bdate,edate,null,null);
+			// 同步 开卡
+			importKaiKa(pk_orgs, bdate, edate);
 			
 		}catch(Exception ex)
 		{
@@ -797,7 +799,7 @@ public class HuiyuanPlugin implements IBackgroundWorkPlugin {
 		// 开卡 结束时间   赋值为   当前服务器时间， 确保跑金贵余额的时候， NC里都用卡
 		kainfo_edate = new UFDate();
 		
-		for( int org_i=0;org_i<pk_orgs.length;org_i++ )
+		for(int org_i=0; org_i<pk_orgs.length; org_i++)
 		{// 公司循环
 			
 			String corp = pk_orgs[org_i];
@@ -805,16 +807,34 @@ public class HuiyuanPlugin implements IBackgroundWorkPlugin {
 			
 			// 查询 开卡信息
 			StringBuffer query_kaika = 
-					new StringBuffer("select memberid ")
-							.append(",CardType cardtypeid ")
-							.append(",OutVpn coach ")
-							.append(",CONVERT(VARCHAR(19),OutDate,120) lastenterdate ")
-//							.append(",OutPerson ")
-							.append(" from Dt_MakeCard ")
-							.append(" where (1=1) ")
-							.append(" and Status = '已发' ")
-							.append(" and OutVpn = '").append( dian ).append("' ")	// 店
-							.append(" and CONVERT(VARCHAR(19),isnull(OutDate,'1990-01-01 00:00:00'),120) between '").append( kainfo_bdate.getDateBefore(1).toString().substring(0,10)+" 23:00:00" ).append("' and '").append((kainfo_edate.getDateAfter(1).toString().substring(0,10))+" 00:59:59").append("' ")	// 时间
+			new StringBuffer()
+					.append("select memberid ")
+					.append(",CardType cardtypeid ")
+					.append(",OutVpn coach ")
+					.append(",CONVERT(VARCHAR(19),OutDate,120) lastenterdate ")
+					.append(",OutPerson ")
+					.append(" from Dt_MakeCard ")
+					.append(" where (1=1) ")
+					.append(" and Status = '已发' ")
+					.append(" and OutVpn = '").append( dian ).append("' ")	// 店
+					.append(" and CONVERT(VARCHAR(19),isnull(OutDate,'1990-01-01 00:00:00'),120) between '")
+					.append( kainfo_bdate.getDateBefore(1).toString().substring(0,10)+" 23:00:00" )
+					.append("' and '")
+					.append((kainfo_edate.getDateAfter(1).toString().substring(0,10))+" 00:59:59").append("' ")	// 时间
+				.append(" union all ")
+					.append("select memberid ")
+					.append(",max(cardtype) cardtypeid ")
+					.append(",max(coach) coach ")
+					.append(",min(CONVERT(VARCHAR(19), enterdate, 120)) lastenterdate ")
+					.append(",max(employName) outperson ")
+					.append(" from V_GetMemberOperateHistory ")
+					.append(" where remark = '接口充值' and left(Memberid,3) <> 'why' ")
+					.append(" and coach = '").append( dian ).append("' ")	// 店
+					.append(" and CONVERT(VARCHAR(19),isnull(enterdate,'1990-01-01 00:00:00'),120) between '")
+					.append( kainfo_bdate.getDateBefore(1).toString().substring(0,10)+" 23:00:00" )
+					.append("' and '")
+					.append((kainfo_edate.getDateAfter(1).toString().substring(0,10))+" 00:59:59").append("' ")	// 时间
+					.append(" group by memberid ")
 			;
 			
 			ArrayList<KadanganTempVO> list_huiyuaka_query = (ArrayList<KadanganTempVO>)hkjt_hg_pub_session.executeQuery(query_kaika.toString(), new BeanListProcessor(KadanganTempVO.class));
