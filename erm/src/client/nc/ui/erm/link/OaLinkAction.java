@@ -14,9 +14,10 @@ import nc.ui.uif2.NCAction;
 import nc.ui.uif2.model.AbstractUIAppModel;
 import nc.vo.ep.bx.JKBXVO;
 import nc.vo.pub.BusinessException;
+import nc.vo.pubapp.AppContext;
 
 /**
- * 月报 取数
+ * 联查oa
  *
  */
 public class OaLinkAction extends NCAction {
@@ -62,7 +63,8 @@ public class OaLinkAction extends NCAction {
 		JKBXVO selectedData = (JKBXVO) getModel().getSelectedData();
 		String url = PuPubVO.getString_TrimZeroLenAsNull(selectedData.getParentVO().getZyx26());
 		if (url == null) return;
-		String creator = selectedData.getParentVO().getCreator();
+//		String creator = selectedData.getParentVO().getCreator();
+		String creator = AppContext.getInstance().getPkUser();	// HK 2020年10月30日14:44:51 改为当前登陆人。
 		if (creator == null) return;
 		String phone = null;
 		{// 根据制单人，去找 手机号
