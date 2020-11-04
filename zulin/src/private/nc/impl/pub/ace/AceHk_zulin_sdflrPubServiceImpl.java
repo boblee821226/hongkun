@@ -339,7 +339,7 @@ public abstract class AceHk_zulin_sdflrPubServiceImpl {
 		    	itemVOs[i].setDef9(item_vo.getPk_area());		// 区域
 		    	itemVOs[i].setDef8(item_vo.getPk_room());		// 房间号
 		    	itemVOs[i].setDef1(item_vo.getPk_sfxm());		// 收费项目
-		    	itemVOs[i].setDef11(item_vo.getPk_place());		// 位置
+		    	itemVOs[i].setDef13(item_vo.getPk_place());		// 位置：由自定义11 改为 13 （2020年11月4日16:55:00）
 		    	itemVOs[i].setDef2(""+item_vo.getSccb_num());	// 上次抄表数
 		    	itemVOs[i].setDef6(""+item_vo.getBccb_num());	// 本次抄表数
 		    	itemVOs[i].setQuantity_de(item_vo.getUse_num());// 用量（不生效）
