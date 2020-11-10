@@ -69,6 +69,7 @@ public class HuiyuanPlugin implements IBackgroundWorkPlugin {
 		MAP_dian_corp.put("上地", "0001N510000000001SXV");	// 国际会馆
 		MAP_dian_corp.put("西山", "0001N510000000001SY7");	// 西山温泉
 		MAP_dian_corp.put("康福瑞", "0001N510000000001SY5");	// 康福瑞西山
+		MAP_dian_corp.put("太申", "0001N5100000000UVI5I");	// 太申（2020年11月9日23:15:18）
 		
 		MAP_corp_dian.put("0001N510000000001SXV", "国际");
 		MAP_corp_dian.put("0001N510000000001SXX", "牡丹");
@@ -76,6 +77,7 @@ public class HuiyuanPlugin implements IBackgroundWorkPlugin {
 		MAP_corp_dian.put("0001N510000000001SY1", "酒店");
 		MAP_corp_dian.put("0001N510000000001SY3", "朗丽兹");
 		MAP_corp_dian.put("0001N510000000001SY5", "康福瑞");
+		MAP_corp_dian.put("0001N5100000000UVI5I", "太申");
 		
 		MAP_dian_flag.put("牡丹", "-01");
 		MAP_dian_flag.put("国际", "-02");
@@ -83,6 +85,7 @@ public class HuiyuanPlugin implements IBackgroundWorkPlugin {
 		MAP_dian_flag.put("酒店", "-04");
 		MAP_dian_flag.put("朗丽兹", "-07");
 		MAP_dian_flag.put("康福瑞", "-08");
+		MAP_dian_flag.put("太申", "-11");
 		
 		MAP_corp_flag.put("0001N510000000001SXX", "-01");
 		MAP_corp_flag.put("0001N510000000001SXV", "-02");
@@ -90,6 +93,7 @@ public class HuiyuanPlugin implements IBackgroundWorkPlugin {
 		MAP_corp_flag.put("0001N510000000001SY1", "-04");
 		MAP_corp_flag.put("0001N510000000001SY3", "-07");
 		MAP_corp_flag.put("0001N510000000001SY5", "-08");
+		MAP_corp_flag.put("0001N5100000000UVI5I", "-11");
 		
 		MAP_dian_db.put("牡丹",  "L01.jgmd");
 		MAP_dian_db.put("国际",  "L02.jggj");
@@ -97,6 +101,7 @@ public class HuiyuanPlugin implements IBackgroundWorkPlugin {
 		MAP_dian_db.put("酒店",  "L04.lmt");
 		MAP_dian_db.put("朗丽兹", "L07.jgllz");
 		MAP_dian_db.put("康福瑞", "L08.jgkfr");
+		MAP_dian_db.put("太申", "L11.jgts");
 		
 	}
 	
@@ -144,6 +149,7 @@ public class HuiyuanPlugin implements IBackgroundWorkPlugin {
 						,"0001N510000000001SY1" //"酒店"
 						,"0001N510000000001SY3" //"朗丽兹"
 						,"0001N510000000001SY5" //"康福瑞"
+						,"0001N5100000000UVI5I" //"太申"
 				};
 			}
 			
@@ -196,17 +202,17 @@ public class HuiyuanPlugin implements IBackgroundWorkPlugin {
 	public Object executeTest(Object obj) throws BusinessException
 	{
 		String[] pk_orgs = {
-			"0001N510000000001SY7"	// 西山
+//			"0001N510000000001SY7"	// 西山
 //			"0001N510000000001SXV"	// 国际
 //			"0001N510000000001SXX"	// "牡丹"
 //			"0001N510000000001SY1", // "康福瑞酒店"
 //			"0001N510000000001SY3",	// "朗丽兹"
 //			"0001N510000000001SY5", // "康福瑞"
-				
+			"0001N5100000000UVI5I"	// 太申
 		};
 		
-		UFDate bdate = PuPubVO.getUFDate("2020-09-23");
-		UFDate edate = PuPubVO.getUFDate("2020-09-26");
+		UFDate bdate = PuPubVO.getUFDate("2020-11-08");
+		UFDate edate = PuPubVO.getUFDate("2020-11-09");
 		
 		try
 		{
@@ -216,7 +222,18 @@ public class HuiyuanPlugin implements IBackgroundWorkPlugin {
 //			importHuiyuanka_info(pk_orgs,bdate,edate,"2019-02-26 00:03:27","2019-02-27 00:13:43");
 //			importHuiyuanka_info(pk_orgs,bdate,edate,null,null);
 			// 同步 开卡
-			importKaiKa(pk_orgs, bdate, edate);
+//			importKaiKa(pk_orgs, bdate, edate);
+			
+			// 同步卡型
+			importKaxing();	
+			// 同步开卡
+			importKaiKa(pk_orgs,bdate,edate);
+			// 同步 换卡信息
+			importHuanka(pk_orgs,bdate,edate);
+			// 同步 会员卡信息
+			importHuiyuanka_info(pk_orgs,bdate,edate,null,null);
+			// 同步 次卡信息
+//			importCika_info(pk_orgs,bdate,edate,null,null);
 			
 		}catch(Exception ex)
 		{
@@ -601,6 +618,11 @@ public class HuiyuanPlugin implements IBackgroundWorkPlugin {
 			hkjt_hg_pub_conn=new JDBCUtils("hkjt_hg_kfrxsd").getConn(JDBCUtils.HKJT_HG);
 			hkjt_hg_pub_session = new JdbcSession(hkjt_hg_pub_conn);
 		}
+		else if( "-11".equals(flag) )
+		{// 太申 TODO
+			hkjt_hg_pub_conn=new JDBCUtils("hkjt_hg_taishen").getConn(JDBCUtils.HKJT_HG);
+			hkjt_hg_pub_session = new JdbcSession(hkjt_hg_pub_conn);
+		}
 		else
 		{
 			return null;
@@ -751,22 +773,26 @@ public class HuiyuanPlugin implements IBackgroundWorkPlugin {
 						.append(" and SUBSTRING(changeclassid,1,3) = 'ZSN' ")	// 通过 交班编号前缀 来过滤
 						;// 同下 
 				
-		}
-		else
+		} else if ("-11".equals(flag)) {
+			// 太申
+			String yyyymmdd = date.toString().substring(0,10);
+			return new String[]{
+				yyyymmdd + " 00:00:00",
+				yyyymmdd + " 23:59:59"
+			};
+		} else
 		{// 其它的会馆  用  桑拿部  来表示业务数据
 			query_sql = 
-					new StringBuffer("SELECT  min(CONVERT(VARCHAR(19),ChangeTime,120)) kssj ")
-							.append(",MAX(CONVERT(VARCHAR(19),ChangeTime,120)) jssj ")
-							.append("from Dt_ChangeClass ")	// 业务汇总库
-							.append("WHERE ")
-							.append(" CONVERT(VARCHAR(19),ChangeTime,120) between '"+(date.getDateBefore(1).toString().substring(0,10))+" 23:00:00' and '"+(date.getDateAfter(1).toString().substring(0,10))+" 00:59:59' ")	// 时间范围应该是 前一天、后一天 各推一小时
-							.append(" and SUBSTRING(changeclassid,16,3)='"+flag+"' ")
-							.append(" and Opersite = '桑拿部' ")
-							.append(" and SUBSTRING(changeclassid,1,3) = 'ZSN' ")	// 通过 交班编号前缀 来过滤
+			new StringBuffer("SELECT  min(CONVERT(VARCHAR(19),ChangeTime,120)) kssj ")
+					.append(",MAX(CONVERT(VARCHAR(19),ChangeTime,120)) jssj ")
+					.append("from Dt_ChangeClass ")	// 业务汇总库
+					.append("WHERE ")
+					.append(" CONVERT(VARCHAR(19),ChangeTime,120) between '"+(date.getDateBefore(1).toString().substring(0,10))+" 23:00:00' and '"+(date.getDateAfter(1).toString().substring(0,10))+" 00:59:59' ")	// 时间范围应该是 前一天、后一天 各推一小时
+					.append(" and SUBSTRING(changeclassid,16,3)='"+flag+"' ")
+					.append(" and Opersite = '桑拿部' ")
+					.append(" and SUBSTRING(changeclassid,1,3) = 'ZSN' ")	// 通过 交班编号前缀 来过滤
 			;
 		}
-		
-		
 		
 		List<String[]> list = (List<String[]>)hkjt_hg_pub_session.executeQuery(query_sql.toString(), new ArrayListProcessor());
 		
@@ -777,8 +803,7 @@ public class HuiyuanPlugin implements IBackgroundWorkPlugin {
 			result[0] = PuPubVO.getString_TrimZeroLenAsNull( obj[0] );
 			result[1] = PuPubVO.getString_TrimZeroLenAsNull( obj[1] );
 		}
-			
-		
+
 		return result;
 	}
 	
