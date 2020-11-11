@@ -72,10 +72,10 @@ public class QushuAction extends NCAction {
 		
 		UFDate yb_ksrq = 
 				PuPubVO.getUFDate(
-						this.getEditor().getBillCardPanel().getHeadItem("begindate").getValueObject() );
+						this.getEditor().getBillCardPanel().getHeadItem("begindate").getValueObject().toString().substring(0, 10) );
 		UFDate yb_jsrq = 
 				PuPubVO.getUFDate(
-						this.getEditor().getBillCardPanel().getHeadItem("enddate").getValueObject() );
+						this.getEditor().getBillCardPanel().getHeadItem("enddate").getValueObject().toString().substring(0, 10) );
 		
 		String str_yb_ksrq = yb_ksrq.toString().substring(0, 10);
 		String str_yb_jsrq = yb_jsrq.toString().substring(0, 10);
@@ -136,7 +136,8 @@ public class QushuAction extends NCAction {
 			.append(" and '"+str_yb_ksrq+"' <= substr(nvl(replace(ct.vdef19,'~',''),'2099-12-31'),1,10) ")	// 用退租日期 来 判断计费时点（退租的那天 要算租金的）
 			.append(" and substr(ctb.vbdef3,1,10)<=substr(nvl(replace(ct.vdef19,'~',''),'2099-12-31'),1,10) ")	// 合同明细的开始日期 要小于等于 退租日期
 			
-//			.append(" and ct.vbillcode in ('202003261403','202005311403') ")		// 测试
+//			.append(" and ct.vbillcode in ('20190301C101') ")		// 测试
+//			.append(" and ct.pk_customer = '1001N510000000APA5BL' ")	// 测试：客户
 		;
 		
 		IUAPQueryBS iUAPQueryBS = (IUAPQueryBS)NCLocator.getInstance().lookup(IUAPQueryBS.class.getName()); 
@@ -543,6 +544,7 @@ public class QushuAction extends NCAction {
 						.append(" and y.vbilltypecode = 'HK37' ")
 						.append(" and y.yearmonth = '"+syqj+"' ")
 						.append(" and y.pk_org = '"+pk_org+"' ")
+//						.append(" and yb.pk_cutomer = '1001N510000000APA5BL' ")	// 测试：客户
 						.append(" group by yb.pk_cutomer,yb.roomno,yb.vbdef03,yb.srxm ")	// Group By  客户+房号+收入项目
 						.append(" having sum(yb.qmyskye) <> 0.00 ")		// 取 余额不为0的
 			;

@@ -76,10 +76,10 @@ public class QushuAction extends NCAction {
 		
 		UFDate yb_ksrq = 
 				PuPubVO.getUFDate(
-						this.getEditor().getBillCardPanel().getHeadItem("begindate").getValueObject() );
+						this.getEditor().getBillCardPanel().getHeadItem("begindate").getValueObject().toString().substring(0, 10) );
 		UFDate yb_jsrq = 
 				PuPubVO.getUFDate(
-						this.getEditor().getBillCardPanel().getHeadItem("enddate").getValueObject() );
+						this.getEditor().getBillCardPanel().getHeadItem("enddate").getValueObject().toString().substring(0, 10) );
 		
 		String str_yb_ksrq = yb_ksrq.toString().substring(0, 10);
 		String str_yb_jsrq = yb_jsrq.toString().substring(0, 10);

@@ -91,7 +91,7 @@ public class TuizuAction extends NCAction {
 		
 		UFDate yb_ksrq = 
 				PuPubVO.getUFDate(
-						this.getEditor().getBillCardPanel().getHeadItem("begindate").getValueObject() );
+						this.getEditor().getBillCardPanel().getHeadItem("begindate").getValueObject().toString().substring(0, 10) );
 		
 		UFDate yb_jsrq = yb_ksrq.getDateAfter(180);	// 默认取 开始日期后的180天
 		

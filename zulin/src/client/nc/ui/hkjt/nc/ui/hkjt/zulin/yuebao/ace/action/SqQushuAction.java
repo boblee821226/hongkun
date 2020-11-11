@@ -93,11 +93,11 @@ public class SqQushuAction extends NCAction {
 		
 		UFDate temp_yb_ksrq = 
 				PuPubVO.getUFDate(
-						this.getEditor().getBillCardPanel().getHeadItem("begindate").getValueObject() );
+						this.getEditor().getBillCardPanel().getHeadItem("begindate").getValueObject().toString().substring(0, 10) );
 		
 		UFDate temp_yb_jsrq = 
 				PuPubVO.getUFDate(
-						this.getEditor().getBillCardPanel().getHeadItem("enddate").getValueObject() );
+						this.getEditor().getBillCardPanel().getHeadItem("enddate").getValueObject().toString().substring(0, 10) );
 		
 		UFDate yb_ksrq = getDateAddMM(temp_yb_ksrq,-1);
 		UFDate yb_jsrq = getDateAddMM(temp_yb_jsrq,-1);
