@@ -10,7 +10,11 @@ import nc.api_oa.hkjt.itf.ApiPubTool;
 import nc.bs.framework.common.NCLocator;
 import nc.itf.uap.IUAPQueryBS;
 import nc.jdbc.framework.processor.ArrayListProcessor;
+import nc.ui.pub.bill.BillItem;
+import nc.ui.pubapp.uif2app.view.BillListView;
 import nc.ui.uif2.NCAction;
+import nc.ui.uif2.editor.BillForm;
+import nc.ui.uif2.model.AbstractAppModel;
 import nc.ui.uif2.model.AbstractUIAppModel;
 import nc.vo.ep.bx.JKBXVO;
 import nc.vo.pub.BusinessException;
@@ -25,11 +29,14 @@ public class OaLinkAction extends NCAction {
 	private static final long serialVersionUID = 7589665530870496301L;
 
 	public OaLinkAction() {
-		setBtnName("OA");
+		setBtnName("联查OA");
 		setCode("oaLinkAction");
 	}
 
-	private AbstractUIAppModel model;
+	private BillListView listView = null;
+	private BillForm editor = null;
+	private AbstractUIAppModel model = null;
+	private String billType = null;
 	private Long lastTime = null;	// 最后一次的点击时间
 	private IUAPQueryBS iUAPQueryBS = (IUAPQueryBS)NCLocator.getInstance().lookup(IUAPQueryBS.class.getName()); 
 	private HashMap<String,String> MAP_creator = new HashMap<>();
@@ -43,25 +50,64 @@ public class OaLinkAction extends NCAction {
 		this.model.addAppEventListener(this);
 	}
 
+	public String getBillType() {
+		return billType;
+	}
+
+	public void setBillType(String billType) {
+		this.billType = billType;
+	}
+	
+	public BillListView getListView() {
+		return listView;
+	}
+
+	public void setListView(BillListView listView) {
+		this.listView = listView;
+	}
+
+	public BillForm getEditor() {
+		return editor;
+	}
+
+	public void setEditor(BillForm editor) {
+		this.editor = editor;
+	}
+
 	@Override
 	protected boolean isActionEnable() {
-		JKBXVO selectedData = (JKBXVO) getModel().getSelectedData();
-		if (selectedData == null) {
-			return false;
+		if (this.getBillType() != null && this.getBillType().startsWith("OA")) {
+			if (getEditor() == null || getEditor().getBillCardPanel() == null) return false;
+			BillItem item = getEditor().getBillCardPanel().getHeadItem("oa_status");
+			if (item != null) {
+				String itemValue = PuPubVO.getString_TrimZeroLenAsNull(item.getValueObject());
+				if ("已归档".equals(itemValue)) return true;
+			}
+		} else {
+			JKBXVO selectedData = (JKBXVO) getModel().getSelectedData();
+			if (selectedData == null) {
+				return false;
+			}
+			// url为空，不进行联查
+			String url = PuPubVO.getString_TrimZeroLenAsNull(selectedData.getParentVO().getZyx26());
+			if (url == null) {
+				return false;
+			}
+			return true;
 		}
-		// url为空，不进行联查
-		String url = PuPubVO.getString_TrimZeroLenAsNull(selectedData.getParentVO().getZyx26());
-		if (url == null) {
-			return false;
-		}
-		return true;
+		return false;
 	}
 	
 	@Override
 	public void doAction(ActionEvent e) throws BusinessException {
-		
-		JKBXVO selectedData = (JKBXVO) getModel().getSelectedData();
-		String url = PuPubVO.getString_TrimZeroLenAsNull(selectedData.getParentVO().getZyx26());
+		String url = null;
+		if (this.getBillType() != null && this.getBillType().startsWith("OA")) {
+			url = PuPubVO.getString_TrimZeroLenAsNull(
+					this.getEditor().getBillCardPanel().getHeadItem("oa_url"));
+		} else {
+			JKBXVO selectedData = (JKBXVO) getModel().getSelectedData();
+			url = PuPubVO.getString_TrimZeroLenAsNull(selectedData.getParentVO().getZyx26());
+		}
 		if (url == null) return;
 //		String creator = selectedData.getParentVO().getCreator();
 		String creator = AppContext.getInstance().getPkUser();	// HK 2020年10月30日14:44:51 改为当前登陆人。
@@ -122,7 +168,5 @@ public class OaLinkAction extends NCAction {
 		} finally {
 			// TODO
 		}
-	
 	}
-
 }
