@@ -54,6 +54,7 @@ public class ApiPubInfo {
 		BILLTYPE.put(BILLTYPE_TEST, null);	// 用于测试
 		BILLTYPE.put("263X", new BillTypeVO("借款单", JkVO.class));
 		BILLTYPE.put("264X", new BillTypeVO("报销单", BxVO.class));
+		BILLTYPE.put("OA", new BillTypeVO("oa单据", HashMap.class));
 		
 //		ACTION.put(ACTION_QUY_COUNT, new ActionVO("工作流数量", ApprovalFlowQueryVO.class));
 //		ACTION.put(ACTION_QUY_DO, new ActionVO("待我审批", ApprovalFlowQueryVO.class));
@@ -73,12 +74,16 @@ public class ApiPubInfo {
 		
 		ACTION.put(ACTION_WRITE + "#263X", new ActionVO("新增", JkVO[].class));	// 借款单VO
 		ACTION.put(ACTION_WRITE + "#264X", new ActionVO("新增", BxVO[].class));	// 报销单VO
+		ACTION.put(ACTION_WRITE + "#OA", new ActionVO("新增", HashMap[].class));	// oa单据VO
 		
 		ACTION.put(ACTION_DELETE + "#263X", new ActionVO("删除", JkVO[].class));	// 借款单VO
 		ACTION.put(ACTION_DELETE + "#264X", new ActionVO("删除", BxVO[].class));	// 报销单VO
+		ACTION.put(ACTION_DELETE + "#OA", new ActionVO("删除", HashMap[].class));// oa单据VO
 		
 		ACTION.put(ACTION_QUERY + "#263X", new ActionVO("查询", JkVO[].class));	// 借款单VO
 		ACTION.put(ACTION_QUERY + "#264X", new ActionVO("查询", BxVO[].class));	// 报销单VO
+		ACTION.put(ACTION_QUERY + "#OA", new ActionVO("查询", HashMap[].class));	// oa单据VO
+		
 	}
 	
 	/**

@@ -7,6 +7,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -89,7 +90,7 @@ public class BillServlet extends HttpServlet {
 		String contentType = req.getContentType();
 		System.out.println(contentType);
 		
-		if (contentType.startsWith("multipart/form-data")) {// 上传文件
+		if (contentType.startsWith("multipart/form-data")) {// 接收上传的文件
 		    DiskFileItemFactory factoy = new DiskFileItemFactory();
 		    ServletFileUpload sfu = new ServletFileUpload(factoy);
 		    //解析request
@@ -132,7 +133,7 @@ public class BillServlet extends HttpServlet {
 		    }
 			
 		}
-		else if (contentType.startsWith("application/json")) {// 上传单据
+		else if (contentType.startsWith("application/json")) {// 接收上传的单据
 			try
 			{
 				RequestParamVO paramVO = null;
@@ -238,7 +239,7 @@ public class BillServlet extends HttpServlet {
 		String cacheUserId = paramVO.getCacheUserId();	// 缓存用户id
 		if (cacheUserId == null) {
 			// 如果前台不传，就赋默认值
-			cacheUserId = "NCuser00000000000001";
+			cacheUserId = ApiPubInfo.USER;
 		}
 		
 		if (PuPubVO.getString_TrimZeroLenAsNull(account) == null) {
@@ -373,8 +374,12 @@ public class BillServlet extends HttpServlet {
 					 || ApiPubInfo.ACTION_DELETE.equals(action)
 					 || ApiPubInfo.ACTION_QUERY.equals(action)
 					) { // 保存、删除的 需要根据单据类型，取找到VO
-						String[] bt = billType.split("-"); // 交易类型类似于263X-Cxx-01，只取前面的单据类型编码来做判断。
-						dataObj = MAPPER.readValue(paramData, ApiPubInfo.ACTION.get(action + "#" + bt[0]).getParamClass());
+						if (billType.startsWith("OA-")) {
+							dataObj = MAPPER.readValue(paramData, HashMap[].class);
+						} else {
+							String[] bt = billType.split("-"); // 交易类型类似于263X-Cxx-01，只取前面的单据类型编码来做判断。
+							dataObj = MAPPER.readValue(paramData, ApiPubInfo.ACTION.get(action + "#" + bt[0]).getParamClass());
+						}
 					} else { // 其它的，都是固定VO
 						dataObj = MAPPER.readValue(paramData, ApiPubInfo.ACTION.get(action).getParamClass());
 					}
