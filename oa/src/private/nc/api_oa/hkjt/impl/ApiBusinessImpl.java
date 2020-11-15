@@ -1,8 +1,7 @@
 package nc.api_oa.hkjt.impl;
 
-import nc.api_oa.hkjt.impl.service.ApprovalFlowQueryCountService;
-import nc.api_oa.hkjt.impl.service.ApprovalFlowQueryService;
-import nc.api_oa.hkjt.impl.service.ApprovalFlowWorkService;
+import java.util.HashMap;
+
 import nc.api_oa.hkjt.impl.service.DocService;
 import nc.api_oa.hkjt.impl.service.PublicService;
 import nc.api_oa.hkjt.impl.service._263X.N263XService;
@@ -11,16 +10,14 @@ import nc.api_oa.hkjt.impl.service._263X.N263XServiceQUERY;
 import nc.api_oa.hkjt.impl.service._264X.N264XService;
 import nc.api_oa.hkjt.impl.service._264X.N264XServiceDELETE;
 import nc.api_oa.hkjt.impl.service._264X.N264XServiceQUERY;
+import nc.api_oa.hkjt.impl.service.other.OtherService;
+import nc.api_oa.hkjt.impl.service.other.OtherServiceDELETE;
+import nc.api_oa.hkjt.impl.service.other.OtherServiceQUERY;
 import nc.api_oa.hkjt.itf.ApiBusinessItf;
 import nc.api_oa.hkjt.itf.ApiPubInfo;
-import nc.api_oa.hkjt.vo.ActionVO;
-import nc.api_oa.hkjt.vo.ApprovalFlowQueryVO;
-import nc.api_oa.hkjt.vo.ApprovalFlowWorkVO;
 import nc.api_oa.hkjt.vo.LoginVO;
 import nc.bs.hkjt.srgk.lvyun.workplugin.ImpLvyunData;
-import nc.bs.hkjt.store.lvyun_out.workplugin.ImpLvyunOutData;
 import nc.vo.pub.BusinessException;
-import nc.vo.pub.pa.CurrEnvVO;
 
 public class ApiBusinessImpl implements ApiBusinessItf {
 
@@ -108,7 +105,7 @@ public class ApiBusinessImpl implements ApiBusinessItf {
 			return DocService.doAction(account);
 		}
 		/**
-		 * 新增
+		 * 新增（提交）
 		 */
 		if (action.equals(ApiPubInfo.ACTION_WRITE)
 //		 || action.equals(ApiPubInfo.ACTION_SAVEBASE)
@@ -118,12 +115,14 @@ public class ApiBusinessImpl implements ApiBusinessItf {
 				return new N263XService().doAction(account, billType, paramObj, action, userId);
 			} else if (billType.startsWith("264X")) {
 				return new N264XService().doAction(account, billType, paramObj, action, userId);
+			} else if (billType.startsWith("OA")) {
+				return new OtherService().doAction(account, billType, paramObj, action, userId);
 			} else {
 				throw new BusinessException("不支持的类型");
 			}
 		}
 		/**
-		 * 删除
+		 * 删除（收回）
 		 */
 		if (action.equals(ApiPubInfo.ACTION_DELETE)) {
 			// 根据单据类型 去 判断，调用哪个处理类。
@@ -131,6 +130,8 @@ public class ApiBusinessImpl implements ApiBusinessItf {
 				return new N263XServiceDELETE().doAction(account, billType, paramObj, action, userId);
 			} else if (billType.startsWith("264X")) {
 				return new N264XServiceDELETE().doAction(account, billType, paramObj, action, userId);
+			} else if (paramObj instanceof HashMap[]) {
+				return new OtherServiceDELETE().doAction(account, billType, paramObj, action, userId);
 			} else {
 				throw new BusinessException("不支持的类型");
 			}
@@ -144,6 +145,8 @@ public class ApiBusinessImpl implements ApiBusinessItf {
 				return new N263XServiceQUERY().doAction(account, billType, paramObj, action, userId);
 			} else if (billType.startsWith("264X")) {
 				return new N264XServiceQUERY().doAction(account, billType, paramObj, action, userId);
+			} else if (paramObj instanceof HashMap[]) {
+				return new OtherServiceQUERY().doAction(account, billType, paramObj, action, userId);
 			} else {
 				throw new BusinessException("不支持的类型");
 			}
