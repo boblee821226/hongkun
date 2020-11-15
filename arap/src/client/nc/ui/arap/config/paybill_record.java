@@ -7,7 +7,7 @@ import java.util.Map;
 
 import nc.ui.uif2.factory.AbstractJavaBeanDefinition;
 
-public class paybill_manage extends AbstractJavaBeanDefinition {
+public class paybill_record extends AbstractJavaBeanDefinition {
 	private Map<String, Object> context = new HashMap();
 
 	public nc.funcnode.ui.action.SeparatorAction getSeparatorAction() {
@@ -160,29 +160,29 @@ public class paybill_manage extends AbstractJavaBeanDefinition {
 
 	private List getManagedList0() {
 		List list = new ArrayList();
-		list.add(getQueryParam_14017ee());
-		list.add(getQueryParam_e32070());
+		list.add(getQueryParam_902c86());
+		list.add(getQueryParam_15b14c7());
 		return list;
 	}
 
-	private nc.ui.uif2.userdefitem.QueryParam getQueryParam_14017ee() {
-		if (context.get("nc.ui.uif2.userdefitem.QueryParam#14017ee") != null)
+	private nc.ui.uif2.userdefitem.QueryParam getQueryParam_902c86() {
+		if (context.get("nc.ui.uif2.userdefitem.QueryParam#902c86") != null)
 			return (nc.ui.uif2.userdefitem.QueryParam) context
-					.get("nc.ui.uif2.userdefitem.QueryParam#14017ee");
+					.get("nc.ui.uif2.userdefitem.QueryParam#902c86");
 		nc.ui.uif2.userdefitem.QueryParam bean = new nc.ui.uif2.userdefitem.QueryParam();
-		context.put("nc.ui.uif2.userdefitem.QueryParam#14017ee", bean);
+		context.put("nc.ui.uif2.userdefitem.QueryParam#902c86", bean);
 		bean.setMdfullname("arap.recbill");
 		setBeanFacotryIfBeanFacatoryAware(bean);
 		invokeInitializingBean(bean);
 		return bean;
 	}
 
-	private nc.ui.uif2.userdefitem.QueryParam getQueryParam_e32070() {
-		if (context.get("nc.ui.uif2.userdefitem.QueryParam#e32070") != null)
+	private nc.ui.uif2.userdefitem.QueryParam getQueryParam_15b14c7() {
+		if (context.get("nc.ui.uif2.userdefitem.QueryParam#15b14c7") != null)
 			return (nc.ui.uif2.userdefitem.QueryParam) context
-					.get("nc.ui.uif2.userdefitem.QueryParam#e32070");
+					.get("nc.ui.uif2.userdefitem.QueryParam#15b14c7");
 		nc.ui.uif2.userdefitem.QueryParam bean = new nc.ui.uif2.userdefitem.QueryParam();
-		context.put("nc.ui.uif2.userdefitem.QueryParam#e32070", bean);
+		context.put("nc.ui.uif2.userdefitem.QueryParam#15b14c7", bean);
 		bean.setMdfullname("arap.recitem");
 		setBeanFacotryIfBeanFacatoryAware(bean);
 		invokeInitializingBean(bean);
@@ -356,25 +356,25 @@ public class paybill_manage extends AbstractJavaBeanDefinition {
 		bean.setClosingListener(getClosingListener());
 		bean.setAutoAddLine(false);
 		bean.setTemplateNotNullValidate(true);
-		bean.setBlankChildrenFilter(getSingleFieldBlankChildrenFilter_166d91e());
+		bean.setBlankChildrenFilter(getSingleFieldBlankChildrenFilter_b147c6());
 		bean.setDefValueItf(getBillDefVauleItf());
 		bean.setBodyLineActions(getManagedList2());
 		bean.setActions(getManagedList5());
-		bean.setUserdefitemPreparator(getUserdefitemContainerPreparator_18bec68());
+		bean.setUserdefitemPreparator(getUserdefitemContainerPreparator_9eea4());
 		bean.initRealUI();
 		setBeanFacotryIfBeanFacatoryAware(bean);
 		invokeInitializingBean(bean);
 		return bean;
 	}
 
-	private nc.ui.pubapp.uif2app.view.value.SingleFieldBlankChildrenFilter getSingleFieldBlankChildrenFilter_166d91e() {
+	private nc.ui.pubapp.uif2app.view.value.SingleFieldBlankChildrenFilter getSingleFieldBlankChildrenFilter_b147c6() {
 		if (context
-				.get("nc.ui.pubapp.uif2app.view.value.SingleFieldBlankChildrenFilter#166d91e") != null)
+				.get("nc.ui.pubapp.uif2app.view.value.SingleFieldBlankChildrenFilter#b147c6") != null)
 			return (nc.ui.pubapp.uif2app.view.value.SingleFieldBlankChildrenFilter) context
-					.get("nc.ui.pubapp.uif2app.view.value.SingleFieldBlankChildrenFilter#166d91e");
+					.get("nc.ui.pubapp.uif2app.view.value.SingleFieldBlankChildrenFilter#b147c6");
 		nc.ui.pubapp.uif2app.view.value.SingleFieldBlankChildrenFilter bean = new nc.ui.pubapp.uif2app.view.value.SingleFieldBlankChildrenFilter();
 		context.put(
-				"nc.ui.pubapp.uif2app.view.value.SingleFieldBlankChildrenFilter#166d91e",
+				"nc.ui.pubapp.uif2app.view.value.SingleFieldBlankChildrenFilter#b147c6",
 				bean);
 		bean.setFieldName(getDefMoneyField());
 		setBeanFacotryIfBeanFacatoryAware(bean);
@@ -385,24 +385,24 @@ public class paybill_manage extends AbstractJavaBeanDefinition {
 	private List getManagedList2() {
 		List list = new ArrayList();
 		list.add(getAddLineAction());
-		list.add(getInsertLineAction_13852ba());
-		list.add(getBodyDelLineAction_bf4ca2());
-		list.add(getBodyCopyLineAction_140221d());
-		list.add(getBodyPasteLineAction_17fb419());
-		list.add(getBodyPasteToTailAction_10916b4());
+		list.add(getInsertLineAction_df51f7());
+		list.add(getBodyDelLineAction_17e32a7());
+		list.add(getBodyCopyLineAction_2f8a4d());
+		list.add(getBodyPasteLineAction_120c867());
+		list.add(getBodyPasteToTailAction_144f01b());
 		list.add(getActionsBarSeparator());
-		list.add(getBodyLineEditAction_1b19043());
+		list.add(getBodyLineEditAction_ef7f50());
 		list.add(getActionsBarSeparator());
-		list.add(getBillBodyZoomAction_763103());
+		list.add(getBillBodyZoomAction_18f971c());
 		return list;
 	}
 
-	private nc.ui.arap.actions.InsertLineAction getInsertLineAction_13852ba() {
-		if (context.get("nc.ui.arap.actions.InsertLineAction#13852ba") != null)
+	private nc.ui.arap.actions.InsertLineAction getInsertLineAction_df51f7() {
+		if (context.get("nc.ui.arap.actions.InsertLineAction#df51f7") != null)
 			return (nc.ui.arap.actions.InsertLineAction) context
-					.get("nc.ui.arap.actions.InsertLineAction#13852ba");
+					.get("nc.ui.arap.actions.InsertLineAction#df51f7");
 		nc.ui.arap.actions.InsertLineAction bean = new nc.ui.arap.actions.InsertLineAction();
-		context.put("nc.ui.arap.actions.InsertLineAction#13852ba", bean);
+		context.put("nc.ui.arap.actions.InsertLineAction#df51f7", bean);
 		bean.setHbrealtion(getRelationEditHandler());
 		bean.setEditor(getBillFormEditor());
 		bean.setIArapLineDefValUtil(getIArapLineDefValUtil());
@@ -411,34 +411,34 @@ public class paybill_manage extends AbstractJavaBeanDefinition {
 		return bean;
 	}
 
-	private nc.ui.arap.actions.BodyDelLineAction getBodyDelLineAction_bf4ca2() {
-		if (context.get("nc.ui.arap.actions.BodyDelLineAction#bf4ca2") != null)
+	private nc.ui.arap.actions.BodyDelLineAction getBodyDelLineAction_17e32a7() {
+		if (context.get("nc.ui.arap.actions.BodyDelLineAction#17e32a7") != null)
 			return (nc.ui.arap.actions.BodyDelLineAction) context
-					.get("nc.ui.arap.actions.BodyDelLineAction#bf4ca2");
+					.get("nc.ui.arap.actions.BodyDelLineAction#17e32a7");
 		nc.ui.arap.actions.BodyDelLineAction bean = new nc.ui.arap.actions.BodyDelLineAction();
-		context.put("nc.ui.arap.actions.BodyDelLineAction#bf4ca2", bean);
+		context.put("nc.ui.arap.actions.BodyDelLineAction#17e32a7", bean);
 		setBeanFacotryIfBeanFacatoryAware(bean);
 		invokeInitializingBean(bean);
 		return bean;
 	}
 
-	private nc.ui.arap.actions.BodyCopyLineAction getBodyCopyLineAction_140221d() {
-		if (context.get("nc.ui.arap.actions.BodyCopyLineAction#140221d") != null)
+	private nc.ui.arap.actions.BodyCopyLineAction getBodyCopyLineAction_2f8a4d() {
+		if (context.get("nc.ui.arap.actions.BodyCopyLineAction#2f8a4d") != null)
 			return (nc.ui.arap.actions.BodyCopyLineAction) context
-					.get("nc.ui.arap.actions.BodyCopyLineAction#140221d");
+					.get("nc.ui.arap.actions.BodyCopyLineAction#2f8a4d");
 		nc.ui.arap.actions.BodyCopyLineAction bean = new nc.ui.arap.actions.BodyCopyLineAction();
-		context.put("nc.ui.arap.actions.BodyCopyLineAction#140221d", bean);
+		context.put("nc.ui.arap.actions.BodyCopyLineAction#2f8a4d", bean);
 		setBeanFacotryIfBeanFacatoryAware(bean);
 		invokeInitializingBean(bean);
 		return bean;
 	}
 
-	private nc.ui.arap.actions.BodyPasteLineAction getBodyPasteLineAction_17fb419() {
-		if (context.get("nc.ui.arap.actions.BodyPasteLineAction#17fb419") != null)
+	private nc.ui.arap.actions.BodyPasteLineAction getBodyPasteLineAction_120c867() {
+		if (context.get("nc.ui.arap.actions.BodyPasteLineAction#120c867") != null)
 			return (nc.ui.arap.actions.BodyPasteLineAction) context
-					.get("nc.ui.arap.actions.BodyPasteLineAction#17fb419");
+					.get("nc.ui.arap.actions.BodyPasteLineAction#120c867");
 		nc.ui.arap.actions.BodyPasteLineAction bean = new nc.ui.arap.actions.BodyPasteLineAction();
-		context.put("nc.ui.arap.actions.BodyPasteLineAction#17fb419", bean);
+		context.put("nc.ui.arap.actions.BodyPasteLineAction#120c867", bean);
 		bean.setClearItems(getManagedList3());
 		bean.setBillType(getDefBillType());
 		setBeanFacotryIfBeanFacatoryAware(bean);
@@ -452,12 +452,12 @@ public class paybill_manage extends AbstractJavaBeanDefinition {
 		return list;
 	}
 
-	private nc.ui.arap.actions.BodyPasteToTailAction getBodyPasteToTailAction_10916b4() {
-		if (context.get("nc.ui.arap.actions.BodyPasteToTailAction#10916b4") != null)
+	private nc.ui.arap.actions.BodyPasteToTailAction getBodyPasteToTailAction_144f01b() {
+		if (context.get("nc.ui.arap.actions.BodyPasteToTailAction#144f01b") != null)
 			return (nc.ui.arap.actions.BodyPasteToTailAction) context
-					.get("nc.ui.arap.actions.BodyPasteToTailAction#10916b4");
+					.get("nc.ui.arap.actions.BodyPasteToTailAction#144f01b");
 		nc.ui.arap.actions.BodyPasteToTailAction bean = new nc.ui.arap.actions.BodyPasteToTailAction();
-		context.put("nc.ui.arap.actions.BodyPasteToTailAction#10916b4", bean);
+		context.put("nc.ui.arap.actions.BodyPasteToTailAction#144f01b", bean);
 		bean.setClearItems(getManagedList4());
 		bean.setBillType(getDefBillType());
 		setBeanFacotryIfBeanFacatoryAware(bean);
@@ -471,23 +471,23 @@ public class paybill_manage extends AbstractJavaBeanDefinition {
 		return list;
 	}
 
-	private nc.ui.arap.actions.BodyLineEditAction getBodyLineEditAction_1b19043() {
-		if (context.get("nc.ui.arap.actions.BodyLineEditAction#1b19043") != null)
+	private nc.ui.arap.actions.BodyLineEditAction getBodyLineEditAction_ef7f50() {
+		if (context.get("nc.ui.arap.actions.BodyLineEditAction#ef7f50") != null)
 			return (nc.ui.arap.actions.BodyLineEditAction) context
-					.get("nc.ui.arap.actions.BodyLineEditAction#1b19043");
+					.get("nc.ui.arap.actions.BodyLineEditAction#ef7f50");
 		nc.ui.arap.actions.BodyLineEditAction bean = new nc.ui.arap.actions.BodyLineEditAction();
-		context.put("nc.ui.arap.actions.BodyLineEditAction#1b19043", bean);
+		context.put("nc.ui.arap.actions.BodyLineEditAction#ef7f50", bean);
 		setBeanFacotryIfBeanFacatoryAware(bean);
 		invokeInitializingBean(bean);
 		return bean;
 	}
 
-	private nc.ui.arap.actions.BillBodyZoomAction getBillBodyZoomAction_763103() {
-		if (context.get("nc.ui.arap.actions.BillBodyZoomAction#763103") != null)
+	private nc.ui.arap.actions.BillBodyZoomAction getBillBodyZoomAction_18f971c() {
+		if (context.get("nc.ui.arap.actions.BillBodyZoomAction#18f971c") != null)
 			return (nc.ui.arap.actions.BillBodyZoomAction) context
-					.get("nc.ui.arap.actions.BillBodyZoomAction#763103");
+					.get("nc.ui.arap.actions.BillBodyZoomAction#18f971c");
 		nc.ui.arap.actions.BillBodyZoomAction bean = new nc.ui.arap.actions.BillBodyZoomAction();
-		context.put("nc.ui.arap.actions.BillBodyZoomAction#763103", bean);
+		context.put("nc.ui.arap.actions.BillBodyZoomAction#18f971c", bean);
 		setBeanFacotryIfBeanFacatoryAware(bean);
 		invokeInitializingBean(bean);
 		return bean;
@@ -502,13 +502,13 @@ public class paybill_manage extends AbstractJavaBeanDefinition {
 		return list;
 	}
 
-	private nc.ui.uif2.editor.UserdefitemContainerPreparator getUserdefitemContainerPreparator_18bec68() {
+	private nc.ui.uif2.editor.UserdefitemContainerPreparator getUserdefitemContainerPreparator_9eea4() {
 		if (context
-				.get("nc.ui.uif2.editor.UserdefitemContainerPreparator#18bec68") != null)
+				.get("nc.ui.uif2.editor.UserdefitemContainerPreparator#9eea4") != null)
 			return (nc.ui.uif2.editor.UserdefitemContainerPreparator) context
-					.get("nc.ui.uif2.editor.UserdefitemContainerPreparator#18bec68");
+					.get("nc.ui.uif2.editor.UserdefitemContainerPreparator#9eea4");
 		nc.ui.uif2.editor.UserdefitemContainerPreparator bean = new nc.ui.uif2.editor.UserdefitemContainerPreparator();
-		context.put("nc.ui.uif2.editor.UserdefitemContainerPreparator#18bec68",
+		context.put("nc.ui.uif2.editor.UserdefitemContainerPreparator#9eea4",
 				bean);
 		bean.setContainer(getUserdefitemContainer());
 		bean.setParams(getManagedList6());
@@ -1423,7 +1423,6 @@ public class paybill_manage extends AbstractJavaBeanDefinition {
 		context.put("multiBesideWidget", bean);
 		bean.setBesideWidgetInfoMap(getManagedMap0());
 		bean.setContext(getContext());
-		bean.setModel(getManageAppModel());
 		bean.initUI();
 		setBeanFacotryIfBeanFacatoryAware(bean);
 		invokeInitializingBean(bean);
@@ -1432,23 +1431,24 @@ public class paybill_manage extends AbstractJavaBeanDefinition {
 
 	private Map getManagedMap0() {
 		Map map = new HashMap();
-		map.put(getI18nFB_7a0237(), getManagedList8());
+		map.put(getI18nFB_6aa65c(), getManagedList8());
+		map.put(getI18nFB_1d01898(), getManagedList9());
 		return map;
 	}
 
-	private java.lang.String getI18nFB_7a0237() {
-		if (context.get("nc.ui.uif2.I18nFB#7a0237") != null)
-			return (java.lang.String) context.get("nc.ui.uif2.I18nFB#7a0237");
+	private java.lang.String getI18nFB_6aa65c() {
+		if (context.get("nc.ui.uif2.I18nFB#6aa65c") != null)
+			return (java.lang.String) context.get("nc.ui.uif2.I18nFB#6aa65c");
 		nc.ui.uif2.I18nFB bean = new nc.ui.uif2.I18nFB();
-		context.put("&nc.ui.uif2.I18nFB#7a0237", bean);
+		context.put("&nc.ui.uif2.I18nFB#6aa65c", bean);
 		bean.setResDir("uif2");
-		bean.setResId("ActionRegistry-000055");
-		bean.setDefaultValue("审批");
+		bean.setResId("BesideWidget-000001");
+		bean.setDefaultValue("辅助信息");
 		setBeanFacotryIfBeanFacatoryAware(bean);
 		invokeInitializingBean(bean);
 		try {
 			Object product = bean.getObject();
-			context.put("nc.ui.uif2.I18nFB#7a0237", product);
+			context.put("nc.ui.uif2.I18nFB#6aa65c", product);
 			return (java.lang.String) product;
 		} catch (Exception e) {
 			throw new RuntimeException(e);
@@ -1457,7 +1457,35 @@ public class paybill_manage extends AbstractJavaBeanDefinition {
 
 	private List getManagedList8() {
 		List list = new ArrayList();
+		list.add(getTermForm());
+		list.add(getCreditForm());
+		list.add(getShowAllActionForm());
+		return list;
+	}
+
+	private java.lang.String getI18nFB_1d01898() {
+		if (context.get("nc.ui.uif2.I18nFB#1d01898") != null)
+			return (java.lang.String) context.get("nc.ui.uif2.I18nFB#1d01898");
+		nc.ui.uif2.I18nFB bean = new nc.ui.uif2.I18nFB();
+		context.put("&nc.ui.uif2.I18nFB#1d01898", bean);
+		bean.setResDir("uif2");
+		bean.setResId("ActionRegistry-000055");
+		bean.setDefaultValue("审批");
+		setBeanFacotryIfBeanFacatoryAware(bean);
+		invokeInitializingBean(bean);
+		try {
+			Object product = bean.getObject();
+			context.put("nc.ui.uif2.I18nFB#1d01898", product);
+			return (java.lang.String) product;
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	private List getManagedList9() {
+		List list = new ArrayList();
 		list.add(getBesideApproveForm());
+		list.add(getBesideHintMessageForm());
 		list.add(getBesideHistoryForm());
 		return list;
 	}
@@ -1480,14 +1508,14 @@ public class paybill_manage extends AbstractJavaBeanDefinition {
 					.get("sideFormMediator");
 		nc.ui.arap.sideforms.ArapSideFormMediator bean = new nc.ui.arap.sideforms.ArapSideFormMediator();
 		context.put("sideFormMediator", bean);
-		bean.setSideFormList(getManagedList9());
+		bean.setSideFormList(getManagedList10());
 		bean.setCardPanel(getBillFormEditor());
 		setBeanFacotryIfBeanFacatoryAware(bean);
 		invokeInitializingBean(bean);
 		return bean;
 	}
 
-	private List getManagedList9() {
+	private List getManagedList10() {
 		List list = new ArrayList();
 		list.add(getTermForm());
 		list.add(getCreditForm());
@@ -1625,18 +1653,18 @@ public class paybill_manage extends AbstractJavaBeanDefinition {
 		bean.setTransferBillViewProcessor(getTransferProcessor());
 		bean.setOrgChangedImpl(getOrgchange());
 		bean.setCode("add");
-		bean.setName(getI18nFB_414358());
+		bean.setName(getI18nFB_fee4b6());
 		bean.refreshChildBtns();
 		setBeanFacotryIfBeanFacatoryAware(bean);
 		invokeInitializingBean(bean);
 		return bean;
 	}
 
-	private java.lang.String getI18nFB_414358() {
-		if (context.get("nc.ui.uif2.I18nFB#414358") != null)
-			return (java.lang.String) context.get("nc.ui.uif2.I18nFB#414358");
+	private java.lang.String getI18nFB_fee4b6() {
+		if (context.get("nc.ui.uif2.I18nFB#fee4b6") != null)
+			return (java.lang.String) context.get("nc.ui.uif2.I18nFB#fee4b6");
 		nc.ui.uif2.I18nFB bean = new nc.ui.uif2.I18nFB();
-		context.put("&nc.ui.uif2.I18nFB#414358", bean);
+		context.put("&nc.ui.uif2.I18nFB#fee4b6", bean);
 		bean.setResDir("pubapp_0");
 		bean.setResId("0pubapp-0121");
 		bean.setDefaultValue("新增");
@@ -1644,7 +1672,7 @@ public class paybill_manage extends AbstractJavaBeanDefinition {
 		invokeInitializingBean(bean);
 		try {
 			Object product = bean.getObject();
-			context.put("nc.ui.uif2.I18nFB#414358", product);
+			context.put("nc.ui.uif2.I18nFB#fee4b6", product);
 			return (java.lang.String) product;
 		} catch (Exception e) {
 			throw new RuntimeException(e);
@@ -1696,13 +1724,13 @@ public class paybill_manage extends AbstractJavaBeanDefinition {
 					.get("interceptor");
 		nc.ui.arap.actions.interceptor.CompositeActionInterceptor bean = new nc.ui.arap.actions.interceptor.CompositeActionInterceptor();
 		context.put("interceptor", bean);
-		bean.setInterceptors(getManagedList10());
+		bean.setInterceptors(getManagedList11());
 		setBeanFacotryIfBeanFacatoryAware(bean);
 		invokeInitializingBean(bean);
 		return bean;
 	}
 
-	private List getManagedList10() {
+	private List getManagedList11() {
 		List list = new ArrayList();
 		list.add(getCaActionInterceptor());
 		list.add(getPauseTransactActionInterceptor());
@@ -1733,13 +1761,13 @@ public class paybill_manage extends AbstractJavaBeanDefinition {
 					.get("toftpanelActionContributors");
 		nc.ui.uif2.actions.ActionContributors bean = new nc.ui.uif2.actions.ActionContributors();
 		context.put("toftpanelActionContributors", bean);
-		bean.setContributors(getManagedList11());
+		bean.setContributors(getManagedList12());
 		setBeanFacotryIfBeanFacatoryAware(bean);
 		invokeInitializingBean(bean);
 		return bean;
 	}
 
-	private List getManagedList11() {
+	private List getManagedList12() {
 		List list = new ArrayList();
 		list.add(getListActions());
 		list.add(getCardActions());
@@ -1802,69 +1830,43 @@ public class paybill_manage extends AbstractJavaBeanDefinition {
 			return (nc.ui.uif2.TangramContainer) context.get("container");
 		nc.ui.uif2.TangramContainer bean = new nc.ui.uif2.TangramContainer();
 		context.put("container", bean);
-		bean.setTangramLayoutRoot(getTBNode_629a06());
+		bean.setTangramLayoutRoot(getTBNode_1811324());
 		bean.initUI();
 		setBeanFacotryIfBeanFacatoryAware(bean);
 		invokeInitializingBean(bean);
 		return bean;
 	}
 
-	private nc.ui.uif2.tangramlayout.node.TBNode getTBNode_629a06() {
-		if (context.get("nc.ui.uif2.tangramlayout.node.TBNode#629a06") != null)
+	private nc.ui.uif2.tangramlayout.node.TBNode getTBNode_1811324() {
+		if (context.get("nc.ui.uif2.tangramlayout.node.TBNode#1811324") != null)
 			return (nc.ui.uif2.tangramlayout.node.TBNode) context
-					.get("nc.ui.uif2.tangramlayout.node.TBNode#629a06");
+					.get("nc.ui.uif2.tangramlayout.node.TBNode#1811324");
 		nc.ui.uif2.tangramlayout.node.TBNode bean = new nc.ui.uif2.tangramlayout.node.TBNode();
-		context.put("nc.ui.uif2.tangramlayout.node.TBNode#629a06", bean);
-		bean.setTabs(getManagedList12());
+		context.put("nc.ui.uif2.tangramlayout.node.TBNode#1811324", bean);
+		bean.setTabs(getManagedList13());
 		bean.setShowMode("CardLayout");
 		setBeanFacotryIfBeanFacatoryAware(bean);
 		invokeInitializingBean(bean);
 		return bean;
 	}
 
-	private List getManagedList12() {
+	private List getManagedList13() {
 		List list = new ArrayList();
-		list.add(getHSNode_117e8e0());
-		list.add(getVSNode_550442());
-		list.add(getCNode_1afa61c());
-		list.add(getCNode_1fc9fd9());
+		list.add(getVSNode_13726d3());
+		list.add(getHSNode_8e63c9());
+		list.add(getCNode_12b527b());
+		list.add(getCNode_c29fac());
 		return list;
 	}
 
-	private nc.ui.uif2.tangramlayout.node.HSNode getHSNode_117e8e0() {
-		if (context.get("nc.ui.uif2.tangramlayout.node.HSNode#117e8e0") != null)
-			return (nc.ui.uif2.tangramlayout.node.HSNode) context
-					.get("nc.ui.uif2.tangramlayout.node.HSNode#117e8e0");
-		nc.ui.uif2.tangramlayout.node.HSNode bean = new nc.ui.uif2.tangramlayout.node.HSNode();
-		context.put("nc.ui.uif2.tangramlayout.node.HSNode#117e8e0", bean);
-		bean.setLeft(getCNode_ac6d84());
-		bean.setRight(getVSNode_c064c5());
-		bean.setDividerLocation(0.2f);
-		setBeanFacotryIfBeanFacatoryAware(bean);
-		invokeInitializingBean(bean);
-		return bean;
-	}
-
-	private nc.ui.uif2.tangramlayout.node.CNode getCNode_ac6d84() {
-		if (context.get("nc.ui.uif2.tangramlayout.node.CNode#ac6d84") != null)
-			return (nc.ui.uif2.tangramlayout.node.CNode) context
-					.get("nc.ui.uif2.tangramlayout.node.CNode#ac6d84");
-		nc.ui.uif2.tangramlayout.node.CNode bean = new nc.ui.uif2.tangramlayout.node.CNode();
-		context.put("nc.ui.uif2.tangramlayout.node.CNode#ac6d84", bean);
-		bean.setComponent(getQueryAreaShell());
-		setBeanFacotryIfBeanFacatoryAware(bean);
-		invokeInitializingBean(bean);
-		return bean;
-	}
-
-	private nc.ui.uif2.tangramlayout.node.VSNode getVSNode_c064c5() {
-		if (context.get("nc.ui.uif2.tangramlayout.node.VSNode#c064c5") != null)
+	private nc.ui.uif2.tangramlayout.node.VSNode getVSNode_13726d3() {
+		if (context.get("nc.ui.uif2.tangramlayout.node.VSNode#13726d3") != null)
 			return (nc.ui.uif2.tangramlayout.node.VSNode) context
-					.get("nc.ui.uif2.tangramlayout.node.VSNode#c064c5");
+					.get("nc.ui.uif2.tangramlayout.node.VSNode#13726d3");
 		nc.ui.uif2.tangramlayout.node.VSNode bean = new nc.ui.uif2.tangramlayout.node.VSNode();
-		context.put("nc.ui.uif2.tangramlayout.node.VSNode#c064c5", bean);
-		bean.setUp(getCNode_4a1e7c());
-		bean.setDown(getCNode_e9a7c());
+		context.put("nc.ui.uif2.tangramlayout.node.VSNode#13726d3", bean);
+		bean.setUp(getCNode_16f833d());
+		bean.setDown(getCNode_85c8a2());
 		bean.setShowMode("NoDivider");
 		bean.setDividerLocation(30f);
 		setBeanFacotryIfBeanFacatoryAware(bean);
@@ -1872,95 +1874,36 @@ public class paybill_manage extends AbstractJavaBeanDefinition {
 		return bean;
 	}
 
-	private nc.ui.uif2.tangramlayout.node.CNode getCNode_4a1e7c() {
-		if (context.get("nc.ui.uif2.tangramlayout.node.CNode#4a1e7c") != null)
+	private nc.ui.uif2.tangramlayout.node.CNode getCNode_16f833d() {
+		if (context.get("nc.ui.uif2.tangramlayout.node.CNode#16f833d") != null)
 			return (nc.ui.uif2.tangramlayout.node.CNode) context
-					.get("nc.ui.uif2.tangramlayout.node.CNode#4a1e7c");
+					.get("nc.ui.uif2.tangramlayout.node.CNode#16f833d");
 		nc.ui.uif2.tangramlayout.node.CNode bean = new nc.ui.uif2.tangramlayout.node.CNode();
-		context.put("nc.ui.uif2.tangramlayout.node.CNode#4a1e7c", bean);
-		bean.setComponent(getQueryInfo());
-		setBeanFacotryIfBeanFacatoryAware(bean);
-		invokeInitializingBean(bean);
-		return bean;
-	}
-
-	private nc.ui.uif2.tangramlayout.node.CNode getCNode_e9a7c() {
-		if (context.get("nc.ui.uif2.tangramlayout.node.CNode#e9a7c") != null)
-			return (nc.ui.uif2.tangramlayout.node.CNode) context
-					.get("nc.ui.uif2.tangramlayout.node.CNode#e9a7c");
-		nc.ui.uif2.tangramlayout.node.CNode bean = new nc.ui.uif2.tangramlayout.node.CNode();
-		context.put("nc.ui.uif2.tangramlayout.node.CNode#e9a7c", bean);
-		bean.setName(getI18nFB_179461());
-		bean.setComponent(getListView());
-		setBeanFacotryIfBeanFacatoryAware(bean);
-		invokeInitializingBean(bean);
-		return bean;
-	}
-
-	private java.lang.String getI18nFB_179461() {
-		if (context.get("nc.ui.uif2.I18nFB#179461") != null)
-			return (java.lang.String) context.get("nc.ui.uif2.I18nFB#179461");
-		nc.ui.uif2.I18nFB bean = new nc.ui.uif2.I18nFB();
-		context.put("&nc.ui.uif2.I18nFB#179461", bean);
-		bean.setResDir("common");
-		bean.setResId("arapcommonv6-0135");
-		bean.setDefaultValue("列表");
-		setBeanFacotryIfBeanFacatoryAware(bean);
-		invokeInitializingBean(bean);
-		try {
-			Object product = bean.getObject();
-			context.put("nc.ui.uif2.I18nFB#179461", product);
-			return (java.lang.String) product;
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	private nc.ui.uif2.tangramlayout.node.VSNode getVSNode_550442() {
-		if (context.get("nc.ui.uif2.tangramlayout.node.VSNode#550442") != null)
-			return (nc.ui.uif2.tangramlayout.node.VSNode) context
-					.get("nc.ui.uif2.tangramlayout.node.VSNode#550442");
-		nc.ui.uif2.tangramlayout.node.VSNode bean = new nc.ui.uif2.tangramlayout.node.VSNode();
-		context.put("nc.ui.uif2.tangramlayout.node.VSNode#550442", bean);
-		bean.setUp(getCNode_ba010d());
-		bean.setDown(getCNode_c68155());
-		bean.setShowMode("NoDivider");
-		bean.setDividerLocation(30f);
-		setBeanFacotryIfBeanFacatoryAware(bean);
-		invokeInitializingBean(bean);
-		return bean;
-	}
-
-	private nc.ui.uif2.tangramlayout.node.CNode getCNode_ba010d() {
-		if (context.get("nc.ui.uif2.tangramlayout.node.CNode#ba010d") != null)
-			return (nc.ui.uif2.tangramlayout.node.CNode) context
-					.get("nc.ui.uif2.tangramlayout.node.CNode#ba010d");
-		nc.ui.uif2.tangramlayout.node.CNode bean = new nc.ui.uif2.tangramlayout.node.CNode();
-		context.put("nc.ui.uif2.tangramlayout.node.CNode#ba010d", bean);
+		context.put("nc.ui.uif2.tangramlayout.node.CNode#16f833d", bean);
 		bean.setComponent(getCardInfoPnl());
 		setBeanFacotryIfBeanFacatoryAware(bean);
 		invokeInitializingBean(bean);
 		return bean;
 	}
 
-	private nc.ui.uif2.tangramlayout.node.CNode getCNode_c68155() {
-		if (context.get("nc.ui.uif2.tangramlayout.node.CNode#c68155") != null)
+	private nc.ui.uif2.tangramlayout.node.CNode getCNode_85c8a2() {
+		if (context.get("nc.ui.uif2.tangramlayout.node.CNode#85c8a2") != null)
 			return (nc.ui.uif2.tangramlayout.node.CNode) context
-					.get("nc.ui.uif2.tangramlayout.node.CNode#c68155");
+					.get("nc.ui.uif2.tangramlayout.node.CNode#85c8a2");
 		nc.ui.uif2.tangramlayout.node.CNode bean = new nc.ui.uif2.tangramlayout.node.CNode();
-		context.put("nc.ui.uif2.tangramlayout.node.CNode#c68155", bean);
-		bean.setName(getI18nFB_19b3545());
+		context.put("nc.ui.uif2.tangramlayout.node.CNode#85c8a2", bean);
+		bean.setName(getI18nFB_113847());
 		bean.setComponent(getBillFormEditor());
 		setBeanFacotryIfBeanFacatoryAware(bean);
 		invokeInitializingBean(bean);
 		return bean;
 	}
 
-	private java.lang.String getI18nFB_19b3545() {
-		if (context.get("nc.ui.uif2.I18nFB#19b3545") != null)
-			return (java.lang.String) context.get("nc.ui.uif2.I18nFB#19b3545");
+	private java.lang.String getI18nFB_113847() {
+		if (context.get("nc.ui.uif2.I18nFB#113847") != null)
+			return (java.lang.String) context.get("nc.ui.uif2.I18nFB#113847");
 		nc.ui.uif2.I18nFB bean = new nc.ui.uif2.I18nFB();
-		context.put("&nc.ui.uif2.I18nFB#19b3545", bean);
+		context.put("&nc.ui.uif2.I18nFB#113847", bean);
 		bean.setResDir("common");
 		bean.setResId("arapcommonv6-0136");
 		bean.setDefaultValue("卡片");
@@ -1968,31 +1911,116 @@ public class paybill_manage extends AbstractJavaBeanDefinition {
 		invokeInitializingBean(bean);
 		try {
 			Object product = bean.getObject();
-			context.put("nc.ui.uif2.I18nFB#19b3545", product);
+			context.put("nc.ui.uif2.I18nFB#113847", product);
 			return (java.lang.String) product;
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
 
-	private nc.ui.uif2.tangramlayout.node.CNode getCNode_1afa61c() {
-		if (context.get("nc.ui.uif2.tangramlayout.node.CNode#1afa61c") != null)
+	private nc.ui.uif2.tangramlayout.node.HSNode getHSNode_8e63c9() {
+		if (context.get("nc.ui.uif2.tangramlayout.node.HSNode#8e63c9") != null)
+			return (nc.ui.uif2.tangramlayout.node.HSNode) context
+					.get("nc.ui.uif2.tangramlayout.node.HSNode#8e63c9");
+		nc.ui.uif2.tangramlayout.node.HSNode bean = new nc.ui.uif2.tangramlayout.node.HSNode();
+		context.put("nc.ui.uif2.tangramlayout.node.HSNode#8e63c9", bean);
+		bean.setLeft(getCNode_1d5fccf());
+		bean.setRight(getVSNode_2ba1d7());
+		bean.setDividerLocation(0.2f);
+		setBeanFacotryIfBeanFacatoryAware(bean);
+		invokeInitializingBean(bean);
+		return bean;
+	}
+
+	private nc.ui.uif2.tangramlayout.node.CNode getCNode_1d5fccf() {
+		if (context.get("nc.ui.uif2.tangramlayout.node.CNode#1d5fccf") != null)
 			return (nc.ui.uif2.tangramlayout.node.CNode) context
-					.get("nc.ui.uif2.tangramlayout.node.CNode#1afa61c");
+					.get("nc.ui.uif2.tangramlayout.node.CNode#1d5fccf");
 		nc.ui.uif2.tangramlayout.node.CNode bean = new nc.ui.uif2.tangramlayout.node.CNode();
-		context.put("nc.ui.uif2.tangramlayout.node.CNode#1afa61c", bean);
-		bean.setName(getI18nFB_18aae27());
+		context.put("nc.ui.uif2.tangramlayout.node.CNode#1d5fccf", bean);
+		bean.setComponent(getQueryAreaShell());
+		setBeanFacotryIfBeanFacatoryAware(bean);
+		invokeInitializingBean(bean);
+		return bean;
+	}
+
+	private nc.ui.uif2.tangramlayout.node.VSNode getVSNode_2ba1d7() {
+		if (context.get("nc.ui.uif2.tangramlayout.node.VSNode#2ba1d7") != null)
+			return (nc.ui.uif2.tangramlayout.node.VSNode) context
+					.get("nc.ui.uif2.tangramlayout.node.VSNode#2ba1d7");
+		nc.ui.uif2.tangramlayout.node.VSNode bean = new nc.ui.uif2.tangramlayout.node.VSNode();
+		context.put("nc.ui.uif2.tangramlayout.node.VSNode#2ba1d7", bean);
+		bean.setUp(getCNode_1c89398());
+		bean.setDown(getCNode_1df604e());
+		bean.setShowMode("NoDivider");
+		bean.setDividerLocation(30f);
+		setBeanFacotryIfBeanFacatoryAware(bean);
+		invokeInitializingBean(bean);
+		return bean;
+	}
+
+	private nc.ui.uif2.tangramlayout.node.CNode getCNode_1c89398() {
+		if (context.get("nc.ui.uif2.tangramlayout.node.CNode#1c89398") != null)
+			return (nc.ui.uif2.tangramlayout.node.CNode) context
+					.get("nc.ui.uif2.tangramlayout.node.CNode#1c89398");
+		nc.ui.uif2.tangramlayout.node.CNode bean = new nc.ui.uif2.tangramlayout.node.CNode();
+		context.put("nc.ui.uif2.tangramlayout.node.CNode#1c89398", bean);
+		bean.setComponent(getQueryInfo());
+		setBeanFacotryIfBeanFacatoryAware(bean);
+		invokeInitializingBean(bean);
+		return bean;
+	}
+
+	private nc.ui.uif2.tangramlayout.node.CNode getCNode_1df604e() {
+		if (context.get("nc.ui.uif2.tangramlayout.node.CNode#1df604e") != null)
+			return (nc.ui.uif2.tangramlayout.node.CNode) context
+					.get("nc.ui.uif2.tangramlayout.node.CNode#1df604e");
+		nc.ui.uif2.tangramlayout.node.CNode bean = new nc.ui.uif2.tangramlayout.node.CNode();
+		context.put("nc.ui.uif2.tangramlayout.node.CNode#1df604e", bean);
+		bean.setName(getI18nFB_1520d2e());
+		bean.setComponent(getListView());
+		setBeanFacotryIfBeanFacatoryAware(bean);
+		invokeInitializingBean(bean);
+		return bean;
+	}
+
+	private java.lang.String getI18nFB_1520d2e() {
+		if (context.get("nc.ui.uif2.I18nFB#1520d2e") != null)
+			return (java.lang.String) context.get("nc.ui.uif2.I18nFB#1520d2e");
+		nc.ui.uif2.I18nFB bean = new nc.ui.uif2.I18nFB();
+		context.put("&nc.ui.uif2.I18nFB#1520d2e", bean);
+		bean.setResDir("common");
+		bean.setResId("arapcommonv6-0135");
+		bean.setDefaultValue("列表");
+		setBeanFacotryIfBeanFacatoryAware(bean);
+		invokeInitializingBean(bean);
+		try {
+			Object product = bean.getObject();
+			context.put("nc.ui.uif2.I18nFB#1520d2e", product);
+			return (java.lang.String) product;
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	private nc.ui.uif2.tangramlayout.node.CNode getCNode_12b527b() {
+		if (context.get("nc.ui.uif2.tangramlayout.node.CNode#12b527b") != null)
+			return (nc.ui.uif2.tangramlayout.node.CNode) context
+					.get("nc.ui.uif2.tangramlayout.node.CNode#12b527b");
+		nc.ui.uif2.tangramlayout.node.CNode bean = new nc.ui.uif2.tangramlayout.node.CNode();
+		context.put("nc.ui.uif2.tangramlayout.node.CNode#12b527b", bean);
+		bean.setName(getI18nFB_39423b());
 		bean.setComponent(getVerifyui());
 		setBeanFacotryIfBeanFacatoryAware(bean);
 		invokeInitializingBean(bean);
 		return bean;
 	}
 
-	private java.lang.String getI18nFB_18aae27() {
-		if (context.get("nc.ui.uif2.I18nFB#18aae27") != null)
-			return (java.lang.String) context.get("nc.ui.uif2.I18nFB#18aae27");
+	private java.lang.String getI18nFB_39423b() {
+		if (context.get("nc.ui.uif2.I18nFB#39423b") != null)
+			return (java.lang.String) context.get("nc.ui.uif2.I18nFB#39423b");
 		nc.ui.uif2.I18nFB bean = new nc.ui.uif2.I18nFB();
-		context.put("&nc.ui.uif2.I18nFB#18aae27", bean);
+		context.put("&nc.ui.uif2.I18nFB#39423b", bean);
 		bean.setResDir("common");
 		bean.setResId("arapcommonv6-0140");
 		bean.setDefaultValue("核销界面");
@@ -2000,31 +2028,31 @@ public class paybill_manage extends AbstractJavaBeanDefinition {
 		invokeInitializingBean(bean);
 		try {
 			Object product = bean.getObject();
-			context.put("nc.ui.uif2.I18nFB#18aae27", product);
+			context.put("nc.ui.uif2.I18nFB#39423b", product);
 			return (java.lang.String) product;
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
 
-	private nc.ui.uif2.tangramlayout.node.CNode getCNode_1fc9fd9() {
-		if (context.get("nc.ui.uif2.tangramlayout.node.CNode#1fc9fd9") != null)
+	private nc.ui.uif2.tangramlayout.node.CNode getCNode_c29fac() {
+		if (context.get("nc.ui.uif2.tangramlayout.node.CNode#c29fac") != null)
 			return (nc.ui.uif2.tangramlayout.node.CNode) context
-					.get("nc.ui.uif2.tangramlayout.node.CNode#1fc9fd9");
+					.get("nc.ui.uif2.tangramlayout.node.CNode#c29fac");
 		nc.ui.uif2.tangramlayout.node.CNode bean = new nc.ui.uif2.tangramlayout.node.CNode();
-		context.put("nc.ui.uif2.tangramlayout.node.CNode#1fc9fd9", bean);
-		bean.setName(getI18nFB_c2825c());
+		context.put("nc.ui.uif2.tangramlayout.node.CNode#c29fac", bean);
+		bean.setName(getI18nFB_1340ef7());
 		bean.setComponent(getMakeupEditor());
 		setBeanFacotryIfBeanFacatoryAware(bean);
 		invokeInitializingBean(bean);
 		return bean;
 	}
 
-	private java.lang.String getI18nFB_c2825c() {
-		if (context.get("nc.ui.uif2.I18nFB#c2825c") != null)
-			return (java.lang.String) context.get("nc.ui.uif2.I18nFB#c2825c");
+	private java.lang.String getI18nFB_1340ef7() {
+		if (context.get("nc.ui.uif2.I18nFB#1340ef7") != null)
+			return (java.lang.String) context.get("nc.ui.uif2.I18nFB#1340ef7");
 		nc.ui.uif2.I18nFB bean = new nc.ui.uif2.I18nFB();
-		context.put("&nc.ui.uif2.I18nFB#c2825c", bean);
+		context.put("&nc.ui.uif2.I18nFB#1340ef7", bean);
 		bean.setResDir("common");
 		bean.setResId("arapcommonv6-0141");
 		bean.setDefaultValue("补差面板");
@@ -2032,7 +2060,7 @@ public class paybill_manage extends AbstractJavaBeanDefinition {
 		invokeInitializingBean(bean);
 		try {
 			Object product = bean.getObject();
-			context.put("nc.ui.uif2.I18nFB#c2825c", product);
+			context.put("nc.ui.uif2.I18nFB#1340ef7", product);
 			return (java.lang.String) product;
 		} catch (Exception e) {
 			throw new RuntimeException(e);
@@ -2070,7 +2098,7 @@ public class paybill_manage extends AbstractJavaBeanDefinition {
 					.get("cardInfoPnl");
 		nc.ui.pubapp.uif2app.tangramlayout.UECardLayoutToolbarPanel bean = new nc.ui.pubapp.uif2app.tangramlayout.UECardLayoutToolbarPanel();
 		context.put("cardInfoPnl", bean);
-		bean.setActions(getManagedList13());
+		bean.setActions(getManagedList14());
 		bean.setTitleAction(getReturnaction());
 		bean.setModel(getManageAppModel());
 		setBeanFacotryIfBeanFacatoryAware(bean);
@@ -2078,7 +2106,7 @@ public class paybill_manage extends AbstractJavaBeanDefinition {
 		return bean;
 	}
 
-	private List getManagedList13() {
+	private List getManagedList14() {
 		List list = new ArrayList();
 		list.add(getDocumentManage());
 		list.add(getActionsBarSeparator());
@@ -2087,16 +2115,16 @@ public class paybill_manage extends AbstractJavaBeanDefinition {
 		list.add(getNextLineAction());
 		list.add(getLastLineAction());
 		list.add(getActionsBarSeparator());
-		list.add(getBillHeadZoomAction_16e001c());
+		list.add(getBillHeadZoomAction_b4202b());
 		return list;
 	}
 
-	private nc.ui.arap.actions.BillHeadZoomAction getBillHeadZoomAction_16e001c() {
-		if (context.get("nc.ui.arap.actions.BillHeadZoomAction#16e001c") != null)
+	private nc.ui.arap.actions.BillHeadZoomAction getBillHeadZoomAction_b4202b() {
+		if (context.get("nc.ui.arap.actions.BillHeadZoomAction#b4202b") != null)
 			return (nc.ui.arap.actions.BillHeadZoomAction) context
-					.get("nc.ui.arap.actions.BillHeadZoomAction#16e001c");
+					.get("nc.ui.arap.actions.BillHeadZoomAction#b4202b");
 		nc.ui.arap.actions.BillHeadZoomAction bean = new nc.ui.arap.actions.BillHeadZoomAction();
-		context.put("nc.ui.arap.actions.BillHeadZoomAction#16e001c", bean);
+		context.put("nc.ui.arap.actions.BillHeadZoomAction#b4202b", bean);
 		bean.setModel(getManageAppModel());
 		bean.setBillForm(getBillFormEditor());
 		setBeanFacotryIfBeanFacatoryAware(bean);
@@ -2179,29 +2207,29 @@ public class paybill_manage extends AbstractJavaBeanDefinition {
 		bean.setClosingListener(getClosingListener());
 		bean.setAutoAddLine(false);
 		bean.setTemplateNotNullValidate(true);
-		bean.setUserdefitemPreparator(getUserdefitemContainerPreparator_c953ed());
+		bean.setUserdefitemPreparator(getUserdefitemContainerPreparator_1ac1cc1());
 		bean.initRealUI();
 		setBeanFacotryIfBeanFacatoryAware(bean);
 		invokeInitializingBean(bean);
 		return bean;
 	}
 
-	private nc.ui.uif2.editor.UserdefitemContainerPreparator getUserdefitemContainerPreparator_c953ed() {
+	private nc.ui.uif2.editor.UserdefitemContainerPreparator getUserdefitemContainerPreparator_1ac1cc1() {
 		if (context
-				.get("nc.ui.uif2.editor.UserdefitemContainerPreparator#c953ed") != null)
+				.get("nc.ui.uif2.editor.UserdefitemContainerPreparator#1ac1cc1") != null)
 			return (nc.ui.uif2.editor.UserdefitemContainerPreparator) context
-					.get("nc.ui.uif2.editor.UserdefitemContainerPreparator#c953ed");
+					.get("nc.ui.uif2.editor.UserdefitemContainerPreparator#1ac1cc1");
 		nc.ui.uif2.editor.UserdefitemContainerPreparator bean = new nc.ui.uif2.editor.UserdefitemContainerPreparator();
-		context.put("nc.ui.uif2.editor.UserdefitemContainerPreparator#c953ed",
+		context.put("nc.ui.uif2.editor.UserdefitemContainerPreparator#1ac1cc1",
 				bean);
 		bean.setContainer(getUserdefitemContainer());
-		bean.setParams(getManagedList14());
+		bean.setParams(getManagedList15());
 		setBeanFacotryIfBeanFacatoryAware(bean);
 		invokeInitializingBean(bean);
 		return bean;
 	}
 
-	private List getManagedList14() {
+	private List getManagedList15() {
 		List list = new ArrayList();
 		list.add(getCardUserdefitemQueryParam());
 		list.add(getCardUserdefitemQueryParam1());
@@ -2251,13 +2279,13 @@ public class paybill_manage extends AbstractJavaBeanDefinition {
 		nc.ui.uif2.actions.StandAloneToftPanelActionContainer bean = new nc.ui.uif2.actions.StandAloneToftPanelActionContainer(
 				getVerifyui());
 		context.put("verifyActions", bean);
-		bean.setActions(getManagedList15());
+		bean.setActions(getManagedList16());
 		setBeanFacotryIfBeanFacatoryAware(bean);
 		invokeInitializingBean(bean);
 		return bean;
 	}
 
-	private List getManagedList15() {
+	private List getManagedList16() {
 		List list = new ArrayList();
 		list.add(getVerifyMakeupAction());
 		list.add(getVerifyAllocationAction());
@@ -2433,13 +2461,13 @@ public class paybill_manage extends AbstractJavaBeanDefinition {
 		nc.ui.uif2.actions.StandAloneToftPanelActionContainer bean = new nc.ui.uif2.actions.StandAloneToftPanelActionContainer(
 				getMakeupEditor());
 		context.put("makeupActions", bean);
-		bean.setActions(getManagedList16());
+		bean.setActions(getManagedList17());
 		setBeanFacotryIfBeanFacatoryAware(bean);
 		invokeInitializingBean(bean);
 		return bean;
 	}
 
-	private List getManagedList16() {
+	private List getManagedList17() {
 		List list = new ArrayList();
 		list.add(getMakeupConfirmAction());
 		list.add(getMakeupCanelAction());
@@ -2587,13 +2615,13 @@ public class paybill_manage extends AbstractJavaBeanDefinition {
 					.get("remoteCallCombinatorCaller");
 		nc.ui.uif2.editor.UIF2RemoteCallCombinatorCaller bean = new nc.ui.uif2.editor.UIF2RemoteCallCombinatorCaller();
 		context.put("remoteCallCombinatorCaller", bean);
-		bean.setRemoteCallers(getManagedList17());
+		bean.setRemoteCallers(getManagedList18());
 		setBeanFacotryIfBeanFacatoryAware(bean);
 		invokeInitializingBean(bean);
 		return bean;
 	}
 
-	private List getManagedList17() {
+	private List getManagedList18() {
 		List list = new ArrayList();
 		list.add(getQueryTemplateContainer());
 		list.add(getUserdefitemContainer());
@@ -2804,19 +2832,19 @@ public class paybill_manage extends AbstractJavaBeanDefinition {
 		bean.setEditor(getListView());
 		bean.setIsbatch("Y");
 		bean.setInterceptor(getInterceptor());
-		bean.setTpaProgressUtil(getTPAProgressUtil_1a51817());
+		bean.setTpaProgressUtil(getTPAProgressUtil_93c7dd());
 		setBeanFacotryIfBeanFacatoryAware(bean);
 		invokeInitializingBean(bean);
 		return bean;
 	}
 
-	private nc.ui.uif2.components.progress.TPAProgressUtil getTPAProgressUtil_1a51817() {
+	private nc.ui.uif2.components.progress.TPAProgressUtil getTPAProgressUtil_93c7dd() {
 		if (context
-				.get("nc.ui.uif2.components.progress.TPAProgressUtil#1a51817") != null)
+				.get("nc.ui.uif2.components.progress.TPAProgressUtil#93c7dd") != null)
 			return (nc.ui.uif2.components.progress.TPAProgressUtil) context
-					.get("nc.ui.uif2.components.progress.TPAProgressUtil#1a51817");
+					.get("nc.ui.uif2.components.progress.TPAProgressUtil#93c7dd");
 		nc.ui.uif2.components.progress.TPAProgressUtil bean = new nc.ui.uif2.components.progress.TPAProgressUtil();
-		context.put("nc.ui.uif2.components.progress.TPAProgressUtil#1a51817",
+		context.put("nc.ui.uif2.components.progress.TPAProgressUtil#93c7dd",
 				bean);
 		bean.setContext(getContext());
 		setBeanFacotryIfBeanFacatoryAware(bean);
@@ -2849,19 +2877,19 @@ public class paybill_manage extends AbstractJavaBeanDefinition {
 		bean.setEditor(getListView());
 		bean.setIsbatch("N");
 		bean.setInterceptor(getInterceptor());
-		bean.setTpaProgressUtil(getTPAProgressUtil_1d0c63d());
+		bean.setTpaProgressUtil(getTPAProgressUtil_267f7d());
 		setBeanFacotryIfBeanFacatoryAware(bean);
 		invokeInitializingBean(bean);
 		return bean;
 	}
 
-	private nc.ui.uif2.components.progress.TPAProgressUtil getTPAProgressUtil_1d0c63d() {
+	private nc.ui.uif2.components.progress.TPAProgressUtil getTPAProgressUtil_267f7d() {
 		if (context
-				.get("nc.ui.uif2.components.progress.TPAProgressUtil#1d0c63d") != null)
+				.get("nc.ui.uif2.components.progress.TPAProgressUtil#267f7d") != null)
 			return (nc.ui.uif2.components.progress.TPAProgressUtil) context
-					.get("nc.ui.uif2.components.progress.TPAProgressUtil#1d0c63d");
+					.get("nc.ui.uif2.components.progress.TPAProgressUtil#267f7d");
 		nc.ui.uif2.components.progress.TPAProgressUtil bean = new nc.ui.uif2.components.progress.TPAProgressUtil();
-		context.put("nc.ui.uif2.components.progress.TPAProgressUtil#1d0c63d",
+		context.put("nc.ui.uif2.components.progress.TPAProgressUtil#267f7d",
 				bean);
 		bean.setContext(getContext());
 		setBeanFacotryIfBeanFacatoryAware(bean);
@@ -3106,18 +3134,18 @@ public class paybill_manage extends AbstractJavaBeanDefinition {
 		nc.funcnode.ui.action.MenuAction bean = new nc.funcnode.ui.action.MenuAction();
 		context.put("billOperateActionGroup", bean);
 		bean.setCode("billOperate");
-		bean.setName(getI18nFB_19082b7());
-		bean.setActions(getManagedList18());
+		bean.setName(getI18nFB_1960967());
+		bean.setActions(getManagedList19());
 		setBeanFacotryIfBeanFacatoryAware(bean);
 		invokeInitializingBean(bean);
 		return bean;
 	}
 
-	private java.lang.String getI18nFB_19082b7() {
-		if (context.get("nc.ui.uif2.I18nFB#19082b7") != null)
-			return (java.lang.String) context.get("nc.ui.uif2.I18nFB#19082b7");
+	private java.lang.String getI18nFB_1960967() {
+		if (context.get("nc.ui.uif2.I18nFB#1960967") != null)
+			return (java.lang.String) context.get("nc.ui.uif2.I18nFB#1960967");
 		nc.ui.uif2.I18nFB bean = new nc.ui.uif2.I18nFB();
-		context.put("&nc.ui.uif2.I18nFB#19082b7", bean);
+		context.put("&nc.ui.uif2.I18nFB#1960967", bean);
 		bean.setResDir("common");
 		bean.setResId("arapcommonv6-0137");
 		bean.setDefaultValue("单据操作");
@@ -3125,14 +3153,14 @@ public class paybill_manage extends AbstractJavaBeanDefinition {
 		invokeInitializingBean(bean);
 		try {
 			Object product = bean.getObject();
-			context.put("nc.ui.uif2.I18nFB#19082b7", product);
+			context.put("nc.ui.uif2.I18nFB#1960967", product);
 			return (java.lang.String) product;
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
 
-	private List getManagedList18() {
+	private List getManagedList19() {
 		List list = new ArrayList();
 		list.add(getDeleteAction());
 		list.add(getEditAction());
@@ -3150,18 +3178,18 @@ public class paybill_manage extends AbstractJavaBeanDefinition {
 		nc.funcnode.ui.action.MenuAction bean = new nc.funcnode.ui.action.MenuAction();
 		context.put("billOperateActionGroup_Record", bean);
 		bean.setCode("billOperate");
-		bean.setName(getI18nFB_6b07a9());
-		bean.setActions(getManagedList19());
+		bean.setName(getI18nFB_7a6efd());
+		bean.setActions(getManagedList20());
 		setBeanFacotryIfBeanFacatoryAware(bean);
 		invokeInitializingBean(bean);
 		return bean;
 	}
 
-	private java.lang.String getI18nFB_6b07a9() {
-		if (context.get("nc.ui.uif2.I18nFB#6b07a9") != null)
-			return (java.lang.String) context.get("nc.ui.uif2.I18nFB#6b07a9");
+	private java.lang.String getI18nFB_7a6efd() {
+		if (context.get("nc.ui.uif2.I18nFB#7a6efd") != null)
+			return (java.lang.String) context.get("nc.ui.uif2.I18nFB#7a6efd");
 		nc.ui.uif2.I18nFB bean = new nc.ui.uif2.I18nFB();
-		context.put("&nc.ui.uif2.I18nFB#6b07a9", bean);
+		context.put("&nc.ui.uif2.I18nFB#7a6efd", bean);
 		bean.setResDir("common");
 		bean.setResId("arapcommonv6-0137");
 		bean.setDefaultValue("单据操作");
@@ -3169,14 +3197,14 @@ public class paybill_manage extends AbstractJavaBeanDefinition {
 		invokeInitializingBean(bean);
 		try {
 			Object product = bean.getObject();
-			context.put("nc.ui.uif2.I18nFB#6b07a9", product);
+			context.put("nc.ui.uif2.I18nFB#7a6efd", product);
 			return (java.lang.String) product;
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
 
-	private List getManagedList19() {
+	private List getManagedList20() {
 		List list = new ArrayList();
 		list.add(getDeleteAction());
 		list.add(getEditAction());
@@ -3192,18 +3220,18 @@ public class paybill_manage extends AbstractJavaBeanDefinition {
 		nc.funcnode.ui.action.MenuAction bean = new nc.funcnode.ui.action.MenuAction();
 		context.put("billOperateActionGroup_Init", bean);
 		bean.setCode("billOperate");
-		bean.setName(getI18nFB_c3ec90());
-		bean.setActions(getManagedList20());
+		bean.setName(getI18nFB_cc209());
+		bean.setActions(getManagedList21());
 		setBeanFacotryIfBeanFacatoryAware(bean);
 		invokeInitializingBean(bean);
 		return bean;
 	}
 
-	private java.lang.String getI18nFB_c3ec90() {
-		if (context.get("nc.ui.uif2.I18nFB#c3ec90") != null)
-			return (java.lang.String) context.get("nc.ui.uif2.I18nFB#c3ec90");
+	private java.lang.String getI18nFB_cc209() {
+		if (context.get("nc.ui.uif2.I18nFB#cc209") != null)
+			return (java.lang.String) context.get("nc.ui.uif2.I18nFB#cc209");
 		nc.ui.uif2.I18nFB bean = new nc.ui.uif2.I18nFB();
-		context.put("&nc.ui.uif2.I18nFB#c3ec90", bean);
+		context.put("&nc.ui.uif2.I18nFB#cc209", bean);
 		bean.setResDir("common");
 		bean.setResId("arapcommonv6-0137");
 		bean.setDefaultValue("单据操作");
@@ -3211,14 +3239,14 @@ public class paybill_manage extends AbstractJavaBeanDefinition {
 		invokeInitializingBean(bean);
 		try {
 			Object product = bean.getObject();
-			context.put("nc.ui.uif2.I18nFB#c3ec90", product);
+			context.put("nc.ui.uif2.I18nFB#cc209", product);
 			return (java.lang.String) product;
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
 
-	private List getManagedList20() {
+	private List getManagedList21() {
 		List list = new ArrayList();
 		list.add(getDeleteAction());
 		list.add(getEditAction());
@@ -3233,18 +3261,18 @@ public class paybill_manage extends AbstractJavaBeanDefinition {
 		nc.funcnode.ui.action.MenuAction bean = new nc.funcnode.ui.action.MenuAction();
 		context.put("billOperateActionGroup_List", bean);
 		bean.setCode("billOperate_List");
-		bean.setName(getI18nFB_dff7df());
-		bean.setActions(getManagedList21());
+		bean.setName(getI18nFB_196fbab());
+		bean.setActions(getManagedList22());
 		setBeanFacotryIfBeanFacatoryAware(bean);
 		invokeInitializingBean(bean);
 		return bean;
 	}
 
-	private java.lang.String getI18nFB_dff7df() {
-		if (context.get("nc.ui.uif2.I18nFB#dff7df") != null)
-			return (java.lang.String) context.get("nc.ui.uif2.I18nFB#dff7df");
+	private java.lang.String getI18nFB_196fbab() {
+		if (context.get("nc.ui.uif2.I18nFB#196fbab") != null)
+			return (java.lang.String) context.get("nc.ui.uif2.I18nFB#196fbab");
 		nc.ui.uif2.I18nFB bean = new nc.ui.uif2.I18nFB();
-		context.put("&nc.ui.uif2.I18nFB#dff7df", bean);
+		context.put("&nc.ui.uif2.I18nFB#196fbab", bean);
 		bean.setResDir("common");
 		bean.setResId("arapcommonv6-0137");
 		bean.setDefaultValue("单据操作");
@@ -3252,14 +3280,14 @@ public class paybill_manage extends AbstractJavaBeanDefinition {
 		invokeInitializingBean(bean);
 		try {
 			Object product = bean.getObject();
-			context.put("nc.ui.uif2.I18nFB#dff7df", product);
+			context.put("nc.ui.uif2.I18nFB#196fbab", product);
 			return (java.lang.String) product;
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
 
-	private List getManagedList21() {
+	private List getManagedList22() {
 		List list = new ArrayList();
 		list.add(getDeleteAction());
 		list.add(getDocumentManage());
@@ -3273,18 +3301,18 @@ public class paybill_manage extends AbstractJavaBeanDefinition {
 		nc.funcnode.ui.action.MenuAction bean = new nc.funcnode.ui.action.MenuAction();
 		context.put("closeOperateAction", bean);
 		bean.setCode("billClose");
-		bean.setName(getI18nFB_a6462());
-		bean.setActions(getManagedList22());
+		bean.setName(getI18nFB_164cdb5());
+		bean.setActions(getManagedList23());
 		setBeanFacotryIfBeanFacatoryAware(bean);
 		invokeInitializingBean(bean);
 		return bean;
 	}
 
-	private java.lang.String getI18nFB_a6462() {
-		if (context.get("nc.ui.uif2.I18nFB#a6462") != null)
-			return (java.lang.String) context.get("nc.ui.uif2.I18nFB#a6462");
+	private java.lang.String getI18nFB_164cdb5() {
+		if (context.get("nc.ui.uif2.I18nFB#164cdb5") != null)
+			return (java.lang.String) context.get("nc.ui.uif2.I18nFB#164cdb5");
 		nc.ui.uif2.I18nFB bean = new nc.ui.uif2.I18nFB();
-		context.put("&nc.ui.uif2.I18nFB#a6462", bean);
+		context.put("&nc.ui.uif2.I18nFB#164cdb5", bean);
 		bean.setResDir("common");
 		bean.setResId("arapcommonv6-0138");
 		bean.setDefaultValue("关闭操作");
@@ -3292,14 +3320,14 @@ public class paybill_manage extends AbstractJavaBeanDefinition {
 		invokeInitializingBean(bean);
 		try {
 			Object product = bean.getObject();
-			context.put("nc.ui.uif2.I18nFB#a6462", product);
+			context.put("nc.ui.uif2.I18nFB#164cdb5", product);
 			return (java.lang.String) product;
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
 
-	private List getManagedList22() {
+	private List getManagedList23() {
 		List list = new ArrayList();
 		return list;
 	}
@@ -3311,18 +3339,18 @@ public class paybill_manage extends AbstractJavaBeanDefinition {
 		nc.funcnode.ui.action.GroupAction bean = new nc.funcnode.ui.action.GroupAction();
 		context.put("billApproveActionGroup", bean);
 		bean.setCode("billApproveActionGroup");
-		bean.setName(getI18nFB_449558());
-		bean.setActions(getManagedList23());
+		bean.setName(getI18nFB_fd427c());
+		bean.setActions(getManagedList24());
 		setBeanFacotryIfBeanFacatoryAware(bean);
 		invokeInitializingBean(bean);
 		return bean;
 	}
 
-	private java.lang.String getI18nFB_449558() {
-		if (context.get("nc.ui.uif2.I18nFB#449558") != null)
-			return (java.lang.String) context.get("nc.ui.uif2.I18nFB#449558");
+	private java.lang.String getI18nFB_fd427c() {
+		if (context.get("nc.ui.uif2.I18nFB#fd427c") != null)
+			return (java.lang.String) context.get("nc.ui.uif2.I18nFB#fd427c");
 		nc.ui.uif2.I18nFB bean = new nc.ui.uif2.I18nFB();
-		context.put("&nc.ui.uif2.I18nFB#449558", bean);
+		context.put("&nc.ui.uif2.I18nFB#fd427c", bean);
 		bean.setResDir("common");
 		bean.setResId("arapcommonv6-0142");
 		bean.setDefaultValue("审批");
@@ -3330,14 +3358,14 @@ public class paybill_manage extends AbstractJavaBeanDefinition {
 		invokeInitializingBean(bean);
 		try {
 			Object product = bean.getObject();
-			context.put("nc.ui.uif2.I18nFB#449558", product);
+			context.put("nc.ui.uif2.I18nFB#fd427c", product);
 			return (java.lang.String) product;
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
 
-	private List getManagedList23() {
+	private List getManagedList24() {
 		List list = new ArrayList();
 		list.add(getApproveAction());
 		list.add(getUnApproveAction());
@@ -3352,18 +3380,18 @@ public class paybill_manage extends AbstractJavaBeanDefinition {
 		nc.funcnode.ui.action.GroupAction bean = new nc.funcnode.ui.action.GroupAction();
 		context.put("billApproveActionGroup_List", bean);
 		bean.setCode("billApproveActionGroup_List");
-		bean.setName(getI18nFB_a8d3ee());
-		bean.setActions(getManagedList24());
+		bean.setName(getI18nFB_117f925());
+		bean.setActions(getManagedList25());
 		setBeanFacotryIfBeanFacatoryAware(bean);
 		invokeInitializingBean(bean);
 		return bean;
 	}
 
-	private java.lang.String getI18nFB_a8d3ee() {
-		if (context.get("nc.ui.uif2.I18nFB#a8d3ee") != null)
-			return (java.lang.String) context.get("nc.ui.uif2.I18nFB#a8d3ee");
+	private java.lang.String getI18nFB_117f925() {
+		if (context.get("nc.ui.uif2.I18nFB#117f925") != null)
+			return (java.lang.String) context.get("nc.ui.uif2.I18nFB#117f925");
 		nc.ui.uif2.I18nFB bean = new nc.ui.uif2.I18nFB();
-		context.put("&nc.ui.uif2.I18nFB#a8d3ee", bean);
+		context.put("&nc.ui.uif2.I18nFB#117f925", bean);
 		bean.setResDir("common");
 		bean.setResId("arapcommonv6-0142");
 		bean.setDefaultValue("审批");
@@ -3371,14 +3399,14 @@ public class paybill_manage extends AbstractJavaBeanDefinition {
 		invokeInitializingBean(bean);
 		try {
 			Object product = bean.getObject();
-			context.put("nc.ui.uif2.I18nFB#a8d3ee", product);
+			context.put("nc.ui.uif2.I18nFB#117f925", product);
 			return (java.lang.String) product;
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
 
-	private List getManagedList24() {
+	private List getManagedList25() {
 		List list = new ArrayList();
 		list.add(getApproveListAction());
 		list.add(getUnApproveListAction());
@@ -3395,18 +3423,18 @@ public class paybill_manage extends AbstractJavaBeanDefinition {
 		nc.funcnode.ui.action.GroupAction bean = new nc.funcnode.ui.action.GroupAction();
 		context.put("billVerifyActionGroup", bean);
 		bean.setCode("billVerify");
-		bean.setName(getI18nFB_1f1c31c());
-		bean.setActions(getManagedList25());
+		bean.setName(getI18nFB_e611a0());
+		bean.setActions(getManagedList26());
 		setBeanFacotryIfBeanFacatoryAware(bean);
 		invokeInitializingBean(bean);
 		return bean;
 	}
 
-	private java.lang.String getI18nFB_1f1c31c() {
-		if (context.get("nc.ui.uif2.I18nFB#1f1c31c") != null)
-			return (java.lang.String) context.get("nc.ui.uif2.I18nFB#1f1c31c");
+	private java.lang.String getI18nFB_e611a0() {
+		if (context.get("nc.ui.uif2.I18nFB#e611a0") != null)
+			return (java.lang.String) context.get("nc.ui.uif2.I18nFB#e611a0");
 		nc.ui.uif2.I18nFB bean = new nc.ui.uif2.I18nFB();
-		context.put("&nc.ui.uif2.I18nFB#1f1c31c", bean);
+		context.put("&nc.ui.uif2.I18nFB#e611a0", bean);
 		bean.setResDir("common");
 		bean.setResId("arapcommonv6-0143");
 		bean.setDefaultValue("即时核销");
@@ -3414,14 +3442,14 @@ public class paybill_manage extends AbstractJavaBeanDefinition {
 		invokeInitializingBean(bean);
 		try {
 			Object product = bean.getObject();
-			context.put("nc.ui.uif2.I18nFB#1f1c31c", product);
+			context.put("nc.ui.uif2.I18nFB#e611a0", product);
 			return (java.lang.String) product;
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
 
-	private List getManagedList25() {
+	private List getManagedList26() {
 		List list = new ArrayList();
 		list.add(getOnBodyVerify());
 		list.add(getOnWholeBillVerifyAction());
@@ -3435,18 +3463,18 @@ public class paybill_manage extends AbstractJavaBeanDefinition {
 		nc.funcnode.ui.action.GroupAction bean = new nc.funcnode.ui.action.GroupAction();
 		context.put("pauseTransactActionGroup", bean);
 		bean.setCode("pauseTransact");
-		bean.setName(getI18nFB_1409687());
-		bean.setActions(getManagedList26());
+		bean.setName(getI18nFB_8f42b6());
+		bean.setActions(getManagedList27());
 		setBeanFacotryIfBeanFacatoryAware(bean);
 		invokeInitializingBean(bean);
 		return bean;
 	}
 
-	private java.lang.String getI18nFB_1409687() {
-		if (context.get("nc.ui.uif2.I18nFB#1409687") != null)
-			return (java.lang.String) context.get("nc.ui.uif2.I18nFB#1409687");
+	private java.lang.String getI18nFB_8f42b6() {
+		if (context.get("nc.ui.uif2.I18nFB#8f42b6") != null)
+			return (java.lang.String) context.get("nc.ui.uif2.I18nFB#8f42b6");
 		nc.ui.uif2.I18nFB bean = new nc.ui.uif2.I18nFB();
-		context.put("&nc.ui.uif2.I18nFB#1409687", bean);
+		context.put("&nc.ui.uif2.I18nFB#8f42b6", bean);
 		bean.setResDir("2006pub_0");
 		bean.setResId("02006pub-0644");
 		bean.setDefaultValue("挂起操作");
@@ -3454,14 +3482,14 @@ public class paybill_manage extends AbstractJavaBeanDefinition {
 		invokeInitializingBean(bean);
 		try {
 			Object product = bean.getObject();
-			context.put("nc.ui.uif2.I18nFB#1409687", product);
+			context.put("nc.ui.uif2.I18nFB#8f42b6", product);
 			return (java.lang.String) product;
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
 
-	private List getManagedList26() {
+	private List getManagedList27() {
 		List list = new ArrayList();
 		list.add(getPauseTransact());
 		list.add(getCancelPauseTransact());
@@ -3475,18 +3503,18 @@ public class paybill_manage extends AbstractJavaBeanDefinition {
 		nc.funcnode.ui.action.GroupAction bean = new nc.funcnode.ui.action.GroupAction();
 		context.put("printOperateActionGroup", bean);
 		bean.setCode("printOperateActionGroup");
-		bean.setName(getI18nFB_15a83f7());
-		bean.setActions(getManagedList27());
+		bean.setName(getI18nFB_164ea33());
+		bean.setActions(getManagedList28());
 		setBeanFacotryIfBeanFacatoryAware(bean);
 		invokeInitializingBean(bean);
 		return bean;
 	}
 
-	private java.lang.String getI18nFB_15a83f7() {
-		if (context.get("nc.ui.uif2.I18nFB#15a83f7") != null)
-			return (java.lang.String) context.get("nc.ui.uif2.I18nFB#15a83f7");
+	private java.lang.String getI18nFB_164ea33() {
+		if (context.get("nc.ui.uif2.I18nFB#164ea33") != null)
+			return (java.lang.String) context.get("nc.ui.uif2.I18nFB#164ea33");
 		nc.ui.uif2.I18nFB bean = new nc.ui.uif2.I18nFB();
-		context.put("&nc.ui.uif2.I18nFB#15a83f7", bean);
+		context.put("&nc.ui.uif2.I18nFB#164ea33", bean);
 		bean.setResDir("common");
 		bean.setResId("arapcommonv6-0139");
 		bean.setDefaultValue("打印");
@@ -3494,14 +3522,14 @@ public class paybill_manage extends AbstractJavaBeanDefinition {
 		invokeInitializingBean(bean);
 		try {
 			Object product = bean.getObject();
-			context.put("nc.ui.uif2.I18nFB#15a83f7", product);
+			context.put("nc.ui.uif2.I18nFB#164ea33", product);
 			return (java.lang.String) product;
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
 
-	private List getManagedList27() {
+	private List getManagedList28() {
 		List list = new ArrayList();
 		list.add(getPrintBill());
 		list.add(getPrintPreview());
@@ -3519,18 +3547,18 @@ public class paybill_manage extends AbstractJavaBeanDefinition {
 		nc.funcnode.ui.action.GroupAction bean = new nc.funcnode.ui.action.GroupAction();
 		context.put("printOperateActionGroup_List", bean);
 		bean.setCode("printOperateActionGroup_List");
-		bean.setName(getI18nFB_18defac());
-		bean.setActions(getManagedList28());
+		bean.setName(getI18nFB_4bdbcf());
+		bean.setActions(getManagedList29());
 		setBeanFacotryIfBeanFacatoryAware(bean);
 		invokeInitializingBean(bean);
 		return bean;
 	}
 
-	private java.lang.String getI18nFB_18defac() {
-		if (context.get("nc.ui.uif2.I18nFB#18defac") != null)
-			return (java.lang.String) context.get("nc.ui.uif2.I18nFB#18defac");
+	private java.lang.String getI18nFB_4bdbcf() {
+		if (context.get("nc.ui.uif2.I18nFB#4bdbcf") != null)
+			return (java.lang.String) context.get("nc.ui.uif2.I18nFB#4bdbcf");
 		nc.ui.uif2.I18nFB bean = new nc.ui.uif2.I18nFB();
-		context.put("&nc.ui.uif2.I18nFB#18defac", bean);
+		context.put("&nc.ui.uif2.I18nFB#4bdbcf", bean);
 		bean.setResDir("common");
 		bean.setResId("arapcommonv6-0139");
 		bean.setDefaultValue("打印");
@@ -3538,14 +3566,14 @@ public class paybill_manage extends AbstractJavaBeanDefinition {
 		invokeInitializingBean(bean);
 		try {
 			Object product = bean.getObject();
-			context.put("nc.ui.uif2.I18nFB#18defac", product);
+			context.put("nc.ui.uif2.I18nFB#4bdbcf", product);
 			return (java.lang.String) product;
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
 
-	private List getManagedList28() {
+	private List getManagedList29() {
 		List list = new ArrayList();
 		list.add(getPrintBill());
 		list.add(getPrintPreview());
@@ -3565,18 +3593,18 @@ public class paybill_manage extends AbstractJavaBeanDefinition {
 		nc.funcnode.ui.action.MenuAction bean = new nc.funcnode.ui.action.MenuAction();
 		context.put("relatedQueryActionGroup", bean);
 		bean.setCode("relatedQuery");
-		bean.setName(getI18nFB_1ef3ee());
-		bean.setActions(getManagedList29());
+		bean.setName(getI18nFB_1ceda91());
+		bean.setActions(getManagedList30());
 		setBeanFacotryIfBeanFacatoryAware(bean);
 		invokeInitializingBean(bean);
 		return bean;
 	}
 
-	private java.lang.String getI18nFB_1ef3ee() {
-		if (context.get("nc.ui.uif2.I18nFB#1ef3ee") != null)
-			return (java.lang.String) context.get("nc.ui.uif2.I18nFB#1ef3ee");
+	private java.lang.String getI18nFB_1ceda91() {
+		if (context.get("nc.ui.uif2.I18nFB#1ceda91") != null)
+			return (java.lang.String) context.get("nc.ui.uif2.I18nFB#1ceda91");
 		nc.ui.uif2.I18nFB bean = new nc.ui.uif2.I18nFB();
-		context.put("&nc.ui.uif2.I18nFB#1ef3ee", bean);
+		context.put("&nc.ui.uif2.I18nFB#1ceda91", bean);
 		bean.setResDir("pubapp_0");
 		bean.setResId("0pubapp-0025");
 		bean.setDefaultValue("联查");
@@ -3584,18 +3612,19 @@ public class paybill_manage extends AbstractJavaBeanDefinition {
 		invokeInitializingBean(bean);
 		try {
 			Object product = bean.getObject();
-			context.put("nc.ui.uif2.I18nFB#1ef3ee", product);
+			context.put("nc.ui.uif2.I18nFB#1ceda91", product);
 			return (java.lang.String) product;
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
 
-	private List getManagedList29() {
+	private List getManagedList30() {
 		List list = new ArrayList();
 		list.add(getLinkQueryAction());
 		list.add(getLinkSettleInfoAction());
 		list.add(getLinkInformerAction());
+		list.add(getFlowStateQueryAction());
 		list.add(getBalanceLinkQueryAction());
 		list.add(getDealLinkQueryAction());
 		list.add(getLinkVoucharQueryAction());
@@ -3699,18 +3728,18 @@ public class paybill_manage extends AbstractJavaBeanDefinition {
 		nc.funcnode.ui.action.MenuAction bean = new nc.funcnode.ui.action.MenuAction();
 		context.put("receiptMenuAction", bean);
 		bean.setCode("Image");
-		bean.setName(getI18nFB_d959b5());
-		bean.setActions(getManagedList30());
+		bean.setName(getI18nFB_1c34f76());
+		bean.setActions(getManagedList31());
 		setBeanFacotryIfBeanFacatoryAware(bean);
 		invokeInitializingBean(bean);
 		return bean;
 	}
 
-	private java.lang.String getI18nFB_d959b5() {
-		if (context.get("nc.ui.uif2.I18nFB#d959b5") != null)
-			return (java.lang.String) context.get("nc.ui.uif2.I18nFB#d959b5");
+	private java.lang.String getI18nFB_1c34f76() {
+		if (context.get("nc.ui.uif2.I18nFB#1c34f76") != null)
+			return (java.lang.String) context.get("nc.ui.uif2.I18nFB#1c34f76");
 		nc.ui.uif2.I18nFB bean = new nc.ui.uif2.I18nFB();
-		context.put("&nc.ui.uif2.I18nFB#d959b5", bean);
+		context.put("&nc.ui.uif2.I18nFB#1c34f76", bean);
 		bean.setResDir("common");
 		bean.setResId("arapcommonv6-0180");
 		bean.setDefaultValue("影像");
@@ -3718,14 +3747,14 @@ public class paybill_manage extends AbstractJavaBeanDefinition {
 		invokeInitializingBean(bean);
 		try {
 			Object product = bean.getObject();
-			context.put("nc.ui.uif2.I18nFB#d959b5", product);
+			context.put("nc.ui.uif2.I18nFB#1c34f76", product);
 			return (java.lang.String) product;
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
 
-	private List getManagedList30() {
+	private List getManagedList31() {
 		List list = new ArrayList();
 		list.add(getReceiptCheckAction());
 		list.add(getReceiptScanAction());
@@ -3881,33 +3910,33 @@ public class paybill_manage extends AbstractJavaBeanDefinition {
 	private Map getManagedMap1() {
 		Map map = new HashMap();
 		map.put("nc.ui.pubapp.uif2app.event.card.CardBodyBeforeEditEvent",
-				getManagedList31());
-		map.put("nc.ui.pubapp.uif2app.event.card.CardBodyAfterEditEvent",
 				getManagedList32());
-		map.put("nc.ui.arap.viewhandler.CardBodyAfterEditEvent",
+		map.put("nc.ui.pubapp.uif2app.event.card.CardBodyAfterEditEvent",
 				getManagedList33());
-		map.put("nc.ui.pubapp.uif2app.event.card.CardHeadTailAfterEditEvent",
+		map.put("nc.ui.arap.viewhandler.CardBodyAfterEditEvent",
 				getManagedList34());
-		map.put("nc.ui.pubapp.uif2app.event.card.CardBodyAfterRowEditEvent",
+		map.put("nc.ui.pubapp.uif2app.event.card.CardHeadTailAfterEditEvent",
 				getManagedList35());
-		map.put("nc.ui.pubapp.uif2app.event.card.CardBodyRowChangedEvent",
+		map.put("nc.ui.pubapp.uif2app.event.card.CardBodyAfterRowEditEvent",
 				getManagedList36());
-		map.put("nc.ui.pubapp.uif2app.event.card.CardHeadTailBeforeEditEvent",
+		map.put("nc.ui.pubapp.uif2app.event.card.CardBodyRowChangedEvent",
 				getManagedList37());
-		map.put("nc.ui.pubapp.uif2app.event.card.CardPanelLoadEvent",
+		map.put("nc.ui.pubapp.uif2app.event.card.CardHeadTailBeforeEditEvent",
 				getManagedList38());
-		map.put("nc.ui.pubapp.uif2app.event.list.ListPanelLoadEvent",
+		map.put("nc.ui.pubapp.uif2app.event.card.CardPanelLoadEvent",
 				getManagedList39());
-		map.put("nc.ui.pubapp.uif2app.event.list.ListHeadRowChangedEvent",
+		map.put("nc.ui.pubapp.uif2app.event.list.ListPanelLoadEvent",
 				getManagedList40());
-		map.put("nc.ui.pubapp.uif2app.event.list.ListHeadDataChangedEvent",
+		map.put("nc.ui.pubapp.uif2app.event.list.ListHeadRowChangedEvent",
 				getManagedList41());
-		map.put("nc.ui.pubapp.uif2app.mediator.mutiltrans.NodekeyEvent",
+		map.put("nc.ui.pubapp.uif2app.event.list.ListHeadDataChangedEvent",
 				getManagedList42());
+		map.put("nc.ui.pubapp.uif2app.mediator.mutiltrans.NodekeyEvent",
+				getManagedList43());
 		return map;
 	}
 
-	private List getManagedList31() {
+	private List getManagedList32() {
 		List list = new ArrayList();
 		list.add(getBodyBankAccBeforeEditHandler());
 		list.add(getBodyFreeCustBeforeEditHandler());
@@ -3927,7 +3956,7 @@ public class paybill_manage extends AbstractJavaBeanDefinition {
 		return list;
 	}
 
-	private List getManagedList32() {
+	private List getManagedList33() {
 		List list = new ArrayList();
 		list.add(getBodyAutoAddLineBeforeEditHandler());
 		list.add(getBodyMaterialAfterEditHandler());
@@ -3950,14 +3979,14 @@ public class paybill_manage extends AbstractJavaBeanDefinition {
 		return list;
 	}
 
-	private List getManagedList33() {
+	private List getManagedList34() {
 		List list = new ArrayList();
 		list.add(getBodyEuroAfterEditHandler());
 		list.add(getBodyCuspAfterEditHandler());
 		return list;
 	}
 
-	private List getManagedList34() {
+	private List getManagedList35() {
 		List list = new ArrayList();
 		list.add(getHBRelationAfterEditHandler());
 		list.add(getHeadCurrTypeAfterEditHandler());
@@ -3974,20 +4003,20 @@ public class paybill_manage extends AbstractJavaBeanDefinition {
 		return list;
 	}
 
-	private List getManagedList35() {
+	private List getManagedList36() {
 		List list = new ArrayList();
 		list.add(getCardBodyAfterRowEditHandler());
 		return list;
 	}
 
-	private List getManagedList36() {
+	private List getManagedList37() {
 		List list = new ArrayList();
 		list.add(getCardBodyRowChangeHandler());
 		list.add(getSideFormMediator());
 		return list;
 	}
 
-	private List getManagedList37() {
+	private List getManagedList38() {
 		List list = new ArrayList();
 		list.add(getHeadBankAccBeforeEditHandler());
 		list.add(getHeadSummaryBeforeEditHandler());
@@ -4002,32 +4031,32 @@ public class paybill_manage extends AbstractJavaBeanDefinition {
 		return list;
 	}
 
-	private List getManagedList38() {
+	private List getManagedList39() {
 		List list = new ArrayList();
 		list.add(getLoadBillCardTemplate());
 		return list;
 	}
 
-	private List getManagedList39() {
+	private List getManagedList40() {
 		List list = new ArrayList();
 		list.add(getLoadBillListTemplate());
 		return list;
 	}
 
-	private List getManagedList40() {
+	private List getManagedList41() {
 		List list = new ArrayList();
 		list.add(getListHeadRowChangeListener());
 		list.add(getSideFormMediator());
 		return list;
 	}
 
-	private List getManagedList41() {
+	private List getManagedList42() {
 		List list = new ArrayList();
 		list.add(getListHeadModelListener());
 		return list;
 	}
 
-	private List getManagedList42() {
+	private List getManagedList43() {
 		List list = new ArrayList();
 		list.add(getAddActionGroup());
 		list.add(getTranstype());
@@ -4104,18 +4133,18 @@ public class paybill_manage extends AbstractJavaBeanDefinition {
 		nc.funcnode.ui.action.MenuAction bean = new nc.funcnode.ui.action.MenuAction();
 		context.put("billAssistantActionGroup", bean);
 		bean.setCode("billAssistant");
-		bean.setName(getI18nFB_75d3bf());
-		bean.setActions(getManagedList43());
+		bean.setName(getI18nFB_14365b3());
+		bean.setActions(getManagedList44());
 		setBeanFacotryIfBeanFacatoryAware(bean);
 		invokeInitializingBean(bean);
 		return bean;
 	}
 
-	private java.lang.String getI18nFB_75d3bf() {
-		if (context.get("nc.ui.uif2.I18nFB#75d3bf") != null)
-			return (java.lang.String) context.get("nc.ui.uif2.I18nFB#75d3bf");
+	private java.lang.String getI18nFB_14365b3() {
+		if (context.get("nc.ui.uif2.I18nFB#14365b3") != null)
+			return (java.lang.String) context.get("nc.ui.uif2.I18nFB#14365b3");
 		nc.ui.uif2.I18nFB bean = new nc.ui.uif2.I18nFB();
-		context.put("&nc.ui.uif2.I18nFB#75d3bf", bean);
+		context.put("&nc.ui.uif2.I18nFB#14365b3", bean);
 		bean.setResDir("2006pub_0");
 		bean.setResId("02006pub-0643");
 		bean.setDefaultValue("辅助功能");
@@ -4123,14 +4152,14 @@ public class paybill_manage extends AbstractJavaBeanDefinition {
 		invokeInitializingBean(bean);
 		try {
 			Object product = bean.getObject();
-			context.put("nc.ui.uif2.I18nFB#75d3bf", product);
+			context.put("nc.ui.uif2.I18nFB#14365b3", product);
 			return (java.lang.String) product;
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
 
-	private List getManagedList43() {
+	private List getManagedList44() {
 		List list = new ArrayList();
 		list.add(getDocumentManage());
 		list.add(getAssociateSettInfoAction());
@@ -4159,18 +4188,18 @@ public class paybill_manage extends AbstractJavaBeanDefinition {
 		nc.funcnode.ui.action.MenuAction bean = new nc.funcnode.ui.action.MenuAction();
 		context.put("billAssistantActionGroup_List", bean);
 		bean.setCode("billAssistant");
-		bean.setName(getI18nFB_1a0d733());
-		bean.setActions(getManagedList44());
+		bean.setName(getI18nFB_1c9f994());
+		bean.setActions(getManagedList45());
 		setBeanFacotryIfBeanFacatoryAware(bean);
 		invokeInitializingBean(bean);
 		return bean;
 	}
 
-	private java.lang.String getI18nFB_1a0d733() {
-		if (context.get("nc.ui.uif2.I18nFB#1a0d733") != null)
-			return (java.lang.String) context.get("nc.ui.uif2.I18nFB#1a0d733");
+	private java.lang.String getI18nFB_1c9f994() {
+		if (context.get("nc.ui.uif2.I18nFB#1c9f994") != null)
+			return (java.lang.String) context.get("nc.ui.uif2.I18nFB#1c9f994");
 		nc.ui.uif2.I18nFB bean = new nc.ui.uif2.I18nFB();
-		context.put("&nc.ui.uif2.I18nFB#1a0d733", bean);
+		context.put("&nc.ui.uif2.I18nFB#1c9f994", bean);
 		bean.setResDir("2006pub_0");
 		bean.setResId("02006pub-0643");
 		bean.setDefaultValue("辅助功能");
@@ -4178,14 +4207,14 @@ public class paybill_manage extends AbstractJavaBeanDefinition {
 		invokeInitializingBean(bean);
 		try {
 			Object product = bean.getObject();
-			context.put("nc.ui.uif2.I18nFB#1a0d733", product);
+			context.put("nc.ui.uif2.I18nFB#1c9f994", product);
 			return (java.lang.String) product;
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
 
-	private List getManagedList44() {
+	private List getManagedList45() {
 		List list = new ArrayList();
 		list.add(getDocumentManage());
 		list.add(getAssociateSettInfoAction());
@@ -4199,18 +4228,18 @@ public class paybill_manage extends AbstractJavaBeanDefinition {
 		nc.funcnode.ui.action.GroupAction bean = new nc.funcnode.ui.action.GroupAction();
 		context.put("billCommissionGroup", bean);
 		bean.setCode("billCommissionGroup");
-		bean.setName(getI18nFB_90854a());
-		bean.setActions(getManagedList45());
+		bean.setName(getI18nFB_12076ed());
+		bean.setActions(getManagedList46());
 		setBeanFacotryIfBeanFacatoryAware(bean);
 		invokeInitializingBean(bean);
 		return bean;
 	}
 
-	private java.lang.String getI18nFB_90854a() {
-		if (context.get("nc.ui.uif2.I18nFB#90854a") != null)
-			return (java.lang.String) context.get("nc.ui.uif2.I18nFB#90854a");
+	private java.lang.String getI18nFB_12076ed() {
+		if (context.get("nc.ui.uif2.I18nFB#12076ed") != null)
+			return (java.lang.String) context.get("nc.ui.uif2.I18nFB#12076ed");
 		nc.ui.uif2.I18nFB bean = new nc.ui.uif2.I18nFB();
-		context.put("&nc.ui.uif2.I18nFB#90854a", bean);
+		context.put("&nc.ui.uif2.I18nFB#12076ed", bean);
 		bean.setResDir("common");
 		bean.setResId("arapcommonv6-0144");
 		bean.setDefaultValue("承付");
@@ -4218,14 +4247,14 @@ public class paybill_manage extends AbstractJavaBeanDefinition {
 		invokeInitializingBean(bean);
 		try {
 			Object product = bean.getObject();
-			context.put("nc.ui.uif2.I18nFB#90854a", product);
+			context.put("nc.ui.uif2.I18nFB#12076ed", product);
 			return (java.lang.String) product;
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
 
-	private List getManagedList45() {
+	private List getManagedList46() {
 		List list = new ArrayList();
 		list.add(getBillCommisionPaySaveAction());
 		list.add(getBillCancelCommisionPayAction());
@@ -4323,11 +4352,11 @@ public class paybill_manage extends AbstractJavaBeanDefinition {
 		return bean;
 	}
 
-	public nc.ui.arap.importable.PayImportablePanel getImportableEditor() {
+	public nc.ui.arap.importable.PayRecordImportablePanel getImportableEditor() {
 		if (context.get("importableEditor") != null)
-			return (nc.ui.arap.importable.PayImportablePanel) context
+			return (nc.ui.arap.importable.PayRecordImportablePanel) context
 					.get("importableEditor");
-		nc.ui.arap.importable.PayImportablePanel bean = new nc.ui.arap.importable.PayImportablePanel();
+		nc.ui.arap.importable.PayRecordImportablePanel bean = new nc.ui.arap.importable.PayRecordImportablePanel();
 		context.put("importableEditor", bean);
 		bean.setUiEditor(getBillFormEditor());
 		setBeanFacotryIfBeanFacatoryAware(bean);
@@ -4369,18 +4398,18 @@ public class paybill_manage extends AbstractJavaBeanDefinition {
 		nc.funcnode.ui.action.MenuAction bean = new nc.funcnode.ui.action.MenuAction();
 		context.put("importexportActionGroup", bean);
 		bean.setCode("ImportExportMenu");
-		bean.setName(getI18nFB_20aa04());
-		bean.setActions(getManagedList46());
+		bean.setName(getI18nFB_13db36d());
+		bean.setActions(getManagedList47());
 		setBeanFacotryIfBeanFacatoryAware(bean);
 		invokeInitializingBean(bean);
 		return bean;
 	}
 
-	private java.lang.String getI18nFB_20aa04() {
-		if (context.get("nc.ui.uif2.I18nFB#20aa04") != null)
-			return (java.lang.String) context.get("nc.ui.uif2.I18nFB#20aa04");
+	private java.lang.String getI18nFB_13db36d() {
+		if (context.get("nc.ui.uif2.I18nFB#13db36d") != null)
+			return (java.lang.String) context.get("nc.ui.uif2.I18nFB#13db36d");
 		nc.ui.uif2.I18nFB bean = new nc.ui.uif2.I18nFB();
-		context.put("&nc.ui.uif2.I18nFB#20aa04", bean);
+		context.put("&nc.ui.uif2.I18nFB#13db36d", bean);
 		bean.setResDir("2006pub_0");
 		bean.setResId("02006pub-0654");
 		bean.setDefaultValue("导入导出");
@@ -4388,14 +4417,14 @@ public class paybill_manage extends AbstractJavaBeanDefinition {
 		invokeInitializingBean(bean);
 		try {
 			Object product = bean.getObject();
-			context.put("nc.ui.uif2.I18nFB#20aa04", product);
+			context.put("nc.ui.uif2.I18nFB#13db36d", product);
 			return (java.lang.String) product;
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
 
-	private List getManagedList46() {
+	private List getManagedList47() {
 		List list = new ArrayList();
 		list.add(getImportAction());
 		list.add(getCurrNullAction());
@@ -4410,54 +4439,7 @@ public class paybill_manage extends AbstractJavaBeanDefinition {
 		nc.ui.uif2.actions.StandAloneToftPanelActionContainer bean = new nc.ui.uif2.actions.StandAloneToftPanelActionContainer(
 				getListView());
 		context.put("listActions", bean);
-		bean.setActions(getManagedList47());
-		setBeanFacotryIfBeanFacatoryAware(bean);
-		invokeInitializingBean(bean);
-		return bean;
-	}
-
-	private List getManagedList47() {
-		List list = new ArrayList();
-		list.add(getAddActionGroup());
-		list.add(getEditAction());
-		list.add(getDeleteAction());
-		list.add(getCopyAction());
-		list.add(getCurrNullAction());
-		list.add(getQueryAction());
-		list.add(getRefreshAllAction());
-		list.add(getCurrNullAction());
-		list.add(getTranstype());
-		list.add(getBillApproveActionGroup_List());
-		list.add(getBillVerifyActionGroup());
-		list.add(getPrepayAction());
-		list.add(getPauseTransactActionGroup());
-		list.add(getMadeBillAction());
-		list.add(getWriteBack());
-		list.add(getBillAssistantActionGroup_List());
-		list.add(getCurrNullAction());
-		list.add(getReceiptMenuAction());
-		list.add(getCurrNullAction());
-		list.add(getRelatedQueryActionGroup());
-		list.add(getCurrNullAction());
-		list.add(getImportexportActionGroup());
-		list.add(getPrintOperateActionGroup_List());
-		list.add(getCurrNullAction());
-		list.add(getFkKaipiaoAction());
-		list.add(getCurrNullAction());
-		list.add(getFkKpQueryAction());
-		return list;
-	}
-
-	public nc.ui.uif2.actions.StandAloneToftPanelActionContainer getCardActions() {
-		if (context.get("cardActions") != null)
-			return (nc.ui.uif2.actions.StandAloneToftPanelActionContainer) context
-					.get("cardActions");
-		nc.ui.uif2.actions.StandAloneToftPanelActionContainer bean = new nc.ui.uif2.actions.StandAloneToftPanelActionContainer(
-				getBillFormEditor());
-		context.put("cardActions", bean);
 		bean.setActions(getManagedList48());
-		bean.setEditActions(getManagedList49());
-		bean.setModel(getManageAppModel());
 		setBeanFacotryIfBeanFacatoryAware(bean);
 		invokeInitializingBean(bean);
 		return bean;
@@ -4471,16 +4453,46 @@ public class paybill_manage extends AbstractJavaBeanDefinition {
 		list.add(getCopyAction());
 		list.add(getCurrNullAction());
 		list.add(getQueryAction());
+		list.add(getRefreshAllAction());
+		list.add(getCurrNullAction());
+		list.add(getTranstype());
+		list.add(getBillAssistantActionGroup_List());
+		list.add(getCurrNullAction());
+		list.add(getReceiptMenuAction());
+		list.add(getCurrNullAction());
+		list.add(getRelatedQueryActionGroup());
+		list.add(getCurrNullAction());
+		list.add(getImportexportActionGroup());
+		list.add(getPrintOperateActionGroup_List());
+		return list;
+	}
+
+	public nc.ui.uif2.actions.StandAloneToftPanelActionContainer getCardActions() {
+		if (context.get("cardActions") != null)
+			return (nc.ui.uif2.actions.StandAloneToftPanelActionContainer) context
+					.get("cardActions");
+		nc.ui.uif2.actions.StandAloneToftPanelActionContainer bean = new nc.ui.uif2.actions.StandAloneToftPanelActionContainer(
+				getBillFormEditor());
+		context.put("cardActions", bean);
+		bean.setActions(getManagedList49());
+		bean.setEditActions(getManagedList50());
+		bean.setModel(getManageAppModel());
+		setBeanFacotryIfBeanFacatoryAware(bean);
+		invokeInitializingBean(bean);
+		return bean;
+	}
+
+	private List getManagedList49() {
+		List list = new ArrayList();
+		list.add(getAddActionGroup());
+		list.add(getEditAction());
+		list.add(getDeleteAction());
+		list.add(getCopyAction());
+		list.add(getCurrNullAction());
+		list.add(getQueryAction());
 		list.add(getRefreshSingAction());
 		list.add(getCurrNullAction());
 		list.add(getTranstype());
-		list.add(getBillApproveActionGroup());
-		list.add(getBillVerifyActionGroup());
-		list.add(getBillCommissionGroup());
-		list.add(getPrepayAction());
-		list.add(getPauseTransactActionGroup());
-		list.add(getMadeBillAction());
-		list.add(getWriteBack());
 		list.add(getBillAssistantActionGroup());
 		list.add(getCurrNullAction());
 		list.add(getReceiptMenuAction());
@@ -4490,10 +4502,6 @@ public class paybill_manage extends AbstractJavaBeanDefinition {
 		list.add(getImportexportActionGroup());
 		list.add(getPrintOperateActionGroup());
 		list.add(getCurrNullAction());
-		list.add(getFkKaipiaoAction());
-		list.add(getCurrNullAction());
-		list.add(getFkKpQueryAction());
-		list.add(getCurrNullAction());
 		list.add(getOaSendAction());
 		list.add(getCurrNullAction());
 		list.add(getOaBackAction());
@@ -4502,7 +4510,7 @@ public class paybill_manage extends AbstractJavaBeanDefinition {
 		return list;
 	}
 
-	private List getManagedList49() {
+	private List getManagedList50() {
 		List list = new ArrayList();
 		list.add(getSaveAction());
 		list.add(getTempSaveAction());
@@ -4512,34 +4520,6 @@ public class paybill_manage extends AbstractJavaBeanDefinition {
 		list.add(getDocumentManage());
 		list.add(getReceiptMenuAction());
 		return list;
-	}
-
-	public nc.ui.arap.actions.FkKaipiaoAction getFkKaipiaoAction() {
-		if (context.get("fkKaipiaoAction") != null)
-			return (nc.ui.arap.actions.FkKaipiaoAction) context
-					.get("fkKaipiaoAction");
-		nc.ui.arap.actions.FkKaipiaoAction bean = new nc.ui.arap.actions.FkKaipiaoAction();
-		context.put("fkKaipiaoAction", bean);
-		bean.setEditor(getBillFormEditor());
-		bean.setModel(getManageAppModel());
-		bean.setListView(getListView());
-		setBeanFacotryIfBeanFacatoryAware(bean);
-		invokeInitializingBean(bean);
-		return bean;
-	}
-
-	public nc.ui.arap.actions.FkKpQueryAction getFkKpQueryAction() {
-		if (context.get("fkKpQueryAction") != null)
-			return (nc.ui.arap.actions.FkKpQueryAction) context
-					.get("fkKpQueryAction");
-		nc.ui.arap.actions.FkKpQueryAction bean = new nc.ui.arap.actions.FkKpQueryAction();
-		context.put("fkKpQueryAction", bean);
-		bean.setEditor(getBillFormEditor());
-		bean.setModel(getManageAppModel());
-		bean.setListView(getListView());
-		setBeanFacotryIfBeanFacatoryAware(bean);
-		invokeInitializingBean(bean);
-		return bean;
 	}
 
 }

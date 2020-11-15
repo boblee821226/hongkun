@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+
+<beans>
+	<import resource="classpath:/nc/ui/arap/config/paybill_base.xml" />
+	<!--导入导出action组  -->
+	<bean id="importableEditor" class="nc.ui.arap.importable.PayRecordImportablePanel" >
+	<property name="uiEditor" ref="billFormEditor" />
+	</bean>
+	<bean id="importAction" class="nc.ui.arap.importable.action.ArapImportAction"
+		autowire="byName">
+		<property name="model" ref="ManageAppModel" />
+		<property name="importableEditor" ref="importableEditor" />
+	</bean>
+	<bean id="exportAction" class="nc.ui.arap.importable.ArapExportAction"
+		autowire="byName">
+		<property name="importableEditor" ref="importableEditor" />
+		<property name="model" ref="ManageAppModel" />
+		<property name="interceptor" ref="exportActionInterceptor"></property>
+	</bean>
+	<bean id="importexportActionGroup" class="nc.funcnode.ui.action.MenuAction">
+		<property name="code" value="ImportExportMenu" />
+		<property name="name">
+			<bean class="nc.ui.uif2.I18nFB">
+				<property name="resDir" value="2006pub_0"></property>
+				<property name="resId" value="02006pub-0654"></property>
+				<property name="defaultValue" value="导入导出"></property>
+			</bean>
+		</property>
+		<property name="actions">
+			<list>
+				<ref bean="importAction" />
+				<ref bean="currNullAction" />
+				<ref bean="exportAction" />
+			</list>
+		</property>
+	</bean>
+	<bean id="listActions" class="nc.ui.uif2.actions.StandAloneToftPanelActionContainer">
+		<constructor-arg>
+			<ref bean="listView" />
+		</constructor-arg>
+		<property name="actions">
+			<list>
+				<ref bean="addActionGroup" />
+				<ref bean="editAction" />
+				<ref bean="deleteAction" />
+				<ref bean="copyAction" />
+				<ref bean="currNullAction" />
+				<ref bean="queryAction" />
+				<ref bean="refreshAllAction" />
+				<ref bean="currNullAction" />
+				<ref bean="transtype" />
+				<ref bean="billAssistantActionGroup_List" />
+				<ref bean="currNullAction" />
+				<ref bean="receiptMenuAction" />
+				<ref bean="currNullAction"/>
+				<ref bean="relatedQueryActionGroup" />
+				<ref bean="currNullAction" />
+				<ref bean="importexportActionGroup" />
+				<ref bean="printOperateActionGroup_List" />
+				
+				<!-- HK 2020年10月23日22:28:53 -->
+				<!-- oa发送 按钮  -->
+				<!--<ref bean="currNullAction" />
+				<ref bean="oaSendAction" />-->
+				<!-- oa收回 按钮  -->
+				<!--<ref bean="currNullAction" />
+				<ref bean="oaBackAction" />-->
+				<!-- END -->
+				
+			</list>
+		</property>
+	</bean>
+	<bean id="cardActions" class="nc.ui.uif2.actions.StandAloneToftPanelActionContainer">
+		<constructor-arg>
+			<ref bean="billFormEditor" />
+		</constructor-arg>
+		<property name="actions">
+			<list>
+				<ref bean="addActionGroup" />
+				<ref bean="editAction" />
+				<ref bean="deleteAction" />
+				<ref bean="copyAction" />
+				<ref bean="currNullAction" />
+				<ref bean="queryAction" />
+				<ref bean="refreshSingAction" />
+				<ref bean="currNullAction" />
+				<ref bean="transtype" />
+				<ref bean="billAssistantActionGroup" />
+				<ref bean="currNullAction" />
+				<ref bean="receiptMenuAction" />
+				<ref bean="currNullAction"/>
+				<ref bean="relatedQueryActionGroup" />
+				<ref bean="currNullAction" />
+				<ref bean="importexportActionGroup" />
+				<ref bean="printOperateActionGroup" />
+				
+				<!-- HK 2020年10月23日22:28:53 -->
+				<!-- oa发送 按钮  -->
+				<ref bean="currNullAction" />
+				<ref bean="oaSendAction" />
+				<!-- oa收回 按钮  -->
+				<ref bean="currNullAction" />
+				<ref bean="oaBackAction" />
+				<!-- oa联查 按钮  -->
+				<ref bean="currNullAction" />
+				<ref bean="oaLinkAction" />
+				<!-- END -->
+				
+			</list>
+		</property>
+		<property name="editActions">
+			<list>
+				<ref bean="saveAction" />
+				<ref bean="tempSaveAction" />
+				<ref bean="currNullAction" />
+				<ref bean="cancelAction" />
+				<ref bean="currNullAction" />
+				<ref bean="documentManage" />
+				<ref bean="receiptMenuAction" />
+			</list>
+		</property>
+		<property name="model" ref="ManageAppModel" />
+	</bean>
+	<bean id="relatedQueryActionGroup" class="nc.funcnode.ui.action.MenuAction">
+		<property name="code">
+			<value>relatedQuery</value>
+		</property>
+		<property name="name">
+			<bean class="nc.ui.uif2.I18nFB">
+				<property name="resDir" value="pubapp_0" />
+				<property name="resId" value="0pubapp-0025" />
+				<property name="defaultValue" value="联查" />
+			</bean>
+		</property>
+		<property name="actions">
+			<list>
+				<ref bean="linkQueryAction" />
+				<ref bean="linkSettleInfoAction" />
+				<ref bean="linkInformerAction" />
+				<ref bean="flowStateQueryAction" />
+				<ref bean="balanceLinkQueryAction" />
+				<ref bean="dealLinkQueryAction" />
+				<ref bean="linkVoucharQueryAction" />
+				<ref bean="bconferQueryAction" />
+				<!--<ref bean="termLinkQueryAction" />-->
+				<ref bean="tbbLinkAction" />
+			</list>
+		</property>
+	</bean>
+		<!--
+		界面布局总装###########################################################
+	-->
+	<bean id="container" class="nc.ui.uif2.TangramContainer"
+		init-method="initUI">
+		<property name="tangramLayoutRoot">
+			<bean class="nc.ui.uif2.tangramlayout.node.TBNode">
+				<property name="tabs">
+					<list>
+
+					<!-- <bean class="nc.ui.uif2.tangramlayout.node.HSNode">
+							<property name="left"> -->
+								<bean class="nc.ui.uif2.tangramlayout.node.VSNode">
+
+									<property name="up">
+										<bean class="nc.ui.uif2.tangramlayout.node.CNode">
+											<property name="component" ref="cardInfoPnl" />
+										</bean>
+									</property>
+									<property name="down">
+										<bean class="nc.ui.uif2.tangramlayout.node.CNode">
+											<property name="name"><bean class="nc.ui.uif2.I18nFB">	<property name="resDir" value="common" />	<property name="resId" value="arapcommonv6-0136" />	<property name="defaultValue" value="卡片" /></bean></property>
+											<property name="component" ref="billFormEditor" />
+										</bean>
+									</property>
+									<property name="showMode" value="NoDivider"></property>
+									<property name="dividerLocation" value="30f" />
+
+								</bean>
+							<!-- </property>
+							<property name="right">
+								<bean class="nc.ui.uif2.tangramlayout.node.CNode">
+									<property name="component" ref="multiBesideWidget" />
+								</bean>
+							</property>
+							<property name="dividerLocation" value="0.8f" />
+						</bean> -->
+						
+						<bean class="nc.ui.uif2.tangramlayout.node.HSNode">
+
+							<property name="left">
+								<bean class="nc.ui.uif2.tangramlayout.node.CNode">
+									<property name="component" ref="queryAreaShell" />
+								</bean>
+							</property>
+							<property name="right">
+								<bean class="nc.ui.uif2.tangramlayout.node.VSNode">
+									<property name="up">
+										<bean class="nc.ui.uif2.tangramlayout.node.CNode">
+											<property name="component" ref="queryInfo" />
+											
+										</bean>
+									</property>
+									<property name="down">
+										<bean class="nc.ui.uif2.tangramlayout.node.CNode">
+											<property name="name"><bean class="nc.ui.uif2.I18nFB">	<property name="resDir" value="common" />	<property name="resId" value="arapcommonv6-0135" />	<property name="defaultValue" value="列表" /></bean></property>
+											<property name="component" ref="listView" />
+										</bean>
+									</property>
+									<property name="showMode" value="NoDivider"></property>
+									<property name="dividerLocation" value="30f" />
+								</bean>
+							</property>
+							<property name="dividerLocation">
+								<value>0.2f</value>
+							</property>
+						</bean>
+						
+						<bean class="nc.ui.uif2.tangramlayout.node.CNode">
+							<property name="name">
+								<bean class="nc.ui.uif2.I18nFB">	<property name="resDir" value="common" />	<property name="resId" value="arapcommonv6-0140" />	<property name="defaultValue" value="核销界面" /></bean>
+							</property>
+							<property name="component" ref="verifyui"></property>
+						</bean>
+
+
+						<bean class="nc.ui.uif2.tangramlayout.node.CNode">
+							<property name="name">
+								<bean class="nc.ui.uif2.I18nFB">	<property name="resDir" value="common" />	<property name="resId" value="arapcommonv6-0141" />	<property name="defaultValue" value="补差面板" /></bean>
+							</property>
+							<property name="component" ref="makeupEditor"></property>
+						</bean>
+					</list>
+				</property>
+				<property name="showMode" value="CardLayout"></property>
+			</bean>
+		</property>
+	</bean>
+	
+</beans>

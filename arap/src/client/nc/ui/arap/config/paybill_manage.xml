@@ -77,6 +77,15 @@
 				<ref bean="fkKpQueryAction" />
 				<!-- END -->
 				
+				<!-- HK 2020年10月23日22:28:53 -->
+				<!-- oa发送 按钮  -->
+				<!--<ref bean="currNullAction" />
+				<ref bean="oaSendAction" />-->
+				<!-- oa收回 按钮  -->
+				<!--<ref bean="currNullAction" />
+				<ref bean="oaBackAction" />-->
+				<!-- END -->
+				
 			</list>
 		</property>
 	</bean>
@@ -121,6 +130,18 @@
 				<!-- 付款开票明细 按钮  -->
 				<ref bean="currNullAction" />
 				<ref bean="fkKpQueryAction" />
+				<!-- END -->
+				
+				<!-- HK 2020年10月23日22:28:53 -->
+				<!-- oa发送 按钮  -->
+				<ref bean="currNullAction" />
+				<ref bean="oaSendAction" />
+				<!-- oa收回 按钮  -->
+				<ref bean="currNullAction" />
+				<ref bean="oaBackAction" />
+				<!-- oa联查 按钮  -->
+				<ref bean="currNullAction" />
+				<ref bean="oaLinkAction" />
 				<!-- END -->
 				
 			</list>

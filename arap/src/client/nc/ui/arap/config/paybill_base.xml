@@ -1,0 +1,383 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+
+<beans>
+	<import resource="classpath:/nc/ui/arap/baseconfig/arapbase_config.xml" />
+
+	<bean id="defMoneyField" class="java.lang.String">
+		<constructor-arg value="money_de" />
+	</bean>
+
+	<bean id="defBillType" class="java.lang.String">
+		<constructor-arg value="F3" />
+	</bean>
+
+	<bean id="defNodeKey" class="java.lang.String">
+		<constructor-arg value="D3" />
+	</bean>
+	<bean id="mdFullnameHead" class="java.lang.String">
+		<constructor-arg value="arap.paybill" />
+	</bean>
+	<bean id="mdFullnameBody" class="java.lang.String">
+		<constructor-arg value="arap.payitem" />
+	</bean>
+
+	<bean id="iArapLineDefValUtil" class="nc.ui.arap.actions.PaybillLineDefValUtil" />
+
+	<!-- 应用服务类，负责进行模型操作的处理-->
+	<bean id="ManageModelService" class="nc.ui.arap.model.PayBillAppModelService" />
+
+	<!--新增单据设置默认值-->
+	<bean id="billDefVauleItf" class="nc.ui.arap.view.PayBillDefValue">
+		<property name="editor" ref="billFormEditor" />
+	</bean>
+
+	<bean id="paginationQueryService" class="nc.ui.arap.model.PayBillPaginationQueryService">
+		<property name="pageSize" value="10"></property>
+	</bean>
+
+	<bean id="saveActionReal"  class="nc.ui.arap.actions.PayBillSaveAction" autowire="byName">
+		<property name="model" ref="ManageAppModel" />
+		<property name="editor" ref="billFormEditor" />
+		<property name="interceptor" ref="interceptor"></property>
+	</bean>	
+	<bean id="saveAction" class="nc.ui.arap.actions.CreditCheckDecoratorAction">
+		<constructor-arg ref="saveActionReal" />
+		<property name="model" ref="ManageAppModel" />
+		<property name="interceptor" ref="interceptor"></property>
+	</bean>
+	<bean id="editAction" class="nc.ui.arap.actions.PayBillEditAction"
+		autowire="byName">
+		<property name="model" ref="ManageAppModel" />
+		<property name="editor" ref="billFormEditor" />
+		<property name="listView" ref="listView" />
+		<property name="interceptor" ref="interceptor"></property>
+	</bean>
+	
+	<bean id="BodyCommissionAfterEditHandler"
+		class="nc.ui.arap.viewhandler.cardafter.BodyCommissionAfterEditHandler">
+		
+		<property name="model" ref="ManageAppModel"></property>
+	</bean>
+	
+	<bean id="BodyCommissionBoforeEditHandler"
+		class="nc.ui.arap.viewhandler.cardbefore.BodyCommissionBoforeEditHandler">
+		
+	</bean>
+	<!--
+		监听器(Mediator)(可选)###########################################################
+	-->
+	<bean id="AppEventHandlerMediator" class="nc.ui.pubapp.uif2app.model.AppEventHandlerMediator">
+		<property name="model" ref="ManageAppModel" />
+		<property name="handlerMap">
+			<map>
+				<entry key="nc.ui.pubapp.uif2app.event.card.CardBodyBeforeEditEvent">
+					<list>
+						<ref bean="BodyBankAccBeforeEditHandler"></ref>
+						<ref bean="BodyFreeCustBeforeEditHandler"></ref>
+						<ref bean="BodyProjectBeforeEditHandler"></ref>
+						<ref bean="BodyAccountRefBeforeEditHandler"></ref>
+						<ref bean="BodyChecNoRefBeforeEditHandler4Pay"></ref>
+						<ref bean="BodyCommissionBoforeEditHandler"></ref>
+						<ref bean="BodyObjTypeBeforeEditHandler"></ref>
+						<ref bean="BodySummaryBeforeEditHandler"></ref>
+						<ref bean="BodyVersionRefBeforeEditHandler"></ref>
+						<ref bean="OtherOrgBodyBeforeEditHandler"></ref>
+						<ref bean="BodyCrossCheckBeforeHandler"></ref>
+						<ref bean ="BodyCostCenterRefBeforeEditHandler"/>
+						<ref bean ="BodyEuroBeforeEditHandler"/>
+						<ref bean ="BodyTaxcodeBeforeEditHandler"/>
+						<ref bean ="BodyPsnDocBeforeEditHandler"/>
+						
+					</list>
+				</entry>
+				<entry key="nc.ui.pubapp.uif2app.event.card.CardBodyAfterEditEvent">
+					<list>
+						<ref bean ="BodyAutoAddLineBeforeEditHandler"/>
+						<ref bean="BodyMaterialAfterEditHandler"></ref>
+						<ref bean="CardAfterEditCalculateHandler"></ref>
+						<ref bean="BodyPsnDocAfterEditHandler"></ref>
+						<ref bean="BodyCurrTypeAfterEditHandler"></ref>
+						<ref bean="BodyLocalMoneyAfterEditHandler"></ref>
+						<ref bean="BodyRateAfterEditHandler"></ref>
+						<ref bean="BodyMoneyBalanceAfterEditHandler"></ref>
+						<ref bean="EnableCtrlBodyAfterEditHandler"></ref>
+						<ref bean="BodyCheckNoAfterEditHandler"></ref>
+						<ref bean="BodyCommissionAfterEditHandler"></ref>
+						<ref bean="OtherOrgBodyAfterEditHandler"></ref>
+						<ref bean="BodyFundplanAfterEditHandler"></ref>
+						<ref bean="BodyCuspAfterEditHandler"></ref>
+						<ref bean ="BodyBankAccAfterEditHandler" ></ref>
+						<ref bean ="BodyDeptAfterEditHandler" ></ref>
+						<ref bean ="BodyVersionRefAfterEditHandler" />
+						<ref bean ="BodyCostCenterAfterEditHandler"></ref>
+					</list>
+				</entry>
+				<entry key="nc.ui.arap.viewhandler.CardBodyAfterEditEvent">
+					<list>
+						<ref bean ="BodyEuroAfterEditHandler"></ref>
+						<ref bean ="BodyCuspAfterEditHandler" ></ref>
+					</list>
+				</entry>
+				<entry key="nc.ui.pubapp.uif2app.event.card.CardHeadTailAfterEditEvent">
+					<list>
+						<ref bean="HBRelationAfterEditHandler"></ref>
+						<ref bean="HeadCurrTypeAfterEditHandler"></ref>
+						<ref bean="HeadPsnDocAfterEditHandler"></ref>
+						<ref bean="OtherOrgHeadAfterEdithandler" />
+						<ref bean="HeadFundplanAfterEditHandler"></ref>
+						<ref bean="ObjTypeHeadAfterEdithandler"></ref>
+						<ref bean="HeadCuspAfterEditHandler"></ref>
+						<ref bean ="HeadDeptAfterEditHandler"></ref>
+						<ref bean ="HeadVersionRefAfterEditHandler" />
+						<ref bean ="HeadCostCenterAfterEditHandler"></ref>
+						<ref bean="HeadEuroAfterEditHandler"></ref>
+						<ref bean ="HeadBillDateAfterEditHandler"></ref>	
+					</list>
+				</entry>
+				<entry key="nc.ui.pubapp.uif2app.event.card.CardBodyAfterRowEditEvent">
+					<list>
+						<ref bean="CardBodyAfterRowEditHandler"></ref>
+					</list>
+				</entry>
+				<entry key="nc.ui.pubapp.uif2app.event.card.CardBodyRowChangedEvent">
+					<list>
+						<ref bean="CardBodyRowChangeHandler"></ref>
+						<ref bean="sideFormMediator" />
+					</list>
+				</entry>
+				<entry key="nc.ui.pubapp.uif2app.event.card.CardHeadTailBeforeEditEvent">
+					<list>
+						<ref bean="HeadBankAccBeforeEditHandler"></ref>
+						<ref bean="HeadSummaryBeforeEditHandler" />
+						<ref bean="HeadVersionRefBeforeEditHandler" />
+						<ref bean="OtherOrgHeadBeforeEditHandler"></ref>
+						<ref bean ="HeadCrossCheckBeforeHandler"></ref>
+						<ref bean ="HeadObjTypeBeforeEditHandler"></ref>
+						<ref bean ="HeadEuroBeforeEditHandler"></ref>
+						<ref bean ="HeadCostCenterRefBeforeEditHandler"></ref>
+						<ref bean ="HeadAccountRefBeforeEditHandler"></ref>
+						<ref bean ="HeadPsnDocBeforeEditHandler"></ref>
+					</list>
+				</entry>
+				<entry key="nc.ui.pubapp.uif2app.event.card.CardPanelLoadEvent">
+					<list>
+						<ref bean="LoadBillCardTemplate"></ref>
+					</list>
+				</entry>
+				<entry key="nc.ui.pubapp.uif2app.event.list.ListPanelLoadEvent">
+					<list>
+						<ref bean="LoadBillListTemplate"></ref>
+					</list>
+				</entry>
+				<entry key="nc.ui.pubapp.uif2app.event.list.ListHeadRowChangedEvent">
+					<list>
+						<ref bean="ListHeadRowChangeListener"></ref>
+						<ref bean="sideFormMediator"></ref>
+					</list>
+				</entry>
+				<entry key="nc.ui.pubapp.uif2app.event.list.ListHeadDataChangedEvent">
+					<list>
+						<ref bean="ListHeadModelListener"></ref>
+					</list>
+				</entry>
+				<entry key="nc.ui.pubapp.uif2app.mediator.mutiltrans.NodekeyEvent">
+					<list>
+						<ref bean="addActionGroup" />
+						<ref bean ="transtype" />
+					</list>
+
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="relationItemForCal" class="nc.vo.arappub.calculator.data.RelationItemForCal_Debit">
+	</bean>
+
+	<bean id="linkSettleInfoAction" class="nc.ui.arap.actions.LinkSettleInfoAction"
+		autowire="byName">
+		<property name="model" ref="ManageAppModel" />
+		<property name="interceptor" ref="interceptor"></property>
+	</bean>
+	<bean id="linkInformerAction" class="nc.ui.arap.actions.LinkInformerAction"
+		autowire="byName">
+		<property name="model" ref="ManageAppModel" />
+		<property name="interceptor" ref="interceptor"></property>
+	</bean>
+
+	<bean id="calFldsItf" class="nc.ui.arap.viewhandler.DebitBillCalculatorFields" />
+
+
+	<bean id="transtype" class="nc.ui.arap.actions.TransTypeAction">
+		<property name="model" ref="ManageAppModel" />
+		<property name="transTypeRefModel" ref="transTypeRefModel" />
+		<property name="wherepart"
+			value=" bd_billtype.parentbilltype ='F3' and pk_group != 'global00000000000000'" />
+		<property name="editor" ref="billFormEditor" />
+	</bean>
+
+	<bean id="billOperateActionGroup" class="nc.funcnode.ui.action.MenuAction">
+		<property name="code">
+			<value>billOperate</value>
+		</property>
+		<property name="name">
+			<bean class="nc.ui.uif2.I18nFB">	<property name="resDir" value="common" />	<property name="resId" value="arapcommonv6-0137" />	<property name="defaultValue" value="单据操作" /></bean>
+		</property>
+		<property name="actions">
+			<list>
+				<ref bean="deleteAction" />
+				<ref bean="editAction" />
+				<ref bean="tempSaveAction" />
+				<ref bean="writeBack" />
+				<ref bean="documentManage" />
+				<ref bean="prepayAction" />
+			</list>
+		</property>
+	</bean>
+
+	<bean id="billAssistantActionGroup" class="nc.funcnode.ui.action.MenuAction">
+		<property name="code">
+			<value>billAssistant</value>
+		</property>
+		<property name="name">
+			<bean class="nc.ui.uif2.I18nFB">
+              <property name="resDir" value="2006pub_0"/>
+              <property name="resId" value="02006pub-0643"/>
+              <property name="defaultValue" value="辅助功能"/>
+           </bean>
+		</property>
+		<property name="actions">
+			<list>
+				<ref bean="documentManage" />
+				<ref bean="associateSettInfoAction"/>
+			</list>
+		</property>
+	</bean>
+
+	<bean id ="associateSettInfoAction" class ="nc.ui.arap.actions.AssociateSettInfoAction">
+		<property name="model" ref="ManageAppModel"></property>
+		<property name="billtype" value="F3"></property>
+		<property name="billform" ref="billFormEditor"></property>
+		<property name="interceptor" ref="interceptor"></property>
+	</bean>
+	<bean id="billAssistantActionGroup_List" class="nc.funcnode.ui.action.MenuAction">
+		<property name="code">
+			<value>billAssistant</value>
+		</property>
+		<property name="name">
+			<bean class="nc.ui.uif2.I18nFB">
+              <property name="resDir" value="2006pub_0"/>
+              <property name="resId" value="02006pub-0643"/>
+              <property name="defaultValue" value="辅助功能"/>
+           </bean>
+		</property>
+		<property name="actions">
+			<list>
+				<ref bean="documentManage" />
+				<ref bean="associateSettInfoAction"/>
+			</list>
+		</property>
+	</bean>
+	<bean id="billCommissionGroup" class="nc.funcnode.ui.action.GroupAction">
+		<property name="code">
+			<value>billCommissionGroup</value>
+		</property>
+		<property name="name">
+			<bean class="nc.ui.uif2.I18nFB">	<property name="resDir" value="common" />	<property name="resId" value="arapcommonv6-0144" />	<property name="defaultValue" value="承付" /></bean>
+		</property>
+		<property name="actions">
+			<list>
+				<ref bean="BillCommisionPaySaveAction" />
+				<ref bean="BillCancelCommisionPayAction" />
+			</list>
+		</property>
+	</bean>
+
+	<bean id="relatedQueryActionGroup" class="nc.funcnode.ui.action.MenuAction">
+		<property name="code">
+			<value>relatedQuery</value>
+		</property>
+		<property name="name">
+			<bean class="nc.ui.uif2.I18nFB">
+              <property name="resDir" value="pubapp_0"/>
+              <property name="resId" value="0pubapp-0025"/>
+              <property name="defaultValue" value="联查"/>
+           </bean>
+		</property>
+		<property name="actions">
+			<list>
+				<ref bean="linkQueryAction" />
+				<ref bean="linkSettleInfoAction" />
+				<ref bean="linkInformerAction" />
+				<!--<ref bean="flowStateQueryAction" />-->
+				<ref bean="balanceLinkQueryAction" />
+				<ref bean="dealLinkQueryAction" />
+				<ref bean="linkVoucharQueryAction" />
+				<ref bean="bconferQueryAction" />
+				<!--<ref bean="termLinkQueryAction" />-->
+				<ref bean="tbbLinkAction" />
+			</list>
+		</property>
+	</bean>
+	<!-- 联查监听器 -->
+	<bean id="InitDataListener" class="nc.ui.arap.listener.PayBillRelationQueryDataListener">
+		<property name="billFormEditor" ref="billFormEditor"></property>
+		<property name="listview" ref="listView"></property>
+		<property name="context" ref="context" />
+		<property name="model" ref="ManageAppModel" />
+		<property name="voClassName" value="nc.vo.arap.pay.AggPayBillVO" />
+		<property name="autoShowUpComponent" ref="billFormEditor" />
+		<property name="queryAction" ref="queryAction" />
+	</bean>
+	<bean id="BillCommisionPaySaveAction" class="nc.ui.arap.actions.BillCommisionPaySaveAction">
+		<property name="interceptor" ref="interceptor"></property>
+		<property name="listView" ref="listView"></property>
+		<property name="context" ref="context"></property>
+		<property name="model" ref="ManageAppModel" />
+		<property name="billFormEditor" ref="billFormEditor"></property>
+	</bean>
+	<bean id="BillCancelCommisionPayAction" class="nc.ui.arap.actions.BillCancelCommisionPayAction">
+		<property name="listView" ref="listView"></property>
+		<property name="model" ref="ManageAppModel"></property>
+		<property name="billFormEditor" ref="billFormEditor"></property>
+	</bean>
+	<!-- 
+	<bean id="multiBesideWidget" class="nc.ui.uif2.components.widget.BesideWidget"
+		init-method="initUI">
+		<property name="besideWidgetlets">
+			<list>
+				<ref bean="termForm" />
+
+			</list>
+		</property>
+		<property name="context" ref="context" />
+		<property name="showAllAction" ref="showAllAction" />
+	</bean>
+	 -->
+	 
+	<!-- HK 2020年10月23日22:24:06 -->
+	<!-- oa发送  按钮 -->
+	<!--<bean id="oaSendAction" class="nc.ui.hkjt.oa.action.SendAction">-->
+	<bean id="oaSendAction" class="nc.ui.hkjt.oa.action.SendAction">
+		<property name="editor" ref="billFormEditor" />
+		<property name="model" ref="ManageAppModel" />
+		<property name="listView" ref="listView" />
+	</bean>
+	<!-- oa收回  按钮 -->
+	<bean id="oaBackAction" class="nc.ui.hkjt.oa.action.BackAction">
+		<property name="editor" ref="billFormEditor" />
+		<property name="model" ref="ManageAppModel" />
+		<property name="listView" ref="listView" />
+	</bean>
+	<!-- oa联查 按钮 -->
+	<bean id="oaLinkAction" class="nc.ui.erm.link.OaLinkAction">
+		<property name="editor" ref="billFormEditor" />
+		<property name="model" ref="ManageAppModel" />
+		<property name="listView" ref="listView" />
+		<property name="billType" value="OA" />
+	</bean>
+	<!-- END -->
+	 
+</beans>
