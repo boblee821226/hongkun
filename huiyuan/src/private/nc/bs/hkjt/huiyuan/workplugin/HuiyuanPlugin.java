@@ -656,6 +656,7 @@ public class HuiyuanPlugin implements IBackgroundWorkPlugin {
 			}
 		}
 		else if("-02".equals(flag)) {
+			// ¹ú¼Ê
 			String yyyymmdd = date.toString().substring(0,10);
 			return new String[]{
 				yyyymmdd + " 00:00:00",
