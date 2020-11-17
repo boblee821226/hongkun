@@ -638,29 +638,46 @@ public class HuiyuanPlugin implements IBackgroundWorkPlugin {
 
 			else
 			{
-				query_sql = 
-						new StringBuffer("SELECT  min(CONVERT(VARCHAR(19),ChangeTime,120)) kssj ")
-								.append(",MAX(CONVERT(VARCHAR(19),ChangeTime,120)) jssj ")
-								.append("from Dt_ChangeClass ")	// 业务汇总库
-								.append("WHERE ")
-								.append(" CONVERT(VARCHAR(19),ChangeTime,120) between '"+(date.getDateBefore(1).toString().substring(0,10))+" 23:00:00' and '"+(date.getDateAfter(1).toString().substring(0,10))+" 11:59:59' ")	// 时间范围应该是 前一天、后一天  12点前结账
-								.append(" and SUBSTRING(changeclassid,16,3)='"+flag+"' ")
-								.append(" and Opersite = '酒店前厅' ")
-								.append(" and SUBSTRING(changeclassid,1,3) = 'ZJD' ")	// 通过 交班编号前缀 来过滤
-				;
+//				query_sql = 
+//						new StringBuffer("SELECT  min(CONVERT(VARCHAR(19),ChangeTime,120)) kssj ")
+//								.append(",MAX(CONVERT(VARCHAR(19),ChangeTime,120)) jssj ")
+//								.append("from Dt_ChangeClass ")	// 业务汇总库
+//								.append("WHERE ")
+//								.append(" CONVERT(VARCHAR(19),ChangeTime,120) between '"+(date.getDateBefore(1).toString().substring(0,10))+" 23:00:00' and '"+(date.getDateAfter(1).toString().substring(0,10))+" 11:59:59' ")	// 时间范围应该是 前一天、后一天  12点前结账
+//								.append(" and SUBSTRING(changeclassid,16,3)='"+flag+"' ")
+//								.append(" and Opersite = '酒店前厅' ")
+//								.append(" and SUBSTRING(changeclassid,1,3) = 'ZJD' ")	// 通过 交班编号前缀 来过滤
+//				;
+				String yyyymmdd = date.toString().substring(0,10);
+				return new String[]{
+					yyyymmdd + " 00:00:00",
+					yyyymmdd + " 23:59:59"
+				};
 			}
+		}
+		else if("-02".equals(flag)) {
+			String yyyymmdd = date.toString().substring(0,10);
+			return new String[]{
+				yyyymmdd + " 00:00:00",
+				yyyymmdd + " 23:59:59"
+			};
 		}
 		else if("-07".equals(flag))
 		{// 朗丽兹 用  前厅部  来表示业务数据
-			query_sql = 
-					new StringBuffer("SELECT  min(CONVERT(VARCHAR(19),ChangeTime,120)) kssj ")
-							.append(",MAX(CONVERT(VARCHAR(19),ChangeTime,120)) jssj ")
-							.append("from Dt_ChangeClass ")	// 业务汇总库
-							.append("WHERE ")
-							.append(" CONVERT(VARCHAR(19),ChangeTime,120) between '"+(date.getDateBefore(1).toString().substring(0,10))+" 23:00:00' and '"+(date.getDateAfter(1).toString().substring(0,10))+" 11:59:59' ")	// 时间范围应该是 前一天、后一天  12点前结账
-							.append(" and SUBSTRING(changeclassid,16,3)='"+flag+"' ")
-							.append(" and Opersite = '前厅部' ")
-			;
+//			query_sql = 
+//					new StringBuffer("SELECT  min(CONVERT(VARCHAR(19),ChangeTime,120)) kssj ")
+//							.append(",MAX(CONVERT(VARCHAR(19),ChangeTime,120)) jssj ")
+//							.append("from Dt_ChangeClass ")	// 业务汇总库
+//							.append("WHERE ")
+//							.append(" CONVERT(VARCHAR(19),ChangeTime,120) between '"+(date.getDateBefore(1).toString().substring(0,10))+" 23:00:00' and '"+(date.getDateAfter(1).toString().substring(0,10))+" 11:59:59' ")	// 时间范围应该是 前一天、后一天  12点前结账
+//							.append(" and SUBSTRING(changeclassid,16,3)='"+flag+"' ")
+//							.append(" and Opersite = '前厅部' ")
+//			;
+			String yyyymmdd = date.toString().substring(0,10);
+			return new String[]{
+				yyyymmdd + " 00:00:00",
+				yyyymmdd + " 23:59:59"
+			};
 			
 		}
 		else if("-08".equals(flag))
@@ -742,15 +759,20 @@ public class HuiyuanPlugin implements IBackgroundWorkPlugin {
 			
 			else
 			{
-				query_sql = 
-						new StringBuffer("SELECT  min(CONVERT(VARCHAR(19),ChangeTime,120)) kssj ")
-								.append(",MAX(CONVERT(VARCHAR(19),ChangeTime,120)) jssj ")
-								.append("from Dt_ChangeClass ")	// 公司业务库
-								.append("WHERE ")
-								.append(" CONVERT(VARCHAR(19),ChangeTime,120) between '"+(date.getDateBefore(1).toString().substring(0,10))+" 23:00:00' and '"+(date.getDateAfter(1).toString().substring(0,10))+" 11:59:59' ")	// 时间范围应该是 前一天、后一天  6点前结账
-								.append(" and SUBSTRING(changeclassid,16,3)='"+flag+"' ")
-								.append(" and SUBSTRING(changeclassid,1,3) = 'ZKF' ")	// 通过 交班编号前缀 来过滤
-								.append(" and Opersite = '前厅部' ");
+//				query_sql = 
+//						new StringBuffer("SELECT  min(CONVERT(VARCHAR(19),ChangeTime,120)) kssj ")
+//								.append(",MAX(CONVERT(VARCHAR(19),ChangeTime,120)) jssj ")
+//								.append("from Dt_ChangeClass ")	// 公司业务库
+//								.append("WHERE ")
+//								.append(" CONVERT(VARCHAR(19),ChangeTime,120) between '"+(date.getDateBefore(1).toString().substring(0,10))+" 23:00:00' and '"+(date.getDateAfter(1).toString().substring(0,10))+" 11:59:59' ")	// 时间范围应该是 前一天、后一天  6点前结账
+//								.append(" and SUBSTRING(changeclassid,16,3)='"+flag+"' ")
+//								.append(" and SUBSTRING(changeclassid,1,3) = 'ZKF' ")	// 通过 交班编号前缀 来过滤
+//								.append(" and Opersite = '前厅部' ");
+				String yyyymmdd = date.toString().substring(0,10);
+				return new String[]{
+					yyyymmdd + " 00:00:00",
+					yyyymmdd + " 23:59:59"
+				};
 			}
 			
 		}
