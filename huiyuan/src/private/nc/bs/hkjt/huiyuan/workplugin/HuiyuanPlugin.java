@@ -97,7 +97,7 @@ public class HuiyuanPlugin implements IBackgroundWorkPlugin {
 		
 		MAP_dian_db.put("牡丹",  "L01.jgmd");
 		MAP_dian_db.put("国际",  "L02.jggj");
-		MAP_dian_db.put("西山",  "L06.jgxs");
+		MAP_dian_db.put("西山",  "L06.lmt");
 		MAP_dian_db.put("酒店",  "L04.lmt");
 		MAP_dian_db.put("朗丽兹", "L07.jgllz");
 		MAP_dian_db.put("康福瑞", "L08.jgkfr");
