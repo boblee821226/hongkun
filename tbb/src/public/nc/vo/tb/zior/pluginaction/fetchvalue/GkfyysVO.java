@@ -2,9 +2,10 @@ package nc.vo.tb.zior.pluginaction.fetchvalue;
 
 import nc.vo.pub.SuperVO;
 import nc.vo.pub.lang.UFDouble;
-
+/**
+ * ¹é¿Ú·ÑÓÃÔ¤Ëã
+ */
 public class GkfyysVO extends SuperVO {
-
 	/**
 	 * 
 	 */
