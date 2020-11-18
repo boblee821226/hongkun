@@ -40,9 +40,9 @@ import com.ufsoft.table.Cell;
 import com.ufsoft.table.CellsModel;
 
 /**
- * 合同成本摊销
+ * 租金收入底表
  */
-public class Action_htcbtx implements Action_itf {
+public class Action_zjsrdb implements Action_itf {
 
 	IUAPQueryBS iquerybs = (IUAPQueryBS) NCLocator.getInstance().lookup(IUAPQueryBS.class.getName());
 	IVOPersistence ip = (IVOPersistence) NCLocator.getInstance().lookup(IVOPersistence.class);
@@ -74,12 +74,11 @@ public class Action_htcbtx implements Action_itf {
 			14,	// 4单价
 			15,	// 5面积
 			16,	// 6税率
-			18,	// 7数据来源=合同成本
-			19,	// 8开始日期
-			20,	// 9截至日期
-			17,	// 10分摊比例
+			17,	// 7数据来源=合同成本
+			18,	// 8开始日期
+			19,	// 9截至日期
 		};
-		Integer monthBeginCol = 21 - 1;
+		Integer monthBeginCol = 20 - 1;
 		
 		String pk_user = WorkbenchEnvironment.getInstance().getLoginUser().getPrimaryKey();
 		String pk_group = WorkbenchEnvironment.getInstance().getGroupVO().getPrimaryKey();
@@ -103,26 +102,6 @@ public class Action_htcbtx implements Action_itf {
 		TbVarAreaUtil.initTBDataCellRefModel(refModel_gys, dim_gys, pk_user, pk_group, cInfo1.getCubeCode(), exVarDef, null, dvMap);
 		refModel_szxm.getData();
 		
-		/**
-		 * 分为两部分sql
-		 * 1、部门分摊页签的数据为空，就按照表头的部门where 并且 分摊比例=1
-		 * 2、部门分摊页签的数据不为空，则按照 分摊页签的部门where，并且取 相应的分摊比例
-		 */
-		String ct_pu_SQL_1 = " select * from ct_pu " +
-						 " where pk_ct_pu not in " +
-						 " ( " +
-						 " select pk_ct_pu from ct_pu_term " +
-						 " where dr = 0 " +
-						 " group by pk_ct_pu " +
-						 " ) ";
-		String ct_pu_SQL_2 = " select * from ct_pu " +
-						 " where pk_ct_pu in " +
-						 " ( " +
-						 " select pk_ct_pu from ct_pu_term " +
-						 " where dr = 0 " +
-						 " and vhkbdef3 = '" + pk_dept + "'" +
-						 " group by pk_ct_pu " +
-						 " ) ";
 		StringBuffer querySQL = 
 		new StringBuffer("select ")
 				.append(" htb.vbdef1 pk_srxm,")		// 0、收支项目
@@ -137,10 +116,9 @@ public class Action_htcbtx implements Action_itf {
 				.append(" gys.name gys_name, ")		// 9、供应商name
 				.append(" to_number(replace(nvl(sl.name,'0'),'%','')) sl,")		// 10、税率
 				// 11、面积
-				.append(" to_number(replace(nvl(ht.vdef8,'~'),'~','0')) + to_number(replace(nvl(ht.vdef11,'~'),'~','0')) mianji, ")
-				.append(" '1.0' ftbl ")// 12、比例
-				.append(" from (").append(ct_pu_SQL_1).append(") ht ")	// 合同：无部门分摊的合同
-				.append(" inner join ct_pu_b htb on ht.pk_ct_pu = htb.pk_ct_pu ")	// 合同：行信息
+				.append(" to_number(replace(nvl(ht.vdef8,'~'),'~','0')) + to_number(replace(nvl(ht.vdef11,'~'),'~','0')) mianji ")
+				.append(" from ct_pu ht ")
+				.append(" inner join ct_pu_b htb on ht.pk_ct_pu = htb.pk_ct_pu ")
 				.append(" left join bd_defdoc fplx on ht.vdef3 = fplx.pk_defdoc ")
 				.append(" left join bd_inoutbusiclass szxm on htb.vbdef1 = szxm.pk_inoutbusiclass ")
 				.append(" left join bd_defdoc sl on ht.vdef4 = sl.pk_defdoc ")
@@ -153,39 +131,7 @@ public class Action_htcbtx implements Action_itf {
 				.append(" and htb.norigtaxmny <> 0.00 ")
 				.append(" and substr(htb.vbdef2,1,10) between '").append(year).append("-01-01' and '").append(year).append("-12-31' ")
 				.append(" and ht.depid = '").append(pk_dept).append("' ")
-//				.append(" order by htb.vbdef1,ht.cvendorid ")
-		.append(" union all ")
-				.append(" select ")
-				.append(" htb.vbdef1 pk_srxm,")		// 0、收支项目
-				.append(" szxm.name srxm_name,")	// 1、收支项目name
-				.append(" substr(ht.valdate,1,10) begin_date,") 	// 2、合同开始日期
-				.append(" substr(ht.invallidate,1,10) end_date,")	// 3、合同截至日期
-				.append(" substr(htb.vbdef3,1,10) ksrq,")	// 4、行 开始日期
-				.append(" substr(htb.vbdef4,1,10) jzrq,")	// 5、行 截至日期
-				.append(" htb.vbdef5 price,")	// 6、单价
-				.append(" fplx.name fplx,")	// 7、发票类型
-				.append(" ht.vbillcode,")	// 8、合同号
-				.append(" gys.name gys_name, ")		// 9、供应商name
-				.append(" to_number(replace(nvl(sl.name,'0'),'%','')) sl,")		// 10、税率
-				// 11、面积
-				.append(" to_number(replace(nvl(ht.vdef8,'~'),'~','0')) + to_number(replace(nvl(ht.vdef11,'~'),'~','0')) mianji, ")
-				.append(" htft.vhkbdef2 ftbl ")// 12、比例
-				.append(" from (").append(ct_pu_SQL_2).append(") ht ")	// 合同：有部门分摊的合同
-				.append(" inner join ct_pu_term htft on ht.pk_ct_pu = htft.pk_ct_pu ")	// 合同：部门分摊
-				.append(" inner join ct_pu_b htb on ht.pk_ct_pu = htb.pk_ct_pu ")		// 合同：行信息
-				.append(" left join bd_defdoc fplx on ht.vdef3 = fplx.pk_defdoc ")
-				.append(" left join bd_inoutbusiclass szxm on htb.vbdef1 = szxm.pk_inoutbusiclass ")
-				.append(" left join bd_defdoc sl on ht.vdef4 = sl.pk_defdoc ")
-				.append(" left join bd_supplier gys on ht.cvendorid = gys.pk_supplier ")
-				.append(" where ht.dr = 0 and htb.dr = 0 and htft.dr = 0 ")
-				.append(" and ht.vtrantypecode = 'Z2-Cxx-01' ")
-				.append(" and szxm.code not in ('2005', '2022') ")
-				.append(" and ht.blatest = 'Y' ")
-				.append(" and ht.fstatusflag in (1, 6) ")
-				.append(" and htb.norigtaxmny <> 0.00 ")
-				.append(" and substr(htb.vbdef2,1,10) between '").append(year).append("-01-01' and '").append(year).append("-12-31' ")
-				.append(" and ht.depid = '").append(pk_dept).append("' ")
-//				.append(" order by htb.vbdef1,ht.cvendorid ")
+				.append(" order by htb.vbdef1,ht.cvendorid ")
 		;
 		ArrayList<HtcbtxVO> list = (ArrayList)iquerybs.executeQuery(querySQL.toString(), new BeanListProcessor(HtcbtxVO.class));
 		// 封装HashMap
@@ -220,7 +166,6 @@ public class Action_htcbtx implements Action_itf {
 			csModel.setCellValue(currRow, cols[7], "合同成本");//7数据来源
 			csModel.setCellValue(currRow, cols[8], vo.getBegin_date());//8开始日期
 			csModel.setCellValue(currRow, cols[9], vo.getEnd_date());//9截至日期
-			csModel.setCellValue(currRow, cols[10], vo.getFtbl());//10比例
 			
 			for (int mm = 1; mm <= 12; mm ++) {
 				String key = (mm < 10 ? "0" : "") + mm;

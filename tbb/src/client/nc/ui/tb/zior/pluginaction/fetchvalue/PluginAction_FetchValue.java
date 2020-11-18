@@ -167,7 +167,13 @@ public class PluginAction_FetchValue extends AbstractTbPluginAction {
 			FlDbGetNum(csModel, tsmodel, mainorg, tbSheetViewer, taskDataModel, rowno, colno, key);
 		}
 		if (tsmodel.getName().equals("租金收入底表")) {
+			/**
+			 * HK 2020年11月18日11:01:53
+			 */
 			ZjGetnum(ormessage, yea, tbSheetViewer,taskDataModel,tsmodel, rowno,colno, csModel);
+//			Action_itf itf = new Action_zjsrdb();
+//			itf.doAction(ormessage, yea, tbSheetViewer, taskDataModel, tsmodel, rowno, colno, csModel);
+			/***END***/
 		}
 		if (tsmodel.getName().equals("人力成本预算")) {
 			Rlbudget(tsmodel, rowno, csModel, tbSheetViewer, yea, cpleng, key);
@@ -2189,14 +2195,8 @@ public class PluginAction_FetchValue extends AbstractTbPluginAction {
 			TbVarAreaUtil.initTBDataCellRefModel(tBDataCellRefModel1, fjhDim, pk_user, pk_group, cInfo1.getCubeCode(), exVarDef, null, dvMap);
 			tBDataCellRefModel1.getData();
 			Boolean flag=false;
-			/**
-			 * HK 2020年11月15日22:44:52
-			 */
-//			String starttime=(yea-1)+"-12-26 00:00:00";
-//			String endtime=yea+"-12-25 23:59:59";
-			String starttime=yea+"-01-01 00:00:00";
-			String endtime=yea+"-12-31 23:59:59";
-			/***END***/
+			String starttime=(yea-1)+"-12-26 00:00:00";
+			String endtime=yea+"-12-25 23:59:59";
 			String salething1sql = "select cubecode from tb_md_workbook  where pk_obj='" + tsmodel.getMdSheet().getPk_workbook() + "' and nvl(dr,0)=0";
 			code = iquerybs.executeQuery(salething1sql, new ColumnProcessor());
 			int colbm=0;
@@ -2501,16 +2501,7 @@ public class PluginAction_FetchValue extends AbstractTbPluginAction {
 					// TODO 自动生成的 catch 块
 					e1.printStackTrace();
 				}
-				
-				/**
-				 * HK 2020年11月15日22:55:53
-				 * TODO
-				 */
-				for (int i2 = 0; i2 < rowno-6; i2++) {// 赋值
-//					csModel.setCellValue(i3, coldate + i - 12, Long.toString(dayss + 1));
-				}
-				
-				/**
+								
 				Calendar cal3 = Calendar.getInstance();
 				int tt = 0;
 				cal3.setTime(amonth.get(0).getBegindate().toDate());
@@ -2588,7 +2579,6 @@ public class PluginAction_FetchValue extends AbstractTbPluginAction {
 					}
 
 				}
-				**/
 
 				beginTime = null;
 				endTime = null;

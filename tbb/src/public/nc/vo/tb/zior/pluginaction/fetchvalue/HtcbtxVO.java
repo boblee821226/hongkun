@@ -24,6 +24,7 @@ public class HtcbtxVO extends SuperVO {
 	private String gys_name;	// 供应商name
 	private String ksrq;	// 表体开始日期
 	private String jzrq;	// 表体截至日期
+	private String ftbl;	// 分摊比例
 	private Integer m_01;
 	private Integer m_02;
 	private Integer m_03;
@@ -114,6 +115,12 @@ public class HtcbtxVO extends SuperVO {
 	}
 	public void setJzrq(String jzrq) {
 		this.jzrq = jzrq;
+	}
+	public String getFtbl() {
+		return ftbl;
+	}
+	public void setFtbl(String ftbl) {
+		this.ftbl = ftbl;
 	}
 	public Integer getM_01() {
 		return m_01;
