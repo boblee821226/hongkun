@@ -96,7 +96,9 @@ public class Action_gkfyys implements Action_itf {
 		refModel_szxm.getData();
 		TbVarAreaUtil.initTBDataCellRefModel(refModel_gys, dim_gys, pk_user, pk_group, cInfo1.getCubeCode(), exVarDef, null, dvMap);
 		refModel_szxm.getData();
-		
+		/**
+		 * 只取：表头-摊销截止日期 小于等于 表体-截止日期 的数据。
+		 */
 		StringBuffer querySQL = 
 		new StringBuffer("select ")
 				.append(" htb.vbdef1 pk_srxm, ")	// 0、收支项目pk
@@ -121,8 +123,11 @@ public class Action_gkfyys implements Action_itf {
 				.append(" and ht.blatest = 'Y' ")
 				.append(" and ht.fstatusflag in (1, 6) ")
 				.append(" and htb.norigtaxmny <> 0.00 ")
+				// 表体付款日期 在 本年内
 				.append(" and substr(htb.vbdef2,1,10) between '").append(year).append("-01-01' and '").append(year).append("-12-31' ")
 				.append(" and ht.depid = '").append(pk_dept).append("' ")
+				// 表体开始日期 <= 表头截止日期
+				.append(" and substr(htb.vbdef3,1,10) <= substr(nvl(replace(ht.invallidate, '~', ''), '2099-12-31'), 1, 10) ")
 				.append(" order by htb.vbdef1,ht.cvendorid ")
 		;
 		ArrayList list = (ArrayList)iquerybs.executeQuery(querySQL.toString(), new ArrayListProcessor());
@@ -218,40 +223,40 @@ public class Action_gkfyys implements Action_itf {
 	private void setMm(GkfyysVO vo, String mm, UFDouble je) {
 		switch (mm) {
 			case "01":
-				vo.setM_01(je);
+				vo.setM_01(PuPubVO.getUFDouble_NullAsZero(vo.getM_01()).add(je));
 				break;
 			case "02":
-				vo.setM_02(je);
+				vo.setM_02(PuPubVO.getUFDouble_NullAsZero(vo.getM_02()).add(je));
 				break;
 			case "03":
-				vo.setM_03(je);
+				vo.setM_03(PuPubVO.getUFDouble_NullAsZero(vo.getM_03()).add(je));
 				break;
 			case "04":
-				vo.setM_04(je);
+				vo.setM_04(PuPubVO.getUFDouble_NullAsZero(vo.getM_04()).add(je));
 				break;
 			case "05":
-				vo.setM_05(je);
+				vo.setM_05(PuPubVO.getUFDouble_NullAsZero(vo.getM_05()).add(je));
 				break;
 			case "06":
-				vo.setM_06(je);
+				vo.setM_06(PuPubVO.getUFDouble_NullAsZero(vo.getM_06()).add(je));
 				break;
 			case "07":
-				vo.setM_07(je);
+				vo.setM_07(PuPubVO.getUFDouble_NullAsZero(vo.getM_07()).add(je));
 				break;
 			case "08":
-				vo.setM_08(je);
+				vo.setM_08(PuPubVO.getUFDouble_NullAsZero(vo.getM_08()).add(je));
 				break;
 			case "09":
-				vo.setM_09(je);
+				vo.setM_09(PuPubVO.getUFDouble_NullAsZero(vo.getM_09()).add(je));
 				break;
 			case "10":
-				vo.setM_10(je);
+				vo.setM_10(PuPubVO.getUFDouble_NullAsZero(vo.getM_10()).add(je));
 				break;
 			case "11":
-				vo.setM_11(je);
+				vo.setM_11(PuPubVO.getUFDouble_NullAsZero(vo.getM_11()).add(je));
 				break;
 			case "12":
-				vo.setM_12(je);
+				vo.setM_12(PuPubVO.getUFDouble_NullAsZero(vo.getM_12()).add(je));
 				break;
 		}
 	}

@@ -29,6 +29,7 @@ import nc.vo.mdm.dim.LevelValue;
 import nc.vo.mdm.pub.NtbLogger;
 import nc.vo.pub.BusinessException;
 import nc.vo.pub.lang.UFDate;
+import nc.vo.pub.lang.UFDouble;
 import nc.vo.tb.form.excel.ExVarAreaDef;
 import nc.vo.tb.form.excel.ExVarDef;
 import nc.vo.tb.form.iufo.CellExtInfo;
@@ -151,9 +152,14 @@ public class Action_htcbtx implements Action_itf {
 				.append(" and ht.blatest = 'Y' ")
 				.append(" and ht.fstatusflag in (1, 6) ")
 				.append(" and htb.norigtaxmny <> 0.00 ")
-				.append(" and substr(htb.vbdef2,1,10) between '").append(year).append("-01-01' and '").append(year).append("-12-31' ")
+				// 表体开始日期 or 表体结束日期  在本年内
+				.append(" and (substr(htb.vbdef3,1,10) between '").append(year).append("-01-01' and '").append(year).append("-12-31' ")
+				.append(" 	or substr(htb.vbdef4,1,10) between '").append(year).append("-01-01' and '").append(year).append("-12-31' ")
+				.append(" ) ")
+				// 表体开始日期 <= 表头截止日期
+				.append(" and substr(htb.vbdef3,1,10) <= substr(nvl(replace(ht.invallidate, '~', ''), '2099-12-31'), 1, 10) ")
 				.append(" and ht.depid = '").append(pk_dept).append("' ")
-//				.append(" order by htb.vbdef1,ht.cvendorid ")
+//				.append(" and ht.vbillcode = '050820200430-SCL' ")// 测试代码
 		.append(" union all ")
 				.append(" select ")
 				.append(" htb.vbdef1 pk_srxm,")		// 0、收支项目
@@ -171,8 +177,8 @@ public class Action_htcbtx implements Action_itf {
 				.append(" to_number(replace(nvl(ht.vdef8,'~'),'~','0')) + to_number(replace(nvl(ht.vdef11,'~'),'~','0')) mianji, ")
 				.append(" htft.vhkbdef2 ftbl ")// 12、比例
 				.append(" from (").append(ct_pu_SQL_2).append(") ht ")	// 合同：有部门分摊的合同
-				.append(" inner join ct_pu_term htft on ht.pk_ct_pu = htft.pk_ct_pu ")	// 合同：部门分摊
-				.append(" inner join ct_pu_b htb on ht.pk_ct_pu = htb.pk_ct_pu ")		// 合同：行信息
+				.append(" inner join ct_pu_term htft on ht.pk_ct_pu = htft.pk_ct_pu  ")	// 合同：部门分摊
+				.append(" inner join ct_pu_b htb on htft.pk_ct_pu = htb.pk_ct_pu ")		// 合同：行信息
 				.append(" left join bd_defdoc fplx on ht.vdef3 = fplx.pk_defdoc ")
 				.append(" left join bd_inoutbusiclass szxm on htb.vbdef1 = szxm.pk_inoutbusiclass ")
 				.append(" left join bd_defdoc sl on ht.vdef4 = sl.pk_defdoc ")
@@ -183,9 +189,14 @@ public class Action_htcbtx implements Action_itf {
 				.append(" and ht.blatest = 'Y' ")
 				.append(" and ht.fstatusflag in (1, 6) ")
 				.append(" and htb.norigtaxmny <> 0.00 ")
-				.append(" and substr(htb.vbdef2,1,10) between '").append(year).append("-01-01' and '").append(year).append("-12-31' ")
-				.append(" and ht.depid = '").append(pk_dept).append("' ")
-//				.append(" order by htb.vbdef1,ht.cvendorid ")
+				// 表体开始日期 or 表体结束日期  在本年内
+				.append(" and (substr(htb.vbdef3,1,10) between '").append(year).append("-01-01' and '").append(year).append("-12-31' ")
+				.append(" 	or substr(htb.vbdef4,1,10) between '").append(year).append("-01-01' and '").append(year).append("-12-31' ")
+				.append(" ) ")
+				// 表体开始日期 <= 表头截止日期
+				.append(" and substr(htb.vbdef3,1,10) <= substr(nvl(replace(ht.invallidate, '~', ''), '2099-12-31'), 1, 10) ")
+				.append(" and htft.vhkbdef3 = '").append(pk_dept).append("' ")
+//				.append(" and ht.vbillcode = '050820200430-SCL' ")// 测试代码
 		;
 		ArrayList<HtcbtxVO> list = (ArrayList)iquerybs.executeQuery(querySQL.toString(), new BeanListProcessor(HtcbtxVO.class));
 		// 封装HashMap
@@ -199,6 +210,9 @@ public class Action_htcbtx implements Action_itf {
 			if (dataMap.containsKey(key)) {
 				this.calcTs(dataMap.get(key), item, year);
 			} else {
+				if (!"专用发票".equals(item.getFplx())) {
+					item.setSl(UFDouble.ZERO_DBL);
+				}
 				this.calcTs(item, item, year);
 				dataMap.put(key, item);
 			}
