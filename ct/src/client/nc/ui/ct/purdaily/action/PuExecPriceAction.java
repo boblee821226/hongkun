@@ -79,6 +79,11 @@ public class PuExecPriceAction extends NCAction {
 		Integer yearRow = 12 / fk_month;
 		// 查询出 有多少年，也就是要循环多少次，根据总行数 除以 每年的行数
 		Integer yearCount = rowCount / yearRow;
+		// 如果不足年，则按一年来处理
+		if (yearCount == 0) {
+			yearCount = 1;
+			yearRow = 1;
+		}
 		// 根据年 来循环计算。
 		for (int i = 0; i < yearCount; i++) {
 			Integer days = 0;
