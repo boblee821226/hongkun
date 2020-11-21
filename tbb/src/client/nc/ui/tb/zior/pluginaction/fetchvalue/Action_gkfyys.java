@@ -36,6 +36,7 @@ import nc.vo.tb.form.iufo.TbIufoConst;
 import nc.vo.tb.obj.LevelValueOfDimLevelVO;
 import nc.vo.tb.zior.pluginaction.fetchvalue.GkfyysVO;
 
+import com.ufida.zior.view.Viewer;
 import com.ufsoft.table.Cell;
 import com.ufsoft.table.CellsModel;
 
@@ -95,7 +96,7 @@ public class Action_gkfyys implements Action_itf {
 		TbVarAreaUtil.initTBDataCellRefModel(refModel_szxm, dim_szxm, pk_user, pk_group, cInfo1.getCubeCode(), exVarDef, null, dvMap);
 		refModel_szxm.getData();
 		TbVarAreaUtil.initTBDataCellRefModel(refModel_gys, dim_gys, pk_user, pk_group, cInfo1.getCubeCode(), exVarDef, null, dvMap);
-		refModel_szxm.getData();
+		refModel_gys.getData();
 		/**
 		 * 只取：表头-摊销截止日期 小于等于 表体-截止日期 的数据。
 		 */
@@ -128,7 +129,7 @@ public class Action_gkfyys implements Action_itf {
 				.append(" and ht.depid = '").append(pk_dept).append("' ")
 				// 表体开始日期 <= 表头截止日期
 				.append(" and substr(htb.vbdef3,1,10) <= substr(nvl(replace(ht.invallidate, '~', ''), '2099-12-31'), 1, 10) ")
-				.append(" order by htb.vbdef1,ht.cvendorid ")
+				.append(" order by htb.vbdef1,ht.cvendorid,htb.norigtaxmny desc ")
 		;
 		ArrayList list = (ArrayList)iquerybs.executeQuery(querySQL.toString(), new ArrayListProcessor());
 		// 封装HashMap
@@ -154,7 +155,12 @@ public class Action_gkfyys implements Action_itf {
 			String mm = yyyymmdd[1];
 //			Integer month = PuPubVO.getInteger_NullAs(mm, 1);
 			
-			String key = hth + "@@@@" + pk_szxm + "@@@@" + pk_gys;
+			// 如果收支项目名称 前缀为 调整，则去掉“调整”字样，与原始进行合并。
+			if (szxm_name.startsWith("调整")) {
+				szxm_name = szxm_name.replaceFirst("调整", "");
+			}
+			
+			String key = hth + "@@@@" + szxm_name + "@@@@" + pk_gys;
 			if (dataMap.containsKey(key)) {
 				this.setMm(dataMap.get(key), mm, je);
 			} else {
@@ -180,7 +186,7 @@ public class Action_gkfyys implements Action_itf {
 			GkfyysVO vo = item.getValue();
 			csModel.setCellValue(currRow, cols[0], vo.getSrxm_name());//0预算项目名称
 			csModel.setCellValue(currRow, cols[1], vo.getGys_name());//1供应商
-			csModel.setCellValue(currRow, cols[2], "N");//2是否分摊
+//			csModel.setCellValue(currRow, cols[2], "N");//2是否分摊（不需要赋默认值，手工选择）
 			csModel.setCellValue(currRow, cols[3], vo.getVbillcode());//3合同号
 			csModel.setCellValue(currRow, cols[4], vo.getSl());//4税率
 			csModel.setCellValue(currRow, cols[5], "取数数据行");//5取数数据行

@@ -37,6 +37,7 @@ import nc.vo.tb.form.iufo.TbIufoConst;
 import nc.vo.tb.obj.LevelValueOfDimLevelVO;
 import nc.vo.tb.zior.pluginaction.fetchvalue.HtcbtxVO;
 
+import com.ufida.zior.view.Viewer;
 import com.ufsoft.table.Cell;
 import com.ufsoft.table.CellsModel;
 
@@ -102,7 +103,7 @@ public class Action_htcbtx implements Action_itf {
 		TbVarAreaUtil.initTBDataCellRefModel(refModel_szxm, dim_szxm, pk_user, pk_group, cInfo1.getCubeCode(), exVarDef, null, dvMap);
 		refModel_szxm.getData();
 		TbVarAreaUtil.initTBDataCellRefModel(refModel_gys, dim_gys, pk_user, pk_group, cInfo1.getCubeCode(), exVarDef, null, dvMap);
-		refModel_szxm.getData();
+		refModel_gys.getData();
 		
 		/**
 		 * 分为两部分sql
@@ -125,7 +126,9 @@ public class Action_htcbtx implements Action_itf {
 						 " group by pk_ct_pu " +
 						 " ) ";
 		StringBuffer querySQL = 
-		new StringBuffer("select ")
+		new StringBuffer("select * from ")
+			.append(" ( ")
+				.append(" select ")
 				.append(" htb.vbdef1 pk_srxm,")		// 0、收支项目
 				.append(" szxm.name srxm_name,")	// 1、收支项目name
 				.append(" substr(ht.valdate,1,10) begin_date,") 	// 2、合同开始日期
@@ -135,11 +138,13 @@ public class Action_htcbtx implements Action_itf {
 				.append(" htb.vbdef5 price,")	// 6、单价
 				.append(" fplx.name fplx,")	// 7、发票类型
 				.append(" ht.vbillcode,")	// 8、合同号
-				.append(" gys.name gys_name, ")		// 9、供应商name
-				.append(" to_number(replace(nvl(sl.name,'0'),'%','')) sl,")		// 10、税率
-				// 11、面积
+				.append(" ht.cvendorid, ")		// 9、供应商pk
+				.append(" gys.name gys_name, ")		// 10、供应商name
+				.append(" to_number(replace(nvl(sl.name,'0'),'%','')) sl,")		// 11、税率
+				// 12、面积
 				.append(" to_number(replace(nvl(ht.vdef8,'~'),'~','0')) + to_number(replace(nvl(ht.vdef11,'~'),'~','0')) mianji, ")
-				.append(" '1.0' ftbl ")// 12、比例
+				.append(" '1.0' ftbl, ")// 13、比例
+				.append(" htb.norigtaxmny ")// 14、金额
 				.append(" from (").append(ct_pu_SQL_1).append(") ht ")	// 合同：无部门分摊的合同
 				.append(" inner join ct_pu_b htb on ht.pk_ct_pu = htb.pk_ct_pu ")	// 合同：行信息
 				.append(" left join bd_defdoc fplx on ht.vdef3 = fplx.pk_defdoc ")
@@ -171,11 +176,13 @@ public class Action_htcbtx implements Action_itf {
 				.append(" htb.vbdef5 price,")	// 6、单价
 				.append(" fplx.name fplx,")	// 7、发票类型
 				.append(" ht.vbillcode,")	// 8、合同号
-				.append(" gys.name gys_name, ")		// 9、供应商name
-				.append(" to_number(replace(nvl(sl.name,'0'),'%','')) sl,")		// 10、税率
-				// 11、面积
+				.append(" ht.cvendorid, ")		// 9、供应商pk
+				.append(" gys.name gys_name, ")		// 10、供应商name
+				.append(" to_number(replace(nvl(sl.name,'0'),'%','')) sl,")		// 11、税率
+				// 12、面积
 				.append(" to_number(replace(nvl(ht.vdef8,'~'),'~','0')) + to_number(replace(nvl(ht.vdef11,'~'),'~','0')) mianji, ")
-				.append(" htft.vhkbdef2 ftbl ")// 12、比例
+				.append(" htft.vhkbdef2 ftbl, ")// 13、比例
+				.append(" htb.norigtaxmny ")// 14、金额
 				.append(" from (").append(ct_pu_SQL_2).append(") ht ")	// 合同：有部门分摊的合同
 				.append(" inner join ct_pu_term htft on ht.pk_ct_pu = htft.pk_ct_pu  ")	// 合同：部门分摊
 				.append(" inner join ct_pu_b htb on htft.pk_ct_pu = htb.pk_ct_pu ")		// 合同：行信息
@@ -195,25 +202,40 @@ public class Action_htcbtx implements Action_itf {
 				.append(" ) ")
 				// 表体开始日期 <= 表头截止日期
 				.append(" and substr(htb.vbdef3,1,10) <= substr(nvl(replace(ht.invallidate, '~', ''), '2099-12-31'), 1, 10) ")
+				// 分摊部门过滤
 				.append(" and htft.vhkbdef3 = '").append(pk_dept).append("' ")
 //				.append(" and ht.vbillcode = '050820200430-SCL' ")// 测试代码
+			.append(" ) a ")
+			.append(" order by a.pk_srxm,a.cvendorid,a.norigtaxmny desc ")
 		;
 		ArrayList<HtcbtxVO> list = (ArrayList)iquerybs.executeQuery(querySQL.toString(), new BeanListProcessor(HtcbtxVO.class));
 		// 封装HashMap
 		HashMap<String,HtcbtxVO> dataMap = new HashMap<>();
 		for (HtcbtxVO item : list) {
+			// 调整的项目，合同表体单价为负数，需要去掉负号，与原始行进行叠加，只是天数来扣减。
+			// 灵活一些，根据单价为正负数，来判断天数的增减。正数为增、负数为减
+			String srxm_name = item.getSrxm_name();
+			String price = item.getPrice();
+			int flag = 1;	// 负数调整 为 -1
+			if (srxm_name.startsWith("调整")) {
+				srxm_name = srxm_name.replaceFirst("调整", "");
+				if (price.startsWith("-")) {
+					price = price.replaceFirst("-", "");
+					flag = -1;
+				}
+			}
 			String key = item.getVbillcode() + "@@@@" 
-						+ item.getPk_srxm() + "@@@@" 
+						+ srxm_name + "@@@@" 
 						+ item.getCvendorid() + "@@@@"
-						+ item.getPrice()
+						+ price
 						;
 			if (dataMap.containsKey(key)) {
-				this.calcTs(dataMap.get(key), item, year);
+				this.calcTs(dataMap.get(key), item, year, flag);
 			} else {
 				if (!"专用发票".equals(item.getFplx())) {
 					item.setSl(UFDouble.ZERO_DBL);
 				}
-				this.calcTs(item, item, year);
+				this.calcTs(item, item, year, flag);
 				dataMap.put(key, item);
 			}
 		}
@@ -270,13 +292,13 @@ public class Action_htcbtx implements Action_itf {
 		}
 	}
 	
-	private void calcTs(HtcbtxVO root, HtcbtxVO calc, Integer year) {
+	private void calcTs(HtcbtxVO root, HtcbtxVO calc, Integer year, Integer flag) {
 		String ksrqStr = calc.getKsrq();
 		String jzrqStr = calc.getJzrq();
 		Integer[] ts = fentanTs(ksrqStr, jzrqStr, year);
 		for (int i=1;i<=12;i++) {
 			String mm = (i<10?"0":"")+i;
-			this.setMm(root, mm, ts[i-1]);
+			this.setMm(root, mm, ts[i-1] * flag);
 		}
 	}
 	

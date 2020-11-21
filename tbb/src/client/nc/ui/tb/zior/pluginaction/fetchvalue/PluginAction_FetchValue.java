@@ -167,13 +167,7 @@ public class PluginAction_FetchValue extends AbstractTbPluginAction {
 			FlDbGetNum(csModel, tsmodel, mainorg, tbSheetViewer, taskDataModel, rowno, colno, key);
 		}
 		if (tsmodel.getName().equals("租金收入底表")) {
-			/**
-			 * HK 2020年11月18日11:01:53
-			 */
 			ZjGetnum(ormessage, yea, tbSheetViewer,taskDataModel,tsmodel, rowno,colno, csModel);
-//			Action_itf itf = new Action_zjsrdb();
-//			itf.doAction(ormessage, yea, tbSheetViewer, taskDataModel, tsmodel, rowno, colno, csModel);
-			/***END***/
 		}
 		if (tsmodel.getName().equals("人力成本预算")) {
 			Rlbudget(tsmodel, rowno, csModel, tbSheetViewer, yea, cpleng, key);
@@ -343,6 +337,13 @@ public class PluginAction_FetchValue extends AbstractTbPluginAction {
 		 */
 		if (tsmodel.getName().equals("合同成本摊销预算")) {
 			Action_itf itf = new Action_htcbtx();
+			itf.doAction(ormessage, yea, tbSheetViewer, taskDataModel, tsmodel, rowno, colno, csModel);
+		}
+		/**
+		 * HK 2020年11月19日23:41:31
+		 */
+		if (tsmodel.getName().equals("租赁收入底表")) {
+			Action_itf itf = new Action_zjsrdb();
 			itf.doAction(ormessage, yea, tbSheetViewer, taskDataModel, tsmodel, rowno, colno, csModel);
 		}
 		/***END***/

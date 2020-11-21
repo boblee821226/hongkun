@@ -34,13 +34,13 @@ import nc.vo.tb.form.excel.ExVarDef;
 import nc.vo.tb.form.iufo.CellExtInfo;
 import nc.vo.tb.form.iufo.TbIufoConst;
 import nc.vo.tb.obj.LevelValueOfDimLevelVO;
-import nc.vo.tb.zior.pluginaction.fetchvalue.HtcbtxVO;
+import nc.vo.tb.zior.pluginaction.fetchvalue.ZjsrdbVO;
 
 import com.ufsoft.table.Cell;
 import com.ufsoft.table.CellsModel;
 
 /**
- * 租金收入底表
+ * 租赁收入底表
  */
 public class Action_zjsrdb implements Action_itf {
 
@@ -65,107 +65,153 @@ public class Action_zjsrdb implements Action_itf {
 			return;
 		}
 		
+		String PK_SZXM = "1001N510000000024S47";
+		String SZXM_NAME = "租金收入";
+		
 		Integer beginRow = 8;	// 开始行
 		Integer[] cols = new Integer[]{
-			7,	// 0预算项目名称
-			8,	// 1供应商
-			12,	// 2是否分摊=Y
-			13,	// 3合同号
-			14,	// 4单价
-			15,	// 5面积
-			16,	// 6税率
-			17,	// 7数据来源=合同成本
-			18,	// 8开始日期
-			19,	// 9截至日期
+			6,	// 0预算项目（600101、租金收入、1001N510000000024S47）（收支档案）
+			9,	// 1物料（房间号）（物料档案）
+			10,	// 2收费项目（自定义档案）
+			11,	// 3客户（客户档案）
+			12,	// 4面积
+			13,	// 5单价
+			14,	// 6开始日期
+			15,	// 7截至日期
+			28,	// 8数据来源=日租型
 		};
-		Integer monthBeginCol = 20 - 1;
+		Integer monthBeginCol = 16 - 1;
 		
 		String pk_user = WorkbenchEnvironment.getInstance().getLoginUser().getPrimaryKey();
 		String pk_group = WorkbenchEnvironment.getInstance().getGroupVO().getPrimaryKey();
 		String pk_dept = tsmodel.getMdTask().getPk_dataent();	// 预算维度 到部门
 		UIRefPane refPane = new UIRefPane("维度选择");
-		TBDataCellRefModel refModel_szxm = (TBDataCellRefModel) refPane.getRefModel();
-		TBDataCellRefModel refModel_gys = (TBDataCellRefModel) refPane.getRefModel();
+//		TBDataCellRefModel refModel_szxm = (TBDataCellRefModel) refPane.getRefModel();
+		TBDataCellRefModel refModel_cust = (TBDataCellRefModel) refPane.getRefModel();
+		TBDataCellRefModel refModel_room = (TBDataCellRefModel) refPane.getRefModel();
+		TBDataCellRefModel refModel_sfxm = (TBDataCellRefModel) refPane.getRefModel();
 		
 		List<Cell> cells1 = tbSheetViewer.getSelectedCell();
 		Cell cell = cells1.get(cells1.size() - 1);
 		CellExtInfo cInfo1 = (CellExtInfo) cell.getExtFmt(TbIufoConst.tbKey);
 		int varType = cInfo1.getExVarAreaDef().varAreaType;
 		int celNum = varType == ExVarAreaDef.varAreatType_ROW ? cell.getCol() : cell.getRow();
-		
-		LevelValueOfDimLevelVO dim_szxm = new LevelValueOfDimLevelVO(celNum, "MEASURE", null, null, taskDataModel.getMdTask());
-		LevelValueOfDimLevelVO dim_gys = new LevelValueOfDimLevelVO(celNum, "SUPPLIER", null, null, taskDataModel.getMdTask());
+		// 指标：收支项目
+//		LevelValueOfDimLevelVO dim_szxm = new LevelValueOfDimLevelVO(celNum, "MEASURE", null, null, taskDataModel.getMdTask());
+		// 维度：客户
+		LevelValueOfDimLevelVO dim_cust = new LevelValueOfDimLevelVO(celNum, "CUSTOM", null, null, taskDataModel.getMdTask());
+		// 维度：物料-房号
+		LevelValueOfDimLevelVO dim_room = new LevelValueOfDimLevelVO(celNum, "MARBAS", null, null, taskDataModel.getMdTask());
+		// 维度：自定义-收费项目
+		LevelValueOfDimLevelVO dim_sfxm = new LevelValueOfDimLevelVO(celNum, "SFXM", null, null, taskDataModel.getMdTask());
+
 		ExVarDef exVarDef = TbVarAreaUtil.getVarDefByCellExtInfo(cInfo1);
 		Map<DimLevel, LevelValue> dvMap = TbVarAreaUtil.getDVMap(cell, cInfo1, exVarDef, tbSheetViewer.getCellsPane());
-		TbVarAreaUtil.initTBDataCellRefModel(refModel_szxm, dim_szxm, pk_user, pk_group, cInfo1.getCubeCode(), exVarDef, null, dvMap);
-		refModel_szxm.getData();
-		TbVarAreaUtil.initTBDataCellRefModel(refModel_gys, dim_gys, pk_user, pk_group, cInfo1.getCubeCode(), exVarDef, null, dvMap);
-		refModel_szxm.getData();
-		
+//		TbVarAreaUtil.initTBDataCellRefModel(refModel_szxm, dim_szxm, pk_user, pk_group, cInfo1.getCubeCode(), exVarDef, null, dvMap);
+//		refModel_szxm.getData();
+		TbVarAreaUtil.initTBDataCellRefModel(refModel_cust, dim_cust, pk_user, pk_group, cInfo1.getCubeCode(), exVarDef, null, dvMap);
+		refModel_cust.getData();
+		TbVarAreaUtil.initTBDataCellRefModel(refModel_room, dim_room, pk_user, pk_group, cInfo1.getCubeCode(), exVarDef, null, dvMap);
+		refModel_room.getData();
+		TbVarAreaUtil.initTBDataCellRefModel(refModel_sfxm, dim_sfxm, pk_user, pk_group, cInfo1.getCubeCode(), exVarDef, null, dvMap);
+		refModel_sfxm.getData();
+
 		StringBuffer querySQL = 
 		new StringBuffer("select ")
-				.append(" htb.vbdef1 pk_srxm,")		// 0、收支项目
-				.append(" szxm.name srxm_name,")	// 1、收支项目name
+				.append(" htb.vbdef1 pk_sfxm,")		// 0、收费项目
+				.append(" sfxm.name sfxm_name,")	// 1、收费项目name
 				.append(" substr(ht.valdate,1,10) begin_date,") 	// 2、合同开始日期
 				.append(" substr(ht.invallidate,1,10) end_date,")	// 3、合同截至日期
 				.append(" substr(htb.vbdef3,1,10) ksrq,")	// 4、行 开始日期
 				.append(" substr(htb.vbdef4,1,10) jzrq,")	// 5、行 截至日期
-				.append(" htb.vbdef5 price,")	// 6、单价
-				.append(" fplx.name fplx,")	// 7、发票类型
-				.append(" ht.vbillcode,")	// 8、合同号
-				.append(" gys.name gys_name, ")		// 9、供应商name
-				.append(" to_number(replace(nvl(sl.name,'0'),'%','')) sl,")		// 10、税率
-				// 11、面积
-				.append(" to_number(replace(nvl(ht.vdef8,'~'),'~','0')) + to_number(replace(nvl(ht.vdef11,'~'),'~','0')) mianji ")
-				.append(" from ct_pu ht ")
-				.append(" inner join ct_pu_b htb on ht.pk_ct_pu = htb.pk_ct_pu ")
-				.append(" left join bd_defdoc fplx on ht.vdef3 = fplx.pk_defdoc ")
-				.append(" left join bd_inoutbusiclass szxm on htb.vbdef1 = szxm.pk_inoutbusiclass ")
-				.append(" left join bd_defdoc sl on ht.vdef4 = sl.pk_defdoc ")
-				.append(" left join bd_supplier gys on ht.cvendorid = gys.pk_supplier ")
+				.append(" htb.vbdef5 price,")				// 6、单价
+				.append(" to_number(htb.vbdef6) mianji,") 	// 7、面积
+				.append(" ht.pk_customer pk_cust,")		// 8、客户pk
+				.append(" cust.name cust_name,")		// 9、客户name
+				.append(" room.name room_name,")		// 10、房号
+				.append(" inv.pk_material pk_room ")	// 11、物料-房号pk
+				.append(" from ct_sale ht ")
+				.append(" inner join ct_sale_b htb on ht.pk_ct_sale = htb.pk_ct_sale ")
+				.append(" left join bd_customer cust on ht.pk_customer = cust.pk_customer ")
+				.append(" left join bd_defdoc sfxm on htb.vbdef1  = sfxm.pk_defdoc ")
+				.append(" left join bd_defdoc room on ht.vdef16 = room.pk_defdoc ")
+				.append(" left join bd_material inv on inv.dr = 0 and inv.pk_org = ht.pk_org and inv.code = room.code ")
 				.append(" where ht.dr = 0 and htb.dr = 0 ")
-				.append(" and ht.vtrantypecode = 'Z2-Cxx-01' ")
-				.append(" and szxm.code not in ('2005', '2022') ")
 				.append(" and ht.blatest = 'Y' ")
+				.append(" and sfxm.name not like '%押金%' ")
 				.append(" and ht.fstatusflag in (1, 6) ")
 				.append(" and htb.norigtaxmny <> 0.00 ")
-				.append(" and substr(htb.vbdef2,1,10) between '").append(year).append("-01-01' and '").append(year).append("-12-31' ")
+				// 表体开始日期 or 表体结束日期  在本年内
+				.append(" and (substr(htb.vbdef3,1,10) between '").append(year).append("-01-01' and '").append(year).append("-12-31' ")
+				.append(" 	or substr(htb.vbdef4,1,10) between '").append(year).append("-01-01' and '").append(year).append("-12-31' ")
+				.append(" ) ")
+				// 表体开始日期 <= 表头截止日期
+				.append(" and substr(htb.vbdef3,1,10) <= substr(nvl(replace(ht.invallidate, '~', ''), '2099-12-31'), 1, 10) ")
 				.append(" and ht.depid = '").append(pk_dept).append("' ")
-				.append(" order by htb.vbdef1,ht.cvendorid ")
+				// 测试
+//				.append(" and ht.vbillcode = '20200901西配楼' ")
+				// 排序
+				.append(" order by htb.vbdef1,ht.pk_customer,htb.norigtaxmny ")
 		;
-		ArrayList<HtcbtxVO> list = (ArrayList)iquerybs.executeQuery(querySQL.toString(), new BeanListProcessor(HtcbtxVO.class));
+		ArrayList<ZjsrdbVO> list = (ArrayList)iquerybs.executeQuery(querySQL.toString(), new BeanListProcessor(ZjsrdbVO.class));
 		// 封装HashMap
-		HashMap<String,HtcbtxVO> dataMap = new HashMap<>();
-		for (HtcbtxVO item : list) {
-			String key = item.getVbillcode() + "@@@@" 
-						+ item.getPk_srxm() + "@@@@" 
-						+ item.getCvendorid() + "@@@@"
+		HashMap<String,ZjsrdbVO> dataMap = new HashMap<>();
+		// 存放pk为空的房间号
+		HashMap<String,String> nullRoomMap = new HashMap<>();
+		for (ZjsrdbVO item : list) {
+			// 调整的项目，合同表体单价为负数，需要去掉负号，与原始行进行叠加，只是天数来扣减。
+			// 灵活一些，根据单价为正负数，来判断天数的增减。正数为增、负数为减
+			String sfxm_name = item.getSfxm_name();
+			String price = item.getPrice();
+			int flag = 1;	// 负数调整 为 -1
+			if (sfxm_name.startsWith("调整")) {
+				sfxm_name = sfxm_name.replaceFirst("调整", "");
+				if (price.startsWith("-")) {
+					price = price.replaceFirst("-", "");
+					flag = -1;
+				}
+			}
+			String key = item.getPk_room() + "@@@@" 
+						+ sfxm_name + "@@@@" 
+						+ item.getPk_cust() + "@@@@"
 						+ item.getPrice()
 						;
 			if (dataMap.containsKey(key)) {
-				this.calcTs(dataMap.get(key), item, year);
+				this.calcTs(dataMap.get(key), item, year, flag);
 			} else {
-				this.calcTs(item, item, year);
+				this.calcTs(item, item, year, flag);
 				dataMap.put(key, item);
 			}
+			// 空房间的处理
+			if (PuPubVO.isNullOrEmpty(item.getPk_room())) {
+				nullRoomMap.put(item.getRoom_name(), item.getRoom_name());
+			}
+		}
+		
+		// 如果存在空房间，则提示错误
+		if (!nullRoomMap.isEmpty()) {
+			String msg = "";
+			for (Entry<String, String> item : nullRoomMap.entrySet()) {
+				msg += item.getKey() + "、";
+			}
+			throw new BusinessException("以下房间在物料档案中没有建立：\r\n" + msg);
 		}
 		
 		CellContentUtil util = new CellContentUtil(tbSheetViewer);
 		util.addMultiLine(1, dataMap.size());
 		Integer currRow = beginRow;
 		
-		for (Entry<String,HtcbtxVO> item : dataMap.entrySet()) {
-			HtcbtxVO vo = item.getValue();
-			csModel.setCellValue(currRow, cols[0], vo.getSrxm_name());//0预算项目名称
-			csModel.setCellValue(currRow, cols[1], vo.getGys_name());//1供应商
-			csModel.setCellValue(currRow, cols[2], "Y");//2是否分摊
-			csModel.setCellValue(currRow, cols[3], vo.getVbillcode());//3合同号
-			csModel.setCellValue(currRow, cols[4], PuPubVO.getUFDouble_NullAsZero(vo.getPrice()));//4单价
-			csModel.setCellValue(currRow, cols[5], vo.getMianji());//5面积
-			csModel.setCellValue(currRow, cols[6], vo.getSl());//6税率
-			csModel.setCellValue(currRow, cols[7], "合同成本");//7数据来源
-			csModel.setCellValue(currRow, cols[8], vo.getBegin_date());//8开始日期
-			csModel.setCellValue(currRow, cols[9], vo.getEnd_date());//9截至日期
+		for (Entry<String, ZjsrdbVO> item : dataMap.entrySet()) {
+			ZjsrdbVO vo = item.getValue();
+//			csModel.setCellValue(currRow, cols[0], SZXM_NAME);//0预算项目名称
+			csModel.setCellValue(currRow, cols[1], vo.getRoom_name());//1物料（房间号）
+			csModel.setCellValue(currRow, cols[2], vo.getSfxm_name());//2收费项目
+			csModel.setCellValue(currRow, cols[3], vo.getCust_name());//3客户
+			csModel.setCellValue(currRow, cols[4], vo.getMianji());//4面积
+			csModel.setCellValue(currRow, cols[5], PuPubVO.getUFDouble_NullAsZero(vo.getPrice()));//5单价
+			csModel.setCellValue(currRow, cols[6], vo.getBegin_date());//6截至日期
+			csModel.setCellValue(currRow, cols[7], vo.getEnd_date());//7截至日期
+			csModel.setCellValue(currRow, cols[8], "日租型");//8数据来源
 			
 			for (int mm = 1; mm <= 12; mm ++) {
 				String key = (mm < 10 ? "0" : "") + mm;
@@ -175,39 +221,81 @@ public class Action_zjsrdb implements Action_itf {
 				}
 			}
 			
-			// 维度：项目
-			DimMember dm_szxm = refModel_szxm.getDimMember(vo.getPk_srxm());
-			if (null != dm_szxm) {
-				DimMember[] dms_szxm = new DimMember[]{dm_szxm};
-				VarCellValueModel vm_szxm = new VarCellValueModel(0, csModel, currRow, cols[0], dms_szxm, 1);
-				try {
-					vm_szxm.fireCellValueChaned();
-				} catch (BusinessException be) {
-					NtbLogger.error(be);
+			// 指标：收支项目
+//			if (PK_SZXM != null) {
+//				DimMember dm_szxm = refModel_szxm.getDimMember(PK_SZXM);
+//				if (null != dm_szxm) {
+//					DimMember[] dms_szxm = new DimMember[]{dm_szxm};
+//					VarCellValueModel vm_szxm = new VarCellValueModel(0, csModel, currRow, cols[0], dms_szxm, 1);
+//					try {
+//						vm_szxm.fireCellValueChaned();
+//					} catch (BusinessException be) {
+//						NtbLogger.error(be);
+//					}
+//				}
+//			} else {
+//				throw new BusinessException("收支项目不能为空");
+////				MessageDialog.showErrorDlg(tbSheetViewer,"错误","收支项目不能为空");
+//			}
+			// 维度：房号
+			if (!PuPubVO.isNullOrEmpty(vo.getPk_room())) {
+				DimMember dm_room = refModel_room.getDimMember("MARBAS"+vo.getPk_room());
+				if (null != dm_room) {
+					DimMember[] dms_room = new DimMember[]{dm_room};
+					VarCellValueModel vm_room = new VarCellValueModel(0, csModel, currRow, cols[1], dms_room, 1);
+					try {
+						vm_room.fireCellValueChaned();
+					} catch (BusinessException be) {
+						NtbLogger.error(be);
+					}
 				}
+			} else {
+				throw new BusinessException("物料档案-房号不能为空");
+//				MessageDialog.showErrorDlg(tbSheetViewer,"错误","物料档案-房号不能为空");
 			}
-			// 维度：供应商
-			DimMember dm_gys = refModel_gys.getDimMember("SUPPLIER"+vo.getCvendorid());
-			if (null != dm_gys) {
-				DimMember[] dms_gys = new DimMember[]{dm_gys};
-				VarCellValueModel vm_gys = new VarCellValueModel(0, csModel, currRow, cols[1], dms_gys, 1);
-				try {
-					vm_gys.fireCellValueChaned();
-				} catch (BusinessException be) {
-					NtbLogger.error(be);
+			// 维度：收费项目
+			if (!PuPubVO.isNullOrEmpty(vo.getPk_sfxm())) {
+				DimMember dm_sfxm = refModel_sfxm.getDimMember(vo.getPk_sfxm());
+				if (null != dm_sfxm) {
+					DimMember[] dms_sfxm = new DimMember[]{dm_sfxm};
+					VarCellValueModel vm_sfxm = new VarCellValueModel(0, csModel, currRow, cols[2], dms_sfxm, 1);
+					try {
+						vm_sfxm.fireCellValueChaned();
+					} catch (BusinessException be) {
+						NtbLogger.error(be);
+					}
 				}
+			} else {
+				throw new BusinessException("收费项目不能为空");
+//				MessageDialog.showErrorDlg(tbSheetViewer,"错误","收费项目不能为空");
+			}
+			// 维度：客户
+			if (!PuPubVO.isNullOrEmpty(vo.getPk_cust())) {
+				DimMember dm_cust = refModel_cust.getDimMember("CUSTOM"+vo.getPk_cust());
+				if (null != dm_cust) {
+					DimMember[] dms_cust = new DimMember[]{dm_cust};
+					VarCellValueModel vm_cust = new VarCellValueModel(0, csModel, currRow, cols[3], dms_cust, 1);
+					try {
+						vm_cust.fireCellValueChaned();
+					} catch (BusinessException be) {
+						NtbLogger.error(be);
+					}
+				}
+			} else {
+				throw new BusinessException("客户不能为空");
+//				MessageDialog.showErrorDlg(tbSheetViewer,"错误","客户不能为空");
 			}
 			currRow ++;
 		}
 	}
 	
-	private void calcTs(HtcbtxVO root, HtcbtxVO calc, Integer year) {
+	private void calcTs(ZjsrdbVO root, ZjsrdbVO calc, Integer year, Integer flag) {
 		String ksrqStr = calc.getKsrq();
 		String jzrqStr = calc.getJzrq();
 		Integer[] ts = fentanTs(ksrqStr, jzrqStr, year);
 		for (int i=1;i<=12;i++) {
 			String mm = (i<10?"0":"")+i;
-			this.setMm(root, mm, ts[i-1]);
+			this.setMm(root, mm, ts[i-1] * flag);
 		}
 	}
 	
@@ -244,7 +332,7 @@ public class Action_zjsrdb implements Action_itf {
 		return result;
 	}
 	
-	private void setMm(HtcbtxVO vo, String mm, Integer ts) {
+	private void setMm(ZjsrdbVO vo, String mm, Integer ts) {
 		switch (mm) {
 			case "01":
 				vo.setM_01(PuPubVO.getInteger_NullAs(vo.getM_01(),0) + ts);
@@ -285,7 +373,7 @@ public class Action_zjsrdb implements Action_itf {
 		}
 	}
 	
-	private Integer getMm(HtcbtxVO vo, String mm) {
+	private Integer getMm(ZjsrdbVO vo, String mm) {
 		switch (mm) {
 			case "01":
 				return vo.getM_01();
