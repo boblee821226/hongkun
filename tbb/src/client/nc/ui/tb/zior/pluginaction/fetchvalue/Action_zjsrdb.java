@@ -82,6 +82,43 @@ public class Action_zjsrdb implements Action_itf {
 		};
 		Integer monthBeginCol = 16 - 1;
 		
+		/**
+		 * 先处理手工增行的数据
+		 */
+		{
+			// 循环找到手工录入的结束行，小计为结束行。
+			Integer currRow = beginRow;
+			boolean isExec = true;	// 是否执行，当遇到小计行时停止
+			while (isExec) {
+				String cell = PuPubVO.getString_TrimZeroLenAsNull(csModel.getCellValue(currRow, cols[0]));
+				if (cell != null) {
+					cell = cell.replaceAll(" ", "");
+					if ("小计：".equals(cell)) {
+						isExec = false;
+					} else {
+						ZjsrdbVO vo = new ZjsrdbVO();
+						String ksrq = PuPubVO.getString_TrimZeroLenAsNull(csModel.getCellValue(currRow, cols[6]));
+						String jzrq = PuPubVO.getString_TrimZeroLenAsNull(csModel.getCellValue(currRow, cols[7]));
+						if (ksrq == null) ksrq = "" + year + "-01-01";
+						if (jzrq == null) jzrq = "" + year + "-12-31";
+						vo.setKsrq(ksrq);
+						vo.setJzrq(jzrq);
+						this.calcTs(vo, vo, year, 1);
+						for (int mm = 1; mm <= 12; mm ++) {
+							String key = (mm < 10 ? "0" : "") + mm;
+							Integer ts = this.getMm(vo, key);
+							if (ts != null) {
+								csModel.setCellValue(currRow, monthBeginCol + mm, ts);// 月份天数
+							}
+						}
+						csModel.setCellValue(currRow, cols[8], "日租型");
+						currRow++;
+					}
+				}
+			}
+		}
+		/***END***/
+		
 		String pk_user = WorkbenchEnvironment.getInstance().getLoginUser().getPrimaryKey();
 		String pk_group = WorkbenchEnvironment.getInstance().getGroupVO().getPrimaryKey();
 		String pk_dept = tsmodel.getMdTask().getPk_dataent();	// 预算维度 到部门
