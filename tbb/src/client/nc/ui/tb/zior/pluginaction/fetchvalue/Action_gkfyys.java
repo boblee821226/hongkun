@@ -36,7 +36,6 @@ import nc.vo.tb.form.iufo.TbIufoConst;
 import nc.vo.tb.obj.LevelValueOfDimLevelVO;
 import nc.vo.tb.zior.pluginaction.fetchvalue.GkfyysVO;
 
-import com.ufida.zior.view.Viewer;
 import com.ufsoft.table.Cell;
 import com.ufsoft.table.CellsModel;
 
@@ -56,7 +55,8 @@ public class Action_gkfyys implements Action_itf {
 			TBSheetViewer tbSheetViewer,
 			TaskDataModel taskDataModel,
 			TaskSheetDataModel tsmodel,
-			int rowno, int colno,
+			int rowno, 
+			int colno,
 			CellsModel csModel
 		) throws BusinessException {
 
@@ -82,6 +82,7 @@ public class Action_gkfyys implements Action_itf {
 		UIRefPane refPane = new UIRefPane("维度选择");
 		TBDataCellRefModel refModel_szxm = (TBDataCellRefModel) refPane.getRefModel();
 		TBDataCellRefModel refModel_gys = (TBDataCellRefModel) refPane.getRefModel();
+		TBDataCellRefModel refModel_eps = (TBDataCellRefModel) refPane.getRefModel();
 		
 		List<Cell> cells1 = tbSheetViewer.getSelectedCell();
 		Cell cell = cells1.get(cells1.size() - 1);
@@ -91,12 +92,15 @@ public class Action_gkfyys implements Action_itf {
 		
 		LevelValueOfDimLevelVO dim_szxm = new LevelValueOfDimLevelVO(celNum, "MEASURE", null, null, taskDataModel.getMdTask());
 		LevelValueOfDimLevelVO dim_gys = new LevelValueOfDimLevelVO(celNum, "SUPPLIER", null, null, taskDataModel.getMdTask());
+		LevelValueOfDimLevelVO dim_eps = new LevelValueOfDimLevelVO(celNum, "PROJECT", null, null, taskDataModel.getMdTask());
 		ExVarDef exVarDef = TbVarAreaUtil.getVarDefByCellExtInfo(cInfo1);
 		Map<DimLevel, LevelValue> dvMap = TbVarAreaUtil.getDVMap(cell, cInfo1, exVarDef, tbSheetViewer.getCellsPane());
 		TbVarAreaUtil.initTBDataCellRefModel(refModel_szxm, dim_szxm, pk_user, pk_group, cInfo1.getCubeCode(), exVarDef, null, dvMap);
 		refModel_szxm.getData();
 		TbVarAreaUtil.initTBDataCellRefModel(refModel_gys, dim_gys, pk_user, pk_group, cInfo1.getCubeCode(), exVarDef, null, dvMap);
 		refModel_gys.getData();
+		TbVarAreaUtil.initTBDataCellRefModel(refModel_eps, dim_eps, pk_user, pk_group, cInfo1.getCubeCode(), exVarDef, null, dvMap);
+		refModel_eps.getData();
 		/**
 		 * 只取：表头-摊销截止日期 小于等于 表体-截止日期 的数据。
 		 */
@@ -186,7 +190,7 @@ public class Action_gkfyys implements Action_itf {
 			GkfyysVO vo = item.getValue();
 			csModel.setCellValue(currRow, cols[0], vo.getSrxm_name());//0预算项目名称
 			csModel.setCellValue(currRow, cols[1], vo.getGys_name());//1供应商
-//			csModel.setCellValue(currRow, cols[2], "N");//2是否分摊（不需要赋默认值，手工选择）
+			csModel.setCellValue(currRow, cols[2], "合同成本摊销");//2是否分摊
 			csModel.setCellValue(currRow, cols[3], vo.getVbillcode());//3合同号
 			csModel.setCellValue(currRow, cols[4], vo.getSl());//4税率
 			csModel.setCellValue(currRow, cols[5], "取数数据行");//5取数数据行
@@ -217,6 +221,17 @@ public class Action_gkfyys implements Action_itf {
 				VarCellValueModel vm_gys = new VarCellValueModel(0, csModel, currRow, cols[1], dms_gys, 1);
 				try {
 					vm_gys.fireCellValueChaned();
+				} catch (BusinessException be) {
+					NtbLogger.error(be);
+				}
+			}
+			// 维度：EPS（合同成本摊销）
+			DimMember dm_eps = refModel_gys.getDimMember("1001S910000000BX0YL9");
+			if (null != dm_eps) {
+				DimMember[] dms_eps = new DimMember[]{dm_eps};
+				VarCellValueModel vm_eps = new VarCellValueModel(0, csModel, currRow, cols[2], dms_eps, 1);
+				try {
+					vm_eps.fireCellValueChaned();
 				} catch (BusinessException be) {
 					NtbLogger.error(be);
 				}

@@ -33,6 +33,9 @@ public class ZjsrdbVO extends SuperVO {
 	private Integer m_10;
 	private Integer m_11;
 	private Integer m_12;
+	private String pk_szxm;		// 收支项目pk（预算）
+	private String szxm_name;	// 收支项目name（预算）
+	private String money;		// 金额
 	
 	public String getPk_sfxm() {
 		return pk_sfxm;
@@ -177,6 +180,24 @@ public class ZjsrdbVO extends SuperVO {
 	}
 	public void setM_12(Integer m_12) {
 		this.m_12 = m_12;
+	}
+	public String getPk_szxm() {
+		return pk_szxm;
+	}
+	public void setPk_szxm(String pk_szxm) {
+		this.pk_szxm = pk_szxm;
+	}
+	public String getSzxm_name() {
+		return szxm_name;
+	}
+	public void setSzxm_name(String szxm_name) {
+		this.szxm_name = szxm_name;
+	}
+	public String getMoney() {
+		return money;
+	}
+	public void setMoney(String money) {
+		this.money = money;
 	}
 	
 }

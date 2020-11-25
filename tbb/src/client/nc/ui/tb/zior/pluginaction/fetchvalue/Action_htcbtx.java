@@ -3,6 +3,7 @@ package nc.ui.tb.zior.pluginaction.fetchvalue;
 import hd.vo.pub.tools.PuPubVO;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,8 +37,8 @@ import nc.vo.tb.form.iufo.CellExtInfo;
 import nc.vo.tb.form.iufo.TbIufoConst;
 import nc.vo.tb.obj.LevelValueOfDimLevelVO;
 import nc.vo.tb.zior.pluginaction.fetchvalue.HtcbtxVO;
+import nc.vo.tb.zior.pluginaction.fetchvalue.ZjsrdbVO;
 
-import com.ufida.zior.view.Viewer;
 import com.ufsoft.table.Cell;
 import com.ufsoft.table.CellsModel;
 
@@ -59,8 +60,8 @@ public class Action_htcbtx implements Action_itf {
 			TaskSheetDataModel tsmodel,
 			int rowno,
 			int colno,
-			CellsModel csModel)
-		throws BusinessException {
+			CellsModel csModel
+		) throws BusinessException {
 		
 		if (tbSheetViewer.getSelectedCell().get(0).getRow() <7) {
 			MessageDialog.showErrorDlg(null, "提示","请选择第8行之后的预算项目下的数据取数");
@@ -89,6 +90,8 @@ public class Action_htcbtx implements Action_itf {
 		UIRefPane refPane = new UIRefPane("维度选择");
 		TBDataCellRefModel refModel_szxm = (TBDataCellRefModel) refPane.getRefModel();
 		TBDataCellRefModel refModel_gys = (TBDataCellRefModel) refPane.getRefModel();
+		TBDataCellRefModel refModel_eps = (TBDataCellRefModel) refPane.getRefModel();
+		TBDataCellRefModel refModel_xmmx = (TBDataCellRefModel) refPane.getRefModel();
 		
 		List<Cell> cells1 = tbSheetViewer.getSelectedCell();
 		Cell cell = cells1.get(cells1.size() - 1);
@@ -98,12 +101,25 @@ public class Action_htcbtx implements Action_itf {
 		
 		LevelValueOfDimLevelVO dim_szxm = new LevelValueOfDimLevelVO(celNum, "MEASURE", null, null, taskDataModel.getMdTask());
 		LevelValueOfDimLevelVO dim_gys = new LevelValueOfDimLevelVO(celNum, "SUPPLIER", null, null, taskDataModel.getMdTask());
+		LevelValueOfDimLevelVO dim_eps = new LevelValueOfDimLevelVO(celNum, "PROJECT", null, null, taskDataModel.getMdTask());
+		LevelValueOfDimLevelVO dim_xmmx = new LevelValueOfDimLevelVO(celNum, "XMMX", null, null, taskDataModel.getMdTask());
 		ExVarDef exVarDef = TbVarAreaUtil.getVarDefByCellExtInfo(cInfo1);
 		Map<DimLevel, LevelValue> dvMap = TbVarAreaUtil.getDVMap(cell, cInfo1, exVarDef, tbSheetViewer.getCellsPane());
 		TbVarAreaUtil.initTBDataCellRefModel(refModel_szxm, dim_szxm, pk_user, pk_group, cInfo1.getCubeCode(), exVarDef, null, dvMap);
 		refModel_szxm.getData();
 		TbVarAreaUtil.initTBDataCellRefModel(refModel_gys, dim_gys, pk_user, pk_group, cInfo1.getCubeCode(), exVarDef, null, dvMap);
 		refModel_gys.getData();
+		TbVarAreaUtil.initTBDataCellRefModel(refModel_eps, dim_eps, pk_user, pk_group, cInfo1.getCubeCode(), exVarDef, null, dvMap);
+		refModel_eps.getData();
+		TbVarAreaUtil.initTBDataCellRefModel(refModel_xmmx, dim_xmmx, pk_user, pk_group, cInfo1.getCubeCode(), exVarDef, null, dvMap);
+		refModel_xmmx.getData();
+		
+		ArrayList<String[]> xmmxList = new ArrayList<String[]>();
+		xmmxList.add(new String[]{"调整一", "1001S910000000BX27M3"});
+		xmmxList.add(new String[]{"调整二", "1001S910000000BX27M4"});
+		xmmxList.add(new String[]{"调整三", "1001S910000000BX27M5"});
+		xmmxList.add(new String[]{"调整四", "1001S910000000BX27M6"});
+		xmmxList.add(new String[]{"调整五", "1001S910000000BX27M7"});
 		
 		/**
 		 * 分为两部分sql
@@ -244,8 +260,18 @@ public class Action_htcbtx implements Action_itf {
 		util.addMultiLine(1, dataMap.size());
 		Integer currRow = beginRow;
 		
-		for (Entry<String,HtcbtxVO> item : dataMap.entrySet()) {
-			HtcbtxVO vo = item.getValue();
+		/**
+		 * 先按map的key排序
+		 */
+		String[] mapKeys = dataMap.keySet().toArray(new String[0]);
+		Arrays.sort(mapKeys);
+		/***END***/
+		
+		HashMap<String, Integer> rowKeyMap = new HashMap<>();	// 每个维度的出现次数
+//		for (Entry<String,HtcbtxVO> item : dataMap.entrySet()) {
+		for (String mapKey : mapKeys) {
+//			HtcbtxVO vo = item.getValue();
+			HtcbtxVO vo = dataMap.get(mapKey);
 			csModel.setCellValue(currRow, cols[0], vo.getSrxm_name());//0预算项目名称
 			csModel.setCellValue(currRow, cols[1], vo.getGys_name());//1供应商
 			csModel.setCellValue(currRow, cols[2], "Y");//2是否分摊
@@ -288,6 +314,41 @@ public class Action_htcbtx implements Action_itf {
 					NtbLogger.error(be);
 				}
 			}
+			// 维度：EPS（合同成本摊销）
+			DimMember dm_eps = refModel_gys.getDimMember("1001N5100000000QDS82");
+			if (null != dm_eps) {
+				DimMember[] dms_eps = new DimMember[]{dm_eps};
+				VarCellValueModel vm_eps = new VarCellValueModel(0, csModel, currRow, cols[2], dms_eps, 1);
+				try {
+					vm_eps.fireCellValueChaned();
+				} catch (BusinessException be) {
+					NtbLogger.error(be);
+				}
+			}
+			// key = 收入项目+供应商+合同号
+			String rowKey = vo.getPk_srxm() + "@@@@" + vo.getCvendorid() + "@@@@" + vo.getVbillcode();
+			if (rowKeyMap.containsKey(rowKey)) {
+				Integer index = rowKeyMap.get(rowKey);
+				if (index < xmmxList.size()-1) {
+					String[] xmmx = xmmxList.get(index);
+					String pk_xmmx = xmmx[1];
+					String xmmx_name = xmmx[0];
+					csModel.setCellValue(currRow, cols[2]-1, xmmx_name);//项目明细
+					DimMember dm_xmmx = refModel_xmmx.getDimMember(pk_xmmx);
+					if (null != dm_xmmx) {
+						DimMember[] dms_xmmx = new DimMember[]{dm_xmmx};
+						VarCellValueModel vm_xmmx = new VarCellValueModel(0, csModel, currRow, cols[2]-1, dms_xmmx, 1);
+						try {
+							vm_xmmx.fireCellValueChaned();
+						} catch (BusinessException be) {
+							NtbLogger.error(be);
+						}
+					}
+				}
+				rowKeyMap.put(rowKey, index+1);
+			} else {
+				rowKeyMap.put(rowKey, 0);
+			}
 			currRow ++;
 		}
 	}
@@ -295,6 +356,21 @@ public class Action_htcbtx implements Action_itf {
 	private void calcTs(HtcbtxVO root, HtcbtxVO calc, Integer year, Integer flag) {
 		String ksrqStr = calc.getKsrq();
 		String jzrqStr = calc.getJzrq();
+		/**
+		 * HK 2020年11月24日19:33:43
+		 * 如果合同的开始日期 大，就取 合同的开始日期
+		 * 如果合同的截至日期 小，就取 合同的截至日期
+		 */
+		String begin_date = calc.getBegin_date();
+		String end_date = calc.getEnd_date();
+		if (begin_date != null && begin_date.compareTo(ksrqStr) > 0) {
+			ksrqStr = begin_date;
+		}
+		if (end_date != null && end_date.compareTo(jzrqStr) < 0) {
+			jzrqStr = end_date;
+		}
+		/***END***/
+		
 		Integer[] ts = fentanTs(ksrqStr, jzrqStr, year);
 		for (int i=1;i<=12;i++) {
 			String mm = (i<10?"0":"")+i;
