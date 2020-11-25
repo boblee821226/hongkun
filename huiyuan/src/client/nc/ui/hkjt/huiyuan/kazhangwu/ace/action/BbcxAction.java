@@ -83,11 +83,12 @@ public class BbcxAction extends NCAction {
 					"0001N510000000001SY5",	// 康福瑞西山店
 					"0001N510000000001SY3",	// 朗丽兹酒店
 					"0001N510000000001SY7",	// 西山温泉
+					"0001N5100000000UVI5I",	// 太申
 				};
 			
 			// 封装出 报表格式
 			KazhangwuHVO   resultHVO  = new KazhangwuHVO();
-			KazhangwuBVO[] resultBVOs = new KazhangwuBVO[34];
+			KazhangwuBVO[] resultBVOs = new KazhangwuBVO[37];
 			
 			resultBVOs[0] = new KazhangwuBVO("     充值","售卡");
 			resultBVOs[1] = new KazhangwuBVO("","赠送");
@@ -101,31 +102,37 @@ public class BbcxAction extends NCAction {
 			resultBVOs[9] = new KazhangwuBVO("","回充");
 			resultBVOs[10] = new KazhangwuBVO("----合计----","");
 			
+			Integer first_index_xf = 11;
 			resultBVOs[11] = new KazhangwuBVO("     消费","贵宾楼卡消费");
 			resultBVOs[12] = new KazhangwuBVO("","国际店卡消费");
 			resultBVOs[13] = new KazhangwuBVO("","康福瑞学院路卡消费");
 			resultBVOs[14] = new KazhangwuBVO("","康福瑞西山卡消费");
 			resultBVOs[15] = new KazhangwuBVO("","朗丽兹卡消费");
 			resultBVOs[16] = new KazhangwuBVO("","西山温泉卡消费");
-			resultBVOs[17] = new KazhangwuBVO("----合计----","");
+			resultBVOs[17] = new KazhangwuBVO("","太申卡消费");	// TODO
+			resultBVOs[18] = new KazhangwuBVO("----合计----","");
 			
-			resultBVOs[18] = new KazhangwuBVO("     调整","贵宾楼卡调整");
-			resultBVOs[19] = new KazhangwuBVO("","国际店卡调整");
-			resultBVOs[20] = new KazhangwuBVO("","康福瑞学院路卡调整");
-			resultBVOs[21] = new KazhangwuBVO("","康福瑞西山卡调整");
-			resultBVOs[22] = new KazhangwuBVO("","朗丽兹卡调整");
-			resultBVOs[23] = new KazhangwuBVO("","西山温泉卡调整");
-			resultBVOs[24] = new KazhangwuBVO("----合计----","");
+			Integer first_index_tz = 19;
+			resultBVOs[19] = new KazhangwuBVO("     调整","贵宾楼卡调整");
+			resultBVOs[20] = new KazhangwuBVO("","国际店卡调整");
+			resultBVOs[21] = new KazhangwuBVO("","康福瑞学院路卡调整");
+			resultBVOs[22] = new KazhangwuBVO("","康福瑞西山卡调整");
+			resultBVOs[23] = new KazhangwuBVO("","朗丽兹卡调整");
+			resultBVOs[24] = new KazhangwuBVO("","西山温泉卡调整");
+			resultBVOs[25] = new KazhangwuBVO("","太申卡调整");	// TODO
+			resultBVOs[26] = new KazhangwuBVO("----合计----","");
 			
-			resultBVOs[25] = new KazhangwuBVO("  应付货币","在贵宾楼刷卡");
-			resultBVOs[26] = new KazhangwuBVO("","在国际店刷卡");
-			resultBVOs[27] = new KazhangwuBVO("","在康福瑞学院路刷卡");
-			resultBVOs[28] = new KazhangwuBVO("","在康福瑞西山刷卡");
-			resultBVOs[29] = new KazhangwuBVO("","在朗丽兹刷卡");
-			resultBVOs[30] = new KazhangwuBVO("","在西山温泉刷卡");
-			resultBVOs[31] = new KazhangwuBVO("----合计----","");
-			resultBVOs[32] = new KazhangwuBVO("----余额----","");
-			resultBVOs[33] = new KazhangwuBVO("---余转差异---","");
+			Integer first_index_yf = 27;
+			resultBVOs[27] = new KazhangwuBVO("  应付货币","在贵宾楼刷卡");
+			resultBVOs[28] = new KazhangwuBVO("","在国际店刷卡");
+			resultBVOs[29] = new KazhangwuBVO("","在康福瑞学院路刷卡");
+			resultBVOs[30] = new KazhangwuBVO("","在康福瑞西山刷卡");
+			resultBVOs[31] = new KazhangwuBVO("","在朗丽兹刷卡");
+			resultBVOs[32] = new KazhangwuBVO("","在西山温泉刷卡");
+			resultBVOs[33] = new KazhangwuBVO("","在太申刷卡");	// TODO
+			resultBVOs[34] = new KazhangwuBVO("----合计----","");
+			resultBVOs[35] = new KazhangwuBVO("----余额----","");
+			resultBVOs[36] = new KazhangwuBVO("---余转差异---","");
 			
 			String hzdate = getValueForColumn(dlg, "dbilldate", true, true);
 			String pk_org = getValueForColumn(dlg, "pk_org", true, false);
@@ -228,7 +235,7 @@ public class BbcxAction extends NCAction {
 					
 					UFDouble xf_kj_total = UFDouble.ZERO_DBL;
 					UFDouble xf_kbl_total = UFDouble.ZERO_DBL;
-					int first_index = 11;
+					int first_index = first_index_xf;
 					
 					for( int i=0;i<PK_CORP.length;i++ )
 					{ 
@@ -293,7 +300,7 @@ public class BbcxAction extends NCAction {
 					
 					UFDouble fq_kj_total = UFDouble.ZERO_DBL;
 					UFDouble fq_kbl_total = UFDouble.ZERO_DBL;
-					int first_index = 11;
+					int first_index = first_index_xf;
 					
 					for( int i=0;i<PK_CORP.length;i++ )
 					{// Vbdef01 分区卡结    Vbdef02 分区卡比例卡结
@@ -323,7 +330,7 @@ public class BbcxAction extends NCAction {
 			 *   合计卡比例卡结    = 会员卡比例卡结 4 + 分区卡比例卡结 2
 			 */
 			{
-				int first_index = 11;
+				int first_index = first_index_xf;	// 
 				for( int i=0;i<PK_CORP.length + 1;i++ )	// 需要计算  合计行
 				{
 					resultBVOs[first_index+i].setKajie(
@@ -375,7 +382,7 @@ public class BbcxAction extends NCAction {
 					
 					UFDouble tz_kj_total  = UFDouble.ZERO_DBL;
 					UFDouble tz_kbl_total = UFDouble.ZERO_DBL;
-					int first_index = 18;
+					int first_index = first_index_tz;
 					
 					for( int i=0;i<PK_CORP.length;i++ )
 					{
@@ -440,7 +447,7 @@ public class BbcxAction extends NCAction {
 					
 					UFDouble yf_kj_total  = UFDouble.ZERO_DBL;
 					UFDouble yf_kbl_total = UFDouble.ZERO_DBL;
-					int first_index = 25;
+					int first_index = first_index_yf;
 					
 					for( int i=0;i<PK_CORP.length;i++ )
 					{
@@ -505,7 +512,7 @@ public class BbcxAction extends NCAction {
 					
 					UFDouble fq_yf_kj_total  = UFDouble.ZERO_DBL;
 					UFDouble fq_yf_kbl_total = UFDouble.ZERO_DBL;
-					int first_index = 25;
+					int first_index = first_index_yf;
 					
 					for( int i=0;i<PK_CORP.length;i++ )
 					{
@@ -535,7 +542,7 @@ public class BbcxAction extends NCAction {
 			 *   合计卡比例卡结    = 会员卡比例卡结 4 + 分区卡比例卡结 2
 			 */
 			{
-				int first_index = 25;
+				int first_index = first_index_yf;
 				for( int i=0;i<PK_CORP.length;i++ )
 				{
 					resultBVOs[first_index+i].setKajie(
