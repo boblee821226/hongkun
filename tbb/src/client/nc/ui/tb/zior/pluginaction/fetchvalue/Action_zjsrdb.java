@@ -255,8 +255,9 @@ public class Action_zjsrdb implements Action_itf {
 				.append(" and ht.depid = '").append(pk_dept).append("' ")
 				// ²âÊÔ
 //				.append(" and ht.vbillcode = '20200901Î÷ÅäÂ¥' ")
+				.append(" and ht.pk_customer = '1001N5100000006SB94B' ")
 				// ÅÅÐò
-				.append(" order by htb.vbdef1,ht.pk_customer,htb.norigtaxmny desc ")
+				.append(" order by htb.vbdef1,ht.pk_customer,htb.norigtaxmny desc,to_number(htb.vbdef5) desc ")
 		;
 		ArrayList<ZjsrdbVO> list = (ArrayList)iquerybs.executeQuery(querySQL.toString(), new BeanListProcessor(ZjsrdbVO.class));
 		// ·â×°HashMap
@@ -284,7 +285,7 @@ public class Action_zjsrdb implements Action_itf {
 			String key = item.getPk_room() + "@@@@" 
 						+ sfxm_name + "@@@@" 
 						+ item.getPk_cust() + "@@@@"
-						+ item.getPrice()
+						+ price
 						;
 			if (dataMap.containsKey(key)) {
 				this.calcTs(dataMap.get(key), item, year, flag);
