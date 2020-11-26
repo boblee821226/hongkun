@@ -84,6 +84,9 @@ public class Action_zjsrdb implements Action_itf {
 		};
 		Integer monthBeginCol = 16 - 1;
 		
+		String yearFirstDate = "" + year + "-01-01";
+		String yearLastDate = "" + year + "-12-31";
+		
 		String pk_user = WorkbenchEnvironment.getInstance().getLoginUser().getPrimaryKey();
 		String pk_group = WorkbenchEnvironment.getInstance().getGroupVO().getPrimaryKey();
 		String pk_dept = tsmodel.getMdTask().getPk_dataent();	// 预算维度 到部门
@@ -186,8 +189,8 @@ public class Action_zjsrdb implements Action_itf {
 						ZjsrdbVO vo = new ZjsrdbVO();
 						String ksrq = PuPubVO.getString_TrimZeroLenAsNull(csModel.getCellValue(currRow, cols[6]));
 						String jzrq = PuPubVO.getString_TrimZeroLenAsNull(csModel.getCellValue(currRow, cols[7]));
-						if (ksrq == null) ksrq = "" + year + "-01-01";
-						if (jzrq == null) jzrq = "" + year + "-12-31";
+						if (ksrq == null) ksrq = yearFirstDate;
+						if (jzrq == null) jzrq = yearLastDate;
 						vo.setKsrq(ksrq);
 						vo.setJzrq(jzrq);
 						this.calcTs(vo, vo, year, 1);
@@ -244,17 +247,22 @@ public class Action_zjsrdb implements Action_itf {
 				.append(" and ht.fstatusflag in (1, 6) ")
 				.append(" and htb.norigtaxmny <> 0.00 ")
 				// 表体开始日期 or 表体结束日期  在本年内
-				.append(" and (substr(htb.vbdef3,1,10) between '").append(year).append("-01-01' and '").append(year).append("-12-31' ")
-				.append(" 	or substr(htb.vbdef4,1,10) between '").append(year).append("-01-01' and '").append(year).append("-12-31' ")
+				.append(" and (substr(htb.vbdef3,1,10) between '").append(yearFirstDate).append("' and '").append(yearLastDate).append("' ")
+				.append(" 	or substr(htb.vbdef4,1,10) between '").append(yearFirstDate).append("' and '").append(yearLastDate).append("' ")
 				.append(" ) ")
 				// 表体开始日期 <= 表头截止日期
 				.append(" and substr(htb.vbdef3,1,10) <= substr(nvl(replace(ht.invallidate, '~', ''), '2099-12-31'), 1, 10) ")
 				// 表体开始日期 <= 表头租金确认截至日
 				.append(" and substr(htb.vbdef3,1,10) <= substr(nvl(replace(ht.vdef19, '~', ''), '2099-12-31'), 1, 10) ")
+				// 表头租金确认截至日（表头截止日期） >= 本年第一天
+				.append(" and (case when nvl(ht.vdef19,'~') = '~'" +
+						"		then substr(ht.invallidate,1,10) " +
+						"		else substr(ht.vdef19,1,10) end >= '" + yearFirstDate + "' " +
+						"	) ")
 				// 部门过滤
 				.append(" and ht.depid = '").append(pk_dept).append("' ")
 				// 测试
-//				.append(" and ht.vbillcode = '20200901西配楼' ")
+//				.append(" and ht.vbillcode = '20190801901' ")
 //				.append(" and ht.pk_customer = '1001N5100000006SB94B' ")
 				// 排序
 				.append(" order by htb.vbdef1,ht.pk_customer,htb.norigtaxmny desc,to_number(htb.vbdef5) desc ")
@@ -320,17 +328,18 @@ public class Action_zjsrdb implements Action_itf {
 		/***END***/
 		
 		HashMap<String, Integer> rowKeyMap = new HashMap<>();	// 每个维度的出现次数
-//		for (Entry<String, ZjsrdbVO> item : dataMap.entrySet()) {
 		for (String mapKey : mapKeys) {
 			ZjsrdbVO vo = dataMap.get(mapKey);
+			String beginDate = yearFirstDate.compareTo(vo.getBegin_date())>0 ? yearFirstDate: vo.getBegin_date();
+			String endDate = yearLastDate.compareTo(vo.getEnd_date())<0 ? yearLastDate: vo.getEnd_date();
 			csModel.setCellValue(currRow, cols[0], vo.getSzxm_name());//0预算项目名称
 			csModel.setCellValue(currRow, cols[1], vo.getRoom_name());//1物料（房间号）
 			csModel.setCellValue(currRow, cols[2], vo.getSfxm_name());//2收费项目
 			csModel.setCellValue(currRow, cols[3], vo.getCust_name());//3客户
 			csModel.setCellValue(currRow, cols[4], vo.getMianji());//4面积
 			csModel.setCellValue(currRow, cols[5], PuPubVO.getUFDouble_NullAsZero(vo.getPrice()));//5单价
-			csModel.setCellValue(currRow, cols[6], vo.getBegin_date());//6截至日期
-			csModel.setCellValue(currRow, cols[7], vo.getEnd_date());//7截至日期
+			csModel.setCellValue(currRow, cols[6], beginDate);//6开始日期
+			csModel.setCellValue(currRow, cols[7], endDate);//7截至日期
 			csModel.setCellValue(currRow, cols[8], "日租型");//8数据来源
 			
 			for (int mm = 1; mm <= 12; mm ++) {

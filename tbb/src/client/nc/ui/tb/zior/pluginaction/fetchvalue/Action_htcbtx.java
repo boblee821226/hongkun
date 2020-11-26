@@ -84,6 +84,9 @@ public class Action_htcbtx implements Action_itf {
 		};
 		Integer monthBeginCol = 21 - 1;
 		
+		String yearFirstDate = "" + year + "-01-01";
+		String yearLastDate = "" + year + "-12-31";
+		
 		String pk_user = WorkbenchEnvironment.getInstance().getLoginUser().getPrimaryKey();
 		String pk_group = WorkbenchEnvironment.getInstance().getGroupVO().getPrimaryKey();
 		String pk_dept = tsmodel.getMdTask().getPk_dataent();	// 预算维度 到部门
@@ -174,13 +177,16 @@ public class Action_htcbtx implements Action_itf {
 				.append(" and ht.fstatusflag in (1, 6) ")
 				.append(" and htb.norigtaxmny <> 0.00 ")
 				// 表体开始日期 or 表体结束日期  在本年内
-				.append(" and (substr(htb.vbdef3,1,10) between '").append(year).append("-01-01' and '").append(year).append("-12-31' ")
-				.append(" 	or substr(htb.vbdef4,1,10) between '").append(year).append("-01-01' and '").append(year).append("-12-31' ")
+				.append(" and (substr(htb.vbdef3,1,10) between '").append(yearFirstDate).append("' and '").append(yearLastDate).append("' ")
+				.append(" 	or substr(htb.vbdef4,1,10) between '").append(yearFirstDate).append("' and '").append(yearLastDate).append("' ")
 				.append(" ) ")
 				// 表体开始日期 <= 表头截止日期
 				.append(" and substr(htb.vbdef3,1,10) <= substr(nvl(replace(ht.invallidate, '~', ''), '2099-12-31'), 1, 10) ")
+				// 表头租金确认截至日 >= 本年第一天
+				.append(" and substr(ht.invallidate,1,10) >= '").append(yearFirstDate).append("' ")
+				// 所属部门
 				.append(" and ht.depid = '").append(pk_dept).append("' ")
-//				.append(" and ht.vbillcode = '050820200430-SCL' ")// 测试代码
+//				.append(" and ht.vbillcode = '050820150806#2' ")// 测试代码
 		.append(" union all ")
 				.append(" select ")
 				.append(" htb.vbdef1 pk_srxm,")		// 0、收支项目
@@ -213,14 +219,14 @@ public class Action_htcbtx implements Action_itf {
 				.append(" and ht.fstatusflag in (1, 6) ")
 				.append(" and htb.norigtaxmny <> 0.00 ")
 				// 表体开始日期 or 表体结束日期  在本年内
-				.append(" and (substr(htb.vbdef3,1,10) between '").append(year).append("-01-01' and '").append(year).append("-12-31' ")
-				.append(" 	or substr(htb.vbdef4,1,10) between '").append(year).append("-01-01' and '").append(year).append("-12-31' ")
+				.append(" and (substr(htb.vbdef3,1,10) between '").append(yearFirstDate).append("' and '").append(yearLastDate).append("' ")
+				.append(" 	or substr(htb.vbdef4,1,10) between '").append(yearFirstDate).append("' and '").append(yearLastDate).append("' ")
 				.append(" ) ")
 				// 表体开始日期 <= 表头截止日期
 				.append(" and substr(htb.vbdef3,1,10) <= substr(nvl(replace(ht.invallidate, '~', ''), '2099-12-31'), 1, 10) ")
 				// 分摊部门过滤
 				.append(" and htft.vhkbdef3 = '").append(pk_dept).append("' ")
-//				.append(" and ht.vbillcode = '050820200430-SCL' ")// 测试代码
+//				.append(" and ht.vbillcode = '050820150806#2' ")// 测试代码
 			.append(" ) a ")
 			.append(" order by a.pk_srxm,a.cvendorid,a.norigtaxmny desc ")
 		;
@@ -268,10 +274,10 @@ public class Action_htcbtx implements Action_itf {
 		/***END***/
 		
 		HashMap<String, Integer> rowKeyMap = new HashMap<>();	// 每个维度的出现次数
-//		for (Entry<String,HtcbtxVO> item : dataMap.entrySet()) {
 		for (String mapKey : mapKeys) {
-//			HtcbtxVO vo = item.getValue();
 			HtcbtxVO vo = dataMap.get(mapKey);
+			String beginDate = yearFirstDate.compareTo(vo.getBegin_date())>0 ? yearFirstDate: vo.getBegin_date();
+			String endDate = yearLastDate.compareTo(vo.getEnd_date())<0 ? yearLastDate: vo.getEnd_date();
 			csModel.setCellValue(currRow, cols[0], vo.getSrxm_name());//0预算项目名称
 			csModel.setCellValue(currRow, cols[1], vo.getGys_name());//1供应商
 			csModel.setCellValue(currRow, cols[2], "Y");//2是否分摊
@@ -280,8 +286,8 @@ public class Action_htcbtx implements Action_itf {
 			csModel.setCellValue(currRow, cols[5], vo.getMianji());//5面积
 			csModel.setCellValue(currRow, cols[6], vo.getSl());//6税率
 			csModel.setCellValue(currRow, cols[7], "合同成本");//7数据来源
-			csModel.setCellValue(currRow, cols[8], vo.getBegin_date());//8开始日期
-			csModel.setCellValue(currRow, cols[9], vo.getEnd_date());//9截至日期
+			csModel.setCellValue(currRow, cols[8], beginDate);//8开始日期
+			csModel.setCellValue(currRow, cols[9], endDate);//9截至日期
 			csModel.setCellValue(currRow, cols[10], vo.getFtbl());//10比例
 			
 			for (int mm = 1; mm <= 12; mm ++) {
