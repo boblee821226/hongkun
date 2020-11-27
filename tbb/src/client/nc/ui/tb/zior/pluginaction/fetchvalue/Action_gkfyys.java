@@ -190,7 +190,7 @@ public class Action_gkfyys implements Action_itf {
 			GkfyysVO vo = item.getValue();
 			csModel.setCellValue(currRow, cols[0], vo.getSrxm_name());//0预算项目名称
 			csModel.setCellValue(currRow, cols[1], vo.getGys_name());//1供应商
-			csModel.setCellValue(currRow, cols[2], "合同成本摊销");//2是否分摊
+			csModel.setCellValue(currRow, cols[2], "合同成本付款");//2是否分摊
 			csModel.setCellValue(currRow, cols[3], vo.getVbillcode());//3合同号
 			csModel.setCellValue(currRow, cols[4], vo.getSl());//4税率
 			csModel.setCellValue(currRow, cols[5], "取数数据行");//5取数数据行
