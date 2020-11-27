@@ -36,6 +36,8 @@ public class ZjsrdbVO extends SuperVO {
 	private String pk_szxm;		// 收支项目pk（预算）
 	private String szxm_name;	// 收支项目name（预算）
 	private String money;		// 金额
+	private String ksrq_calc;	// 计算开始日期
+	private String jzrq_calc;	// 计算截至日期
 	
 	public String getPk_sfxm() {
 		return pk_sfxm;
@@ -198,6 +200,18 @@ public class ZjsrdbVO extends SuperVO {
 	}
 	public void setMoney(String money) {
 		this.money = money;
+	}
+	public String getKsrq_calc() {
+		return ksrq_calc;
+	}
+	public void setKsrq_calc(String ksrq_calc) {
+		this.ksrq_calc = ksrq_calc;
+	}
+	public String getJzrq_calc() {
+		return jzrq_calc;
+	}
+	public void setJzrq_calc(String jzrq_calc) {
+		this.jzrq_calc = jzrq_calc;
 	}
 	
 }

@@ -330,8 +330,21 @@ public class Action_zjsrdb implements Action_itf {
 		HashMap<String, Integer> rowKeyMap = new HashMap<>();	// 每个维度的出现次数
 		for (String mapKey : mapKeys) {
 			ZjsrdbVO vo = dataMap.get(mapKey);
-			String beginDate = yearFirstDate.compareTo(vo.getBegin_date())>0 ? yearFirstDate: vo.getBegin_date();
-			String endDate = yearLastDate.compareTo(vo.getEnd_date())<0 ? yearLastDate: vo.getEnd_date();
+			String beginDate = vo.getKsrq_calc();
+			String endDate = vo.getJzrq_calc();
+			// 跟 实际计算的首末日期来比较
+//			if (vo.getKsrq_calc() != null && beginDate.compareTo(vo.getKsrq_calc()) > 0) {
+//				beginDate = vo.getKsrq_calc();
+//			}
+//			if (vo.getJzrq_calc() != null && beginDate.compareTo(vo.getJzrq_calc()) < 0) {
+//				endDate = vo.getJzrq_calc();
+//			}
+			// 合同日期  跟 本年首末日期来比较
+//			beginDate = yearFirstDate.compareTo(vo.getBegin_date())>0 ? yearFirstDate: vo.getBegin_date();
+//			endDate = yearLastDate.compareTo(vo.getEnd_date())<0 ? yearLastDate: vo.getEnd_date();
+			beginDate = yearFirstDate.compareTo(beginDate)>0 ? yearFirstDate: beginDate;
+			endDate = yearLastDate.compareTo(endDate)<0 ? yearLastDate: endDate;
+			
 			csModel.setCellValue(currRow, cols[0], vo.getSzxm_name());//0预算项目名称
 			csModel.setCellValue(currRow, cols[1], vo.getRoom_name());//1物料（房间号）
 			csModel.setCellValue(currRow, cols[2], vo.getSfxm_name());//2收费项目
@@ -457,6 +470,19 @@ public class Action_zjsrdb implements Action_itf {
 		}
 		if (end_date != null && end_date.compareTo(jzrqStr) < 0) {
 			jzrqStr = end_date;
+		}
+		/***END***/
+		/**
+		 * HK 2020年11月27日15:13:48
+		 * 将本次用于计算的日期 赋值给 合同日期上。
+		 */
+		String ksrq_calc = root.getKsrq_calc();
+		String jzrq_calc = root.getJzrq_calc();
+		if (ksrq_calc == null || ksrq_calc.compareTo(ksrqStr) > 0) {
+			root.setKsrq_calc(ksrqStr);
+		}
+		if (jzrq_calc == null || jzrq_calc.compareTo(jzrqStr) < 0) {
+			root.setJzrq_calc(jzrqStr);
 		}
 		/***END***/
 		Integer[] ts = fentanTs(ksrqStr, jzrqStr, year);
