@@ -37,6 +37,8 @@ public class HtcbtxVO extends SuperVO {
 	private Integer m_10;
 	private Integer m_11;
 	private Integer m_12;
+	private String ksrq_calc;	// 计算开始日期
+	private String jzrq_calc;	// 计算截至日期
 	
 	public String getPk_srxm() {
 		return pk_srxm;
@@ -193,6 +195,18 @@ public class HtcbtxVO extends SuperVO {
 	}
 	public void setM_12(Integer m_12) {
 		this.m_12 = m_12;
+	}
+	public String getKsrq_calc() {
+		return ksrq_calc;
+	}
+	public void setKsrq_calc(String ksrq_calc) {
+		this.ksrq_calc = ksrq_calc;
+	}
+	public String getJzrq_calc() {
+		return jzrq_calc;
+	}
+	public void setJzrq_calc(String jzrq_calc) {
+		this.jzrq_calc = jzrq_calc;
 	}
 	
 }

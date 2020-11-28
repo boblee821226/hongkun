@@ -276,8 +276,12 @@ public class Action_htcbtx implements Action_itf {
 		HashMap<String, Integer> rowKeyMap = new HashMap<>();	// 每个维度的出现次数
 		for (String mapKey : mapKeys) {
 			HtcbtxVO vo = dataMap.get(mapKey);
-			String beginDate = yearFirstDate.compareTo(vo.getBegin_date())>0 ? yearFirstDate: vo.getBegin_date();
-			String endDate = yearLastDate.compareTo(vo.getEnd_date())<0 ? yearLastDate: vo.getEnd_date();
+			String beginDate = vo.getKsrq_calc();
+			String endDate = vo.getJzrq_calc();
+			// 合同日期  跟 本年首末日期来比较
+			beginDate = yearFirstDate.compareTo(beginDate)>0 ? yearFirstDate: beginDate;
+			endDate = yearLastDate.compareTo(endDate)<0 ? yearLastDate: endDate;
+			
 			csModel.setCellValue(currRow, cols[0], vo.getSrxm_name());//0预算项目名称
 			csModel.setCellValue(currRow, cols[1], vo.getGys_name());//1供应商
 			csModel.setCellValue(currRow, cols[2], "Y");//2是否分摊
@@ -376,7 +380,19 @@ public class Action_htcbtx implements Action_itf {
 			jzrqStr = end_date;
 		}
 		/***END***/
-		
+		/**
+		 * HK 2020年11月27日15:13:48
+		 * 将本次用于计算的日期 赋值给 合同日期上。
+		 */
+		String ksrq_calc = root.getKsrq_calc();
+		String jzrq_calc = root.getJzrq_calc();
+		if (ksrq_calc == null || ksrq_calc.compareTo(ksrqStr) > 0) {
+			root.setKsrq_calc(ksrqStr);
+		}
+		if (jzrq_calc == null || jzrq_calc.compareTo(jzrqStr) < 0) {
+			root.setJzrq_calc(jzrqStr);
+		}
+		/***END***/
 		Integer[] ts = fentanTs(ksrqStr, jzrqStr, year);
 		for (int i=1;i<=12;i++) {
 			String mm = (i<10?"0":"")+i;

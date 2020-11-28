@@ -145,7 +145,6 @@ public class Action_zjsrdb implements Action_itf {
 				String firstCell = PuPubVO.getString_TrimZeroLenAsNull(csModel.getCellValue(currRow, cols[0]));
 				// 房间号
 				String roomCell = PuPubVO.getString_TrimZeroLenAsNull(csModel.getCellValue(currRow, cols[1]));
-//				System.out.println(roomCell);
 				if (firstCell != null && "小计：".equals(firstCell.replaceAll(" ", ""))) {
 					isExec = false;
 				} else {
@@ -332,16 +331,7 @@ public class Action_zjsrdb implements Action_itf {
 			ZjsrdbVO vo = dataMap.get(mapKey);
 			String beginDate = vo.getKsrq_calc();
 			String endDate = vo.getJzrq_calc();
-			// 跟 实际计算的首末日期来比较
-//			if (vo.getKsrq_calc() != null && beginDate.compareTo(vo.getKsrq_calc()) > 0) {
-//				beginDate = vo.getKsrq_calc();
-//			}
-//			if (vo.getJzrq_calc() != null && beginDate.compareTo(vo.getJzrq_calc()) < 0) {
-//				endDate = vo.getJzrq_calc();
-//			}
 			// 合同日期  跟 本年首末日期来比较
-//			beginDate = yearFirstDate.compareTo(vo.getBegin_date())>0 ? yearFirstDate: vo.getBegin_date();
-//			endDate = yearLastDate.compareTo(vo.getEnd_date())<0 ? yearLastDate: vo.getEnd_date();
 			beginDate = yearFirstDate.compareTo(beginDate)>0 ? yearFirstDate: beginDate;
 			endDate = yearLastDate.compareTo(endDate)<0 ? yearLastDate: endDate;
 			
