@@ -130,6 +130,7 @@ public class BbcxAction extends NCAction {
 			resultBVOs[31] = new KazhangwuBVO("","在朗丽兹刷卡");
 			resultBVOs[32] = new KazhangwuBVO("","在西山温泉刷卡");
 			resultBVOs[33] = new KazhangwuBVO("","在太申刷卡");	// TODO
+			Integer total_index = 34;
 			resultBVOs[34] = new KazhangwuBVO("----合计----","");
 			resultBVOs[35] = new KazhangwuBVO("----余额----","");
 			resultBVOs[36] = new KazhangwuBVO("---余转差异---","");
@@ -614,32 +615,32 @@ public class BbcxAction extends NCAction {
 					// 将 在贵宾楼刷卡 = 贵宾楼消费 + 贵宾楼回充
 					// 会影响 应付货币 合计，需要重算 合计
 					////// 合计 //////
-					resultBVOs[26].setKajie( UFDouble.ZERO_DBL );	// 清空 国际店
-					resultBVOs[26].setKajie_kbl( UFDouble.ZERO_DBL );
+					resultBVOs[26+2].setKajie( UFDouble.ZERO_DBL );	// 清空 国际店
+					resultBVOs[26+2].setKajie_kbl( UFDouble.ZERO_DBL );
 					
-					resultBVOs[25].setKajie( PuPubVO.getUFDouble_NullAsZero( resultBVOs[11].getKajie())
-										.add( PuPubVO.getUFDouble_NullAsZero( resultBVOs[18].getKajie())) );	// 赋值 贵宾楼的新数据
-					resultBVOs[25].setKajie_kbl( PuPubVO.getUFDouble_NullAsZero( resultBVOs[11].getKajie_kbl())
-											.add( PuPubVO.getUFDouble_NullAsZero( resultBVOs[18].getKajie_kbl()) ) );
+					resultBVOs[25+2].setKajie( PuPubVO.getUFDouble_NullAsZero( resultBVOs[11].getKajie())
+										.add( PuPubVO.getUFDouble_NullAsZero( resultBVOs[18+1].getKajie())) );	// 赋值 贵宾楼的新数据
+					resultBVOs[25+2].setKajie_kbl( PuPubVO.getUFDouble_NullAsZero( resultBVOs[11].getKajie_kbl())
+											.add( PuPubVO.getUFDouble_NullAsZero( resultBVOs[18+1].getKajie_kbl()) ) );
 					////// 会员 //////
-					resultBVOs[26].setVbdef03( UFDouble.ZERO_DBL.toString() );
-					resultBVOs[26].setVbdef04( UFDouble.ZERO_DBL.toString() );
+					resultBVOs[26+2].setVbdef03( UFDouble.ZERO_DBL.toString() );
+					resultBVOs[26+2].setVbdef04( UFDouble.ZERO_DBL.toString() );
 					
-					resultBVOs[25].setVbdef03( PuPubVO.getUFDouble_NullAsZero( resultBVOs[11].getVbdef03())
-										.add( PuPubVO.getUFDouble_NullAsZero( resultBVOs[18].getVbdef03())) 
+					resultBVOs[25+2].setVbdef03( PuPubVO.getUFDouble_NullAsZero( resultBVOs[11].getVbdef03())
+										.add( PuPubVO.getUFDouble_NullAsZero( resultBVOs[18+1].getVbdef03())) 
 										.toString() );	// 赋值 贵宾楼的新数据
-					resultBVOs[25].setVbdef04( PuPubVO.getUFDouble_NullAsZero( resultBVOs[11].getVbdef04())
-											.add( PuPubVO.getUFDouble_NullAsZero( resultBVOs[18].getVbdef04()) ) 
+					resultBVOs[25+2].setVbdef04( PuPubVO.getUFDouble_NullAsZero( resultBVOs[11].getVbdef04())
+											.add( PuPubVO.getUFDouble_NullAsZero( resultBVOs[18+1].getVbdef04()) ) 
 											.toString() );
 					////// 分区 //////
-					resultBVOs[26].setVbdef01( UFDouble.ZERO_DBL.toString() );
-					resultBVOs[26].setVbdef02( UFDouble.ZERO_DBL.toString() );
+					resultBVOs[26+2].setVbdef01( UFDouble.ZERO_DBL.toString() );
+					resultBVOs[26+2].setVbdef02( UFDouble.ZERO_DBL.toString() );
 					
-					resultBVOs[25].setVbdef01( PuPubVO.getUFDouble_NullAsZero( resultBVOs[11].getVbdef01())
-										.add( PuPubVO.getUFDouble_NullAsZero( resultBVOs[18].getVbdef01())) 
+					resultBVOs[25+2].setVbdef01( PuPubVO.getUFDouble_NullAsZero( resultBVOs[11].getVbdef01())
+										.add( PuPubVO.getUFDouble_NullAsZero( resultBVOs[18+1].getVbdef01())) 
 										.toString() );	// 赋值 贵宾楼的新数据
-					resultBVOs[25].setVbdef02( PuPubVO.getUFDouble_NullAsZero( resultBVOs[11].getVbdef02())
-											.add( PuPubVO.getUFDouble_NullAsZero( resultBVOs[18].getVbdef02()) ) 
+					resultBVOs[25+2].setVbdef02( PuPubVO.getUFDouble_NullAsZero( resultBVOs[11].getVbdef02())
+											.add( PuPubVO.getUFDouble_NullAsZero( resultBVOs[18+1].getVbdef02()) ) 
 											.toString() );
 				}
 				
@@ -688,85 +689,91 @@ public class BbcxAction extends NCAction {
 					// 将 在国际店刷卡 = 国际店消费  + 国际店回充
 					// 会影响 应付货币 合计，需要重算 合计
 					////// 合计 //////
-					resultBVOs[25].setKajie( UFDouble.ZERO_DBL );
-					resultBVOs[25].setKajie_kbl( UFDouble.ZERO_DBL );
+					resultBVOs[25+2].setKajie( UFDouble.ZERO_DBL );
+					resultBVOs[25+2].setKajie_kbl( UFDouble.ZERO_DBL );
 					
-					resultBVOs[26].setKajie(  PuPubVO.getUFDouble_NullAsZero(resultBVOs[12].getKajie())
-										.add( PuPubVO.getUFDouble_NullAsZero(resultBVOs[19].getKajie()) ) );
-					resultBVOs[26].setKajie_kbl( PuPubVO.getUFDouble_NullAsZero(resultBVOs[12].getKajie_kbl())
-										.add( PuPubVO.getUFDouble_NullAsZero(resultBVOs[19].getKajie_kbl()) ) );
+					resultBVOs[26+2].setKajie(  PuPubVO.getUFDouble_NullAsZero(resultBVOs[12].getKajie())
+										.add( PuPubVO.getUFDouble_NullAsZero(resultBVOs[19+1].getKajie()) ) );
+					resultBVOs[26+2].setKajie_kbl( PuPubVO.getUFDouble_NullAsZero(resultBVOs[12].getKajie_kbl())
+										.add( PuPubVO.getUFDouble_NullAsZero(resultBVOs[19+1].getKajie_kbl()) ) );
 					////// 会员 //////
-					resultBVOs[25].setVbdef03( UFDouble.ZERO_DBL.toString() );
-					resultBVOs[25].setVbdef04( UFDouble.ZERO_DBL.toString() );
+					resultBVOs[25+2].setVbdef03( UFDouble.ZERO_DBL.toString() );
+					resultBVOs[25+2].setVbdef04( UFDouble.ZERO_DBL.toString() );
 					
-					resultBVOs[26].setVbdef03( PuPubVO.getUFDouble_NullAsZero( resultBVOs[11].getVbdef03())
-										.add( PuPubVO.getUFDouble_NullAsZero( resultBVOs[18].getVbdef03())) 
+					resultBVOs[26+2].setVbdef03( PuPubVO.getUFDouble_NullAsZero( resultBVOs[11].getVbdef03())
+										.add( PuPubVO.getUFDouble_NullAsZero( resultBVOs[18+1].getVbdef03())) 
 										.toString() );	// 赋值 贵宾楼的新数据
-					resultBVOs[26].setVbdef04( PuPubVO.getUFDouble_NullAsZero( resultBVOs[11].getVbdef04())
-											.add( PuPubVO.getUFDouble_NullAsZero( resultBVOs[18].getVbdef04()) ) 
+					resultBVOs[26+2].setVbdef04( PuPubVO.getUFDouble_NullAsZero( resultBVOs[11].getVbdef04())
+											.add( PuPubVO.getUFDouble_NullAsZero( resultBVOs[18+1].getVbdef04()) ) 
 											.toString() );
 					////// 分区 //////
-					resultBVOs[25].setVbdef01( UFDouble.ZERO_DBL.toString() );
-					resultBVOs[25].setVbdef02( UFDouble.ZERO_DBL.toString() );
+					resultBVOs[25+2].setVbdef01( UFDouble.ZERO_DBL.toString() );
+					resultBVOs[25+2].setVbdef02( UFDouble.ZERO_DBL.toString() );
 					
-					resultBVOs[26].setVbdef01( PuPubVO.getUFDouble_NullAsZero( resultBVOs[11].getVbdef01())
-										.add( PuPubVO.getUFDouble_NullAsZero( resultBVOs[18].getVbdef01())) 
+					resultBVOs[26+2].setVbdef01( PuPubVO.getUFDouble_NullAsZero( resultBVOs[11].getVbdef01())
+										.add( PuPubVO.getUFDouble_NullAsZero( resultBVOs[18+1].getVbdef01())) 
 										.toString() );	// 赋值 贵宾楼的新数据
-					resultBVOs[26].setVbdef02( PuPubVO.getUFDouble_NullAsZero( resultBVOs[11].getVbdef02())
-											.add( PuPubVO.getUFDouble_NullAsZero( resultBVOs[18].getVbdef02()) ) 
+					resultBVOs[26+2].setVbdef02( PuPubVO.getUFDouble_NullAsZero( resultBVOs[11].getVbdef02())
+											.add( PuPubVO.getUFDouble_NullAsZero( resultBVOs[18+1].getVbdef02()) ) 
 															.toString() );
 				}
 				
-				resultBVOs[31].setKajie( //重算合计
-						  PuPubVO.getUFDouble_NullAsZero( resultBVOs[25].getKajie() )
-					.add( PuPubVO.getUFDouble_NullAsZero( resultBVOs[26].getKajie() ) ) 
-					.add( PuPubVO.getUFDouble_NullAsZero( resultBVOs[27].getKajie() ) ) 
-					.add( PuPubVO.getUFDouble_NullAsZero( resultBVOs[28].getKajie() ) ) 
-					.add( PuPubVO.getUFDouble_NullAsZero( resultBVOs[29].getKajie() ) ) 
-					.add( PuPubVO.getUFDouble_NullAsZero( resultBVOs[30].getKajie() ) ) 
+				resultBVOs[31+3].setKajie( //重算合计
+						  PuPubVO.getUFDouble_NullAsZero( resultBVOs[25+2].getKajie() )
+					.add( PuPubVO.getUFDouble_NullAsZero( resultBVOs[26+2].getKajie() ) ) 
+					.add( PuPubVO.getUFDouble_NullAsZero( resultBVOs[27+2].getKajie() ) ) 
+					.add( PuPubVO.getUFDouble_NullAsZero( resultBVOs[28+2].getKajie() ) ) 
+					.add( PuPubVO.getUFDouble_NullAsZero( resultBVOs[29+2].getKajie() ) ) 
+					.add( PuPubVO.getUFDouble_NullAsZero( resultBVOs[30+2].getKajie() ) ) 
+					.add( PuPubVO.getUFDouble_NullAsZero( resultBVOs[31+2].getKajie() ) ) 
 				);
-				resultBVOs[31].setKajie_kbl( 
-						  PuPubVO.getUFDouble_NullAsZero( resultBVOs[25].getKajie_kbl() )
-					.add( PuPubVO.getUFDouble_NullAsZero( resultBVOs[26].getKajie_kbl() ) ) 
-					.add( PuPubVO.getUFDouble_NullAsZero( resultBVOs[27].getKajie_kbl() ) ) 
-					.add( PuPubVO.getUFDouble_NullAsZero( resultBVOs[28].getKajie_kbl() ) ) 
-					.add( PuPubVO.getUFDouble_NullAsZero( resultBVOs[29].getKajie_kbl() ) ) 
-					.add( PuPubVO.getUFDouble_NullAsZero( resultBVOs[30].getKajie_kbl() ) ) 
+				resultBVOs[31+3].setKajie_kbl( 
+						  PuPubVO.getUFDouble_NullAsZero( resultBVOs[25+2].getKajie_kbl() )
+					.add( PuPubVO.getUFDouble_NullAsZero( resultBVOs[26+2].getKajie_kbl() ) ) 
+					.add( PuPubVO.getUFDouble_NullAsZero( resultBVOs[27+2].getKajie_kbl() ) ) 
+					.add( PuPubVO.getUFDouble_NullAsZero( resultBVOs[28+2].getKajie_kbl() ) ) 
+					.add( PuPubVO.getUFDouble_NullAsZero( resultBVOs[29+2].getKajie_kbl() ) ) 
+					.add( PuPubVO.getUFDouble_NullAsZero( resultBVOs[30+2].getKajie_kbl() ) ) 
+					.add( PuPubVO.getUFDouble_NullAsZero( resultBVOs[31+2].getKajie_kbl() ) )
 				);
-				resultBVOs[31].setVbdef03( //重算合计--会员
-						  PuPubVO.getUFDouble_NullAsZero( resultBVOs[25].getVbdef03() )
-					.add( PuPubVO.getUFDouble_NullAsZero( resultBVOs[26].getVbdef03() ) ) 
-					.add( PuPubVO.getUFDouble_NullAsZero( resultBVOs[27].getVbdef03() ) ) 
-					.add( PuPubVO.getUFDouble_NullAsZero( resultBVOs[28].getVbdef03() ) ) 
-					.add( PuPubVO.getUFDouble_NullAsZero( resultBVOs[29].getVbdef03() ) ) 
-					.add( PuPubVO.getUFDouble_NullAsZero( resultBVOs[30].getVbdef03() ) ) 
+				resultBVOs[31+3].setVbdef03( //重算合计--会员
+						  PuPubVO.getUFDouble_NullAsZero( resultBVOs[25+2].getVbdef03() )
+					.add( PuPubVO.getUFDouble_NullAsZero( resultBVOs[26+2].getVbdef03() ) ) 
+					.add( PuPubVO.getUFDouble_NullAsZero( resultBVOs[27+2].getVbdef03() ) ) 
+					.add( PuPubVO.getUFDouble_NullAsZero( resultBVOs[28+2].getVbdef03() ) ) 
+					.add( PuPubVO.getUFDouble_NullAsZero( resultBVOs[29+2].getVbdef03() ) ) 
+					.add( PuPubVO.getUFDouble_NullAsZero( resultBVOs[30+2].getVbdef03() ) ) 
+					.add( PuPubVO.getUFDouble_NullAsZero( resultBVOs[31+2].getVbdef03() ) )
 					.toString()
 				);
-				resultBVOs[31].setVbdef04( //重算合计--会员
-						  PuPubVO.getUFDouble_NullAsZero( resultBVOs[25].getVbdef04() )
-					.add( PuPubVO.getUFDouble_NullAsZero( resultBVOs[26].getVbdef04() ) ) 
-					.add( PuPubVO.getUFDouble_NullAsZero( resultBVOs[27].getVbdef04() ) ) 
-					.add( PuPubVO.getUFDouble_NullAsZero( resultBVOs[28].getVbdef04() ) ) 
-					.add( PuPubVO.getUFDouble_NullAsZero( resultBVOs[29].getVbdef04() ) ) 
-					.add( PuPubVO.getUFDouble_NullAsZero( resultBVOs[30].getVbdef04() ) ) 
+				resultBVOs[31+3].setVbdef04( //重算合计--会员
+						  PuPubVO.getUFDouble_NullAsZero( resultBVOs[25+2].getVbdef04() )
+					.add( PuPubVO.getUFDouble_NullAsZero( resultBVOs[26+2].getVbdef04() ) ) 
+					.add( PuPubVO.getUFDouble_NullAsZero( resultBVOs[27+2].getVbdef04() ) ) 
+					.add( PuPubVO.getUFDouble_NullAsZero( resultBVOs[28+2].getVbdef04() ) ) 
+					.add( PuPubVO.getUFDouble_NullAsZero( resultBVOs[29+2].getVbdef04() ) ) 
+					.add( PuPubVO.getUFDouble_NullAsZero( resultBVOs[30+2].getVbdef04() ) ) 
+					.add( PuPubVO.getUFDouble_NullAsZero( resultBVOs[31+2].getVbdef04() ) )
 					.toString()
 				);
-				resultBVOs[31].setVbdef01( //重算合计--分区
-						  PuPubVO.getUFDouble_NullAsZero( resultBVOs[25].getVbdef01() )
-					.add( PuPubVO.getUFDouble_NullAsZero( resultBVOs[26].getVbdef01() ) ) 
-					.add( PuPubVO.getUFDouble_NullAsZero( resultBVOs[27].getVbdef01() ) ) 
-					.add( PuPubVO.getUFDouble_NullAsZero( resultBVOs[28].getVbdef01() ) ) 
-					.add( PuPubVO.getUFDouble_NullAsZero( resultBVOs[29].getVbdef01() ) ) 
-					.add( PuPubVO.getUFDouble_NullAsZero( resultBVOs[30].getVbdef01() ) ) 
+				resultBVOs[31+3].setVbdef01( //重算合计--分区
+						  PuPubVO.getUFDouble_NullAsZero( resultBVOs[25+2].getVbdef01() )
+					.add( PuPubVO.getUFDouble_NullAsZero( resultBVOs[26+2].getVbdef01() ) ) 
+					.add( PuPubVO.getUFDouble_NullAsZero( resultBVOs[27+2].getVbdef01() ) ) 
+					.add( PuPubVO.getUFDouble_NullAsZero( resultBVOs[28+2].getVbdef01() ) ) 
+					.add( PuPubVO.getUFDouble_NullAsZero( resultBVOs[29+2].getVbdef01() ) ) 
+					.add( PuPubVO.getUFDouble_NullAsZero( resultBVOs[30+2].getVbdef01() ) )
+					.add( PuPubVO.getUFDouble_NullAsZero( resultBVOs[31+2].getVbdef01() ) )
 					.toString()
 				);
-				resultBVOs[31].setVbdef02( //重算合计--分区
-						  PuPubVO.getUFDouble_NullAsZero( resultBVOs[25].getVbdef02() )
-					.add( PuPubVO.getUFDouble_NullAsZero( resultBVOs[26].getVbdef02() ) ) 
-					.add( PuPubVO.getUFDouble_NullAsZero( resultBVOs[27].getVbdef02() ) ) 
-					.add( PuPubVO.getUFDouble_NullAsZero( resultBVOs[28].getVbdef02() ) ) 
-					.add( PuPubVO.getUFDouble_NullAsZero( resultBVOs[29].getVbdef02() ) ) 
-					.add( PuPubVO.getUFDouble_NullAsZero( resultBVOs[30].getVbdef02() ) ) 
+				resultBVOs[total_index].setVbdef02( //重算合计--分区
+						  PuPubVO.getUFDouble_NullAsZero( resultBVOs[25+2].getVbdef02() )
+					.add( PuPubVO.getUFDouble_NullAsZero( resultBVOs[26+2].getVbdef02() ) ) 
+					.add( PuPubVO.getUFDouble_NullAsZero( resultBVOs[27+2].getVbdef02() ) ) 
+					.add( PuPubVO.getUFDouble_NullAsZero( resultBVOs[28+2].getVbdef02() ) ) 
+					.add( PuPubVO.getUFDouble_NullAsZero( resultBVOs[29+2].getVbdef02() ) ) 
+					.add( PuPubVO.getUFDouble_NullAsZero( resultBVOs[30+2].getVbdef02() ) )
+					.add( PuPubVO.getUFDouble_NullAsZero( resultBVOs[31+2].getVbdef02() ) )
 					.toString()
 				);
 				
@@ -778,10 +785,13 @@ public class BbcxAction extends NCAction {
 			 */
 			{
 				resultBVOs[resultBVOs.length-2].setKajie(
-						resultBVOs[10].getKajie().sub( resultBVOs[8].getKajie() ).add( resultBVOs[31].getKajie() ) 
+						resultBVOs[10].getKajie()
+					.sub( resultBVOs[8].getKajie() )
+					.add( resultBVOs[total_index].getKajie() ) 
 				);	// 所有充值（除作废）-应付货币之和 （消费、应付 是由负数体现， 所以用add）
 				resultBVOs[resultBVOs.length-2].setKajie_kbl(
-						resultBVOs[0].getKajie_kbl().add( resultBVOs[31].getKajie_kbl() ) 
+						resultBVOs[0].getKajie_kbl()
+					.add( resultBVOs[total_index].getKajie_kbl() ) 
 				);	// 售卡 - 应付货币之和  （消费、应付 是由负数体现， 所以用add）
 			}
 			
