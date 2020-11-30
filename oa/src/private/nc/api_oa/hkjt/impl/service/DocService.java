@@ -12,7 +12,7 @@ import nc.vo.pub.BusinessException;
 
 public class DocService {
 	
-	public static Object doAction(String account) throws BusinessException  {
+	public static Object doAction(String account, String table) throws BusinessException  {
 		if (ApiPubInfo.CACHE_DOC == null) {
 			ApiPubInfo.CACHE_DOC = new HashMap<String,HashMap<String,HashMap<String,HashMap<String,String>>>>();
 		}
@@ -40,7 +40,7 @@ public class DocService {
 //				ApiPubInfo.CACHE_DOC.get(account).get(TABLE).put(id, value);
 //			}
 //		}
-		{// 人员 bd_psndoc
+		if (table == null || "bd_psndoc".equals(table)) {// 人员 bd_psndoc
 			String TABLE = "bd_psndoc";
 			StringBuffer querySQL = 
 			new StringBuffer("select ")
@@ -70,7 +70,7 @@ public class DocService {
 				ApiPubInfo.CACHE_DOC.get(account).get(TABLE).put(lcId, value);
 			}
 		}
-		{// 公司 org_orgs
+		if (table == null || "org_orgs".equals(table)) {// 公司 org_orgs
 			/**
 			 * select code,name,pk_org,pk_vid,def20 from org_orgs
 				where nvl(def20,'~') <> '~'
@@ -107,7 +107,7 @@ public class DocService {
 				ApiPubInfo.CACHE_DOC.get(account).get(TABLE).put(lcId, value);
 			}
 		}
-		{// 部门 org_orgs
+		if (table == null || "org_dept".equals(table)) {// 部门 org_orgs
 			/**
 			 * select code,name,pk_dept,pk_vid,pk_org,def18 from org_dept
 				where nvl(def18,'~') <> '~'
@@ -142,7 +142,7 @@ public class DocService {
 				ApiPubInfo.CACHE_DOC.get(account).get(TABLE).put(lcId, value);
 			}
 		}
-		{// 抵扣方式 dkfs
+		if (table == null || "bd_defdoc_dkfs".equals(table)) {// 抵扣方式 dkfs
 			/**
 			 * select code, name, pk_defdoc from bd_defdoc 
 				where enablestate = 2 and pk_defdoclist = '1001N510000000818QAH'
@@ -170,7 +170,7 @@ public class DocService {
 				ApiPubInfo.CACHE_DOC.get(account).get(TABLE).put(name, value);
 			}
 		}
-		{// 结算方式
+		if (table == null || "bd_balatype".equals(table)) {// 结算方式
 			/**
 			 * select 
 			    code

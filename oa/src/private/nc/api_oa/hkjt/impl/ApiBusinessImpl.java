@@ -2,6 +2,8 @@ package nc.api_oa.hkjt.impl;
 
 import java.util.HashMap;
 
+import nc.api.zhiyun.tool.MyHttpUtil;
+import nc.api.zhiyun.vo.RequestParamVO;
 import nc.api_oa.hkjt.impl.service.DocService;
 import nc.api_oa.hkjt.impl.service.PublicService;
 import nc.api_oa.hkjt.impl.service._263X.N263XService;
@@ -41,7 +43,7 @@ public class ApiBusinessImpl implements ApiBusinessItf {
 		if (ApiPubInfo.BILLTYPE_INIT.equals(billType)) {
 			Object res1 = PublicService.getGroup(account);
 			Object res2 = PublicService.getUser(account);
-			Object res3 = DocService.doAction(account);
+			Object res3 = DocService.doAction(account, null);
 			return "初始化完成";
 		}
 		
@@ -65,6 +67,9 @@ public class ApiBusinessImpl implements ApiBusinessItf {
 			/** 绿云-入账明细 **/
 			Object res = new ImpLvyunData().executeTest(null);
 			
+			/** 更新缓存 **/
+			
+			
 			return res;
 		}
 		/**
@@ -76,7 +81,7 @@ public class ApiBusinessImpl implements ApiBusinessItf {
 		 *             value：档案值 （字符串）
 		 */
 		if (ApiPubInfo.BILLTYPE_DOC.equals(billType)) {
-			return DocService.doAction(account);
+			return DocService.doAction(account, null);
 		}
 		/**
 		 * 更新用户
@@ -102,7 +107,7 @@ public class ApiBusinessImpl implements ApiBusinessItf {
 		if ( ApiPubInfo.CACHE_DOC == null 
 		|| ApiPubInfo.CACHE_DOC.get(account) == null 
 		) {
-			return DocService.doAction(account);
+			return DocService.doAction(account, null);
 		}
 		/**
 		 * 新增（提交）
@@ -175,5 +180,42 @@ public class ApiBusinessImpl implements ApiBusinessItf {
 //		}
 		
 		return "类型不存在";
+	}
+	
+	/**
+	 * 更新缓存
+	 */
+	private Object updateCache(HashMap params) {
+		
+		String cache_url = "http://10.0.0.50:9081,http://10.0.0.50:9082,http://10.0.0.50:9083,http://10.0.0.50:9084,http://10.0.0.50:9085,http://10.0.0.50:9086";
+		
+		String baseUrl = "/service/~hkjt/nc.api_oa.hkjt.BillServlet";
+		cache_url = cache_url.replaceAll("、", ",").replaceAll("，", ",");
+		String[] cache_urls = cache_url.split(",");
+		for (String apiUrl : cache_urls) {
+			String url = apiUrl + baseUrl;
+			/**
+			 * {
+			    "account": "NC65",
+			    "userCode": "543308",
+			    "billType": "DOC",
+			    "action": "WRITE",
+			    "data": null
+				}
+			 */
+			RequestParamVO paramObj = new RequestParamVO();
+//			paramObj.setAccount("NC65");
+			paramObj.setUserCode("543308");
+			paramObj.setBillType("DOC");
+			paramObj.setAction("WRITE");
+			try {
+				String res = MyHttpUtil.doPost(url, paramObj);
+				System.out.println("==res:" + res + "==");
+			} catch (Exception ex) {
+				
+			}
+		}
+		
+		return "更新缓存成功";
 	}
 }

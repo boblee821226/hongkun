@@ -5,6 +5,7 @@ import hd.vo.pub.tools.PuPubVO;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import nc.api_oa.hkjt.impl.service.DocService;
 import nc.api_oa.hkjt.itf.ApiPubInfo;
 import nc.api_oa.hkjt.vo._264X.BxVO;
 import nc.bs.framework.common.InvocationInfoProxy;
@@ -177,6 +178,10 @@ public class N264XService {
 		String userId = InvocationInfoProxy.getInstance().getUserId();
 		String zdrStr = srcHVO.getZdr();	// 制单人
 		HashMap<String,String> zdr_map = ApiPubInfo.CACHE_DOC.get(account).get("bd_psndoc").get(zdrStr);
+		if (zdr_map == null) { // 如果缓存为空，则需要更新缓存 重新查找（暂时先加在人员档案上，其它档案 看情况再说）
+			DocService.doAction(account, "bd_psndoc");
+			zdr_map = ApiPubInfo.CACHE_DOC.get(account).get("bd_psndoc").get(zdrStr);
+		}
 		if (zdr_map == null) {throw new BusinessException("制单人不匹配：" + zdrStr);}
 		String zdr = zdr_map.get("id");
 		String zdrUserId = PuPubVO.getString_TrimZeroLenAsNull(zdr_map.get("userId"));
