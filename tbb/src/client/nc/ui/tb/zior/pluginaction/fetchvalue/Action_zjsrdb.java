@@ -163,6 +163,7 @@ public class Action_zjsrdb implements Action_itf {
 							.append(" 	select pk_org from org_dept ")
 							.append(" 	where pk_dept = '").append(pk_dept).append("' ")
 							.append(" ) ")
+							.append(" and m.enablestate = 2 ")	// 只取启用状态的
 							.append(" and m.name = '").append(roomCell).append("' ")
 						;
 						ArrayList list = (ArrayList)iquerybs.executeQuery(querySQL.toString(), new ArrayListProcessor());
@@ -238,7 +239,7 @@ public class Action_zjsrdb implements Action_itf {
 				.append(" left join bd_customer cust on ht.pk_customer = cust.pk_customer ")
 				.append(" left join bd_defdoc sfxm on htb.vbdef1  = sfxm.pk_defdoc ")
 				.append(" left join bd_defdoc room on ht.vdef16 = room.pk_defdoc ")
-				.append(" left join bd_material inv on inv.dr = 0 and inv.pk_org = ht.pk_org and inv.code = room.code ")
+				.append(" left join bd_material inv on inv.dr = 0 and inv.enablestate = 2 and inv.pk_org = ht.pk_org and inv.code = room.code ")
 				.append(" left join bd_inoutbusiclass szxm on inv.def5 = szxm.pk_inoutbusiclass ")
 				.append(" where ht.dr = 0 and htb.dr = 0 ")
 				.append(" and ht.blatest = 'Y' ")
