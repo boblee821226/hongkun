@@ -106,8 +106,10 @@ public class PuBodyBeforeEventHandler extends
      * HK
      * 2019年10月21日 09点42分
      * 表体自定义项01 为 收支项目，进行过滤 只显示出 支出类，并且是非停用的
+     * 2020年12月8日16:39:48
+     * 去掉收支项目的过滤
      */
-    listenerMap.put(CtAbstractBVO.VBDEF1, new PuVbdef01());
+//    listenerMap.put(CtAbstractBVO.VBDEF1, new PuVbdef01());
     /***END***/
   }
 }

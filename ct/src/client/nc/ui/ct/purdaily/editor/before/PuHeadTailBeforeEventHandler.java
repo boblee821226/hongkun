@@ -74,11 +74,13 @@ public class PuHeadTailBeforeEventHandler extends
      * 2020年1月8日15:04:39
      * 13 与 17 相同，分别为 收支项目1、2
      * 18 为 保证金项目
+     * 2020年12月8日16:40:20
+     * 去掉收支项目的过滤（13、18）
      */
-    listenerMap.put(CtAbstractVO.VDEF13, new PuVdef13());
+//    listenerMap.put(CtAbstractVO.VDEF13, new PuVdef13());
     // 20200225问题文档
 //    listenerMap.put(CtAbstractVO.VDEF17, new PuVdef17());
-    listenerMap.put(CtAbstractVO.VDEF18, new PuVdef18());
+//    listenerMap.put(CtAbstractVO.VDEF18, new PuVdef18());
     /***END***/
   }
 }
