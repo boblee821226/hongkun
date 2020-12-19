@@ -13,6 +13,9 @@ import nc.vo.pub.BusinessException;
 public class PublicService {
 	
 	public static Object getUser(String account) throws BusinessException  {
+		
+		ApiPubInfo.lock();	// 同步加锁
+		
 		if (ApiPubInfo.CACHE_USER == null) {
 			ApiPubInfo.CACHE_USER = new HashMap<String, HashMap<String, String>>();
 		}
@@ -49,10 +52,16 @@ public class PublicService {
 				ApiPubInfo.CACHE_USER.get(account).put(lcId, userId);
 			}
 		}
+		
+		ApiPubInfo.unLock();	// 同步解锁
+		
 		return "更新操作员成功";
 	}
 	
 	public static Object getGroup(String account) throws BusinessException  {
+		
+		ApiPubInfo.lock();	// 同步加锁
+		
 		if (ApiPubInfo.CACHE_GROUP == null) {
 			ApiPubInfo.CACHE_GROUP = new HashMap<String, HashMap<String, String>>();
 		}
@@ -69,6 +78,9 @@ public class PublicService {
 				ApiPubInfo.CACHE_GROUP.get(account).put(name, pk_group);
 			}
 		}
+		
+		ApiPubInfo.unLock();	// 同步解锁
+		
 		return "更新集团成功";
 	}
 	

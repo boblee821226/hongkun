@@ -8,6 +8,7 @@ import nc.api_oa.hkjt.vo.ApprovalFlowWorkVO;
 import nc.api_oa.hkjt.vo.BillTypeVO;
 import nc.api_oa.hkjt.vo._263X.JkVO;
 import nc.api_oa.hkjt.vo._264X.BxVO;
+import nc.vo.pub.BusinessException;
 
 public class ApiPubInfo {
 	/**
@@ -119,4 +120,31 @@ public class ApiPubInfo {
 	 */
 	public static HashMap<String, HashMap<String, String>>
 	CACHE_GROUP = new HashMap<String, HashMap<String, String>>();
+	
+	/**
+	 * 只有一个线程能updateCache
+	 * 当有线程在更新缓存时，进行lock=true，更新完成后，lock=false。
+	 */
+	private static boolean isLocked = false;
+	/**
+	 * 加锁
+	 */
+	public static synchronized void lock() throws BusinessException {
+		if (!isLocked) {
+			isLocked = true;
+		} else {
+			throw new BusinessException("缓存正在更新，请稍后再试。");
+		}
+	}
+	/**
+	 * 解锁
+	 */
+	public static synchronized void unLock() throws BusinessException {
+		if (isLocked) {
+			isLocked = false;
+		} else {
+			throw new BusinessException("缓存正在更新，请稍后再试。");
+		}
+	}
+	
 }

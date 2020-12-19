@@ -158,6 +158,18 @@ public class N264XService {
 		String szgsStr = srcHVO.getSzgs();		// 所在公司（只是 人员所在公司）
 		String szbmStr = srcHVO.getSzbm();		// 所在部门
 		UFBoolean isShare = PuPubVO.getUFBoolean_NullAs(srcHVO.getFt(), UFBoolean.FALSE);	// 是否分摊
+		
+		if (
+			ApiPubInfo.CACHE_DOC.get(account)==null
+		|| ApiPubInfo.CACHE_DOC.get(account).get("org_orgs")==null
+		|| ApiPubInfo.CACHE_DOC.get(account).get("org_dept")==null
+		|| ApiPubInfo.CACHE_DOC.get(account).get("bd_psndoc")==null
+		|| ApiPubInfo.CACHE_DOC.get(account).get("bd_balatype")==null
+		|| ApiPubInfo.CACHE_DOC.get(account).get("bd_defdoc_dkfs")==null
+		) {
+			throw new BusinessException("档案缓存有问题");
+		}
+		
 		HashMap<String,String> szgs_map = ApiPubInfo.CACHE_DOC.get(account).get("org_orgs").get(szgsStr);
 		if (szgs_map == null) {throw new BusinessException("所在公司不匹配：" + szgsStr);}
 		String szgs = szgs_map.get("id");
