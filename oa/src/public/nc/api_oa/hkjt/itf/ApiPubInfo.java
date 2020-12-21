@@ -53,6 +53,7 @@ public class ApiPubInfo {
 		BILLTYPE.put(BILLTYPE_INIT, null);	// 用于所有缓存
 		BILLTYPE.put(BILLTYPE_DOC, null);	// 用于更新档案数据
 		BILLTYPE.put(BILLTYPE_TEST, null);	// 用于测试
+		BILLTYPE.put(BILLTYPE_USER, null);	// 用于更新用户
 		BILLTYPE.put("263X", new BillTypeVO("借款单", JkVO.class));
 		BILLTYPE.put("264X", new BillTypeVO("报销单", BxVO.class));
 		BILLTYPE.put("OA", new BillTypeVO("oa单据", HashMap.class));
