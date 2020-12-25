@@ -2,7 +2,6 @@ package nc.api_oa.hkjt.impl;
 
 import java.util.HashMap;
 
-import nc.api.zhiyun.tool.MyHttpUtil;
 import nc.api.zhiyun.vo.RequestParamVO;
 import nc.api_oa.hkjt.impl.service.DocService;
 import nc.api_oa.hkjt.impl.service.PublicService;
@@ -17,6 +16,7 @@ import nc.api_oa.hkjt.impl.service.other.OtherServiceDELETE;
 import nc.api_oa.hkjt.impl.service.other.OtherServiceQUERY;
 import nc.api_oa.hkjt.itf.ApiBusinessItf;
 import nc.api_oa.hkjt.itf.ApiPubInfo;
+import nc.api_oa.hkjt.tool.MyHttpUtil;
 import nc.api_oa.hkjt.vo.LoginVO;
 import nc.bs.hkjt.srgk.lvyun.workplugin.ImpLvyunData;
 import nc.vo.pub.BusinessException;
