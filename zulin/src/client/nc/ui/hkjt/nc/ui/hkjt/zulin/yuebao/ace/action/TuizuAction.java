@@ -130,6 +130,7 @@ public class TuizuAction extends NCAction {
 			.append(" where ct.dr = 0 and ctb.dr = 0 ")
 			.append(" and ct.pk_org = '"+pk_org+"' ")
 			.append(" and ct.blatest = 'Y' ")
+			.append(" and nvl(ct.vdef20,'~') <> 'Y' ")	// 不取 内部租赁合同
 			.append(" and srxm.name not like '%押金%' ")	// 不取 押金 行
 			.append(" and srxm.name not like '%调整%' ")	// 不取 调整 行
 
@@ -330,6 +331,7 @@ public class TuizuAction extends NCAction {
 				.append(" where ct.dr = 0 and ctb.dr = 0 ")
 				.append(" and ct.pk_org = '"+pk_org+"' ")
 				.append(" and ct.blatest = 'Y' ")
+				.append(" and nvl(ct.vdef20,'~') <> 'Y' ")	// 不取 内部租赁合同
 				.append(" and srxm.name like '%调整%' ")	// 只取 调整 行
 				.append(" and ( ")
 				.append("		'"+str_yb_ksrq+"' between substr(ctb.vbdef3,1,10) and substr(ctb.vbdef4,1,10) ")
