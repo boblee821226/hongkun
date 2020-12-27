@@ -13,13 +13,15 @@ import nc.vo.pub.BusinessException;
 public class DocService {
 	
 	public static Object doAction(String account, String table) throws BusinessException  {
-		
+//		ApiPubInfo.unLock();
 		ApiPubInfo.lock();	// Í¬²½¼ÓËø
 		
 		if (ApiPubInfo.CACHE_DOC == null) {
 			ApiPubInfo.CACHE_DOC = new HashMap<String,HashMap<String,HashMap<String,HashMap<String,String>>>>();
 		}
-		ApiPubInfo.CACHE_DOC.put(account, new HashMap<String,HashMap<String,HashMap<String,String>>>());
+		if (table == null) {
+			ApiPubInfo.CACHE_DOC.put(account, new HashMap<String,HashMap<String,HashMap<String,String>>>());
+		}
 		String   ID = "id";
 		String  VID = "vid";
 		String CODE = "code";
