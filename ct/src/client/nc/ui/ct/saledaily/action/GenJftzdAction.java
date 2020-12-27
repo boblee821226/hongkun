@@ -144,7 +144,7 @@ public class GenJftzdAction extends HelpAction {
 								.append(",ct.pk_ct_sale ")		// 合同主pk
 //								.append(",ctb.norigtaxmny ")	// 合同金额
 								.append(",nvl(ctb.norigtaxmny,0)-nvl(ctb.noritotalgpmny,0) norigtaxmny ")	// 合同金额 减去 已收款金额
-								.append(",substr(ctb.vbdef3, 1, 10) busi_date ")	// 业务日期
+								.append(",substr(ctb.vbdef10, 1, 10) busi_date ")	// 业务日期 = 表体收款日期
 								.append(",ct.pk_customer ")		// 客户
 								.append(",ct.pk_org ")			// 组织
 								.append(",ct.pk_org_v ")		// 组织版本
@@ -164,8 +164,8 @@ public class GenJftzdAction extends HelpAction {
 								.append(" and ct.fstatusflag = 1 ")		// 合同状态 = 生效
 								.append(" and ysb.pk_recitem is null ")	// 没有生成应收单的
 								.append(" and nvl(ctb.norigtaxmny,0)>nvl(ctb.noritotalgpmny,0) ")// 只取 合同金额 大于 收款金额 的
-								.append(" and substr(ctb.vbdef3, 1, 10) between '"+ksrq+"' and '"+jsrq+"' ")	// 过滤 日期范围
-								.append(" and substr(ctb.vbdef3, 1, 10) <= substr(nvl(ct.vdef19,'2099-12-31 23:59:59'), 1, 10) ")	// 只取 表体-开始日期 小于等于 租金截止日期 的数据（HK 2019年1月23日17:04:07）
+								.append(" and substr(ctb.vbdef10, 1, 10) between '"+ksrq+"' and '"+jsrq+"' ")	// 过滤 日期范围（表体收款日期）
+								.append(" and substr(ctb.vbdef10, 1, 10) <= substr(nvl(ct.vdef19,'2099-12-31 23:59:59'), 1, 10) ")	// 只取 表体-收款日期 小于等于 租金截止日期 的数据（HK 2019年1月23日17:04:07）
 								.append(htcode==null?"":" and ct.vbillcode = '"+htcode+"' ")	// 过滤 合同号
 								.append(" and ct.pk_org = '"+zuzhi+"' ")	// 过滤 组织
 								.append(" and nvl(ctb.norigtaxmny,0) > 0 ")	// 合同金额 大于 0
@@ -184,7 +184,7 @@ public class GenJftzdAction extends HelpAction {
 								.append(",case when instr(ct.vbillcode,'#')>0 then substr(ct.vbillcode,1,instr(ct.vbillcode,'#')-1) else ct.vbillcode end vbillcode2 ")	// 合同号2
 								.append(",room.name vdef01 ")	// 房间号
 								.append(",substr(ctb.vbdef3, 1, 10) vdef02 ")	// 开始日期
-								.append(",substr(ctb.vbdef4, 1, 10) vdef03 ")	// 结算日期
+								.append(",substr(ctb.vbdef4, 1, 10) vdef03 ")	// 结束日期
 								.append(" from ct_sale_b ctb ")
 								.append(" inner join ct_sale ct on (ctb.pk_ct_sale = ct.pk_ct_sale) ")
 								.append(" left join ar_recitem ysb on (ysb.def29 = ctb.pk_ct_sale_b and ysb.dr = 0) ")	// 应收单自定义30存主表pk，29存主表pk
@@ -232,7 +232,7 @@ public class GenJftzdAction extends HelpAction {
 									.append(",ct.pk_ct_sale ")		// 合同主pk
 	//								.append(",ctb.norigtaxmny ")	// 合同金额
 									.append(",nvl(ctb.norigtaxmny,0) - nvl(ctb.noritotalgpmny,0) norigtaxmny ")	// 合同金额 减去 收款金额
-									.append(",substr(ctb.vbdef3, 1, 10) busi_date ")	// 业务日期
+									.append(",substr(ctb.vbdef10, 1, 10) busi_date ")	// 业务日期 = 表体收款日期
 									.append(",ct.pk_customer ")		// 客户
 									.append(",ct.pk_org ")			// 组织
 									.append(",ct.pk_org_v ")		// 组织版本
@@ -250,12 +250,12 @@ public class GenJftzdAction extends HelpAction {
 									.append(" and ct.fstatusflag = 1 ")		// 合同状态 = 生效
 //									.append(" and ysb.pk_recitem is null ")	// 没有生成应收单的
 									.append(" and nvl(ctb.norigtaxmny,0)>nvl(ctb.noritotalgpmny,0) ")// 只取 合同金额 大于 收款金额 的
-									.append(" and substr(ctb.vbdef3, 1, 10) <= '"+jsrq+"' ")	// 过滤 开始日期<=结束日期
+									.append(" and substr(ctb.vbdef10, 1, 10) <= '"+jsrq+"' ")	// 过滤 表体收款日期<=结束日期
 //									.append(htcode==null?"":" and ct.vbillcode = '"+htcode+"' ")	// 过滤 合同号
 //									.append(" and ct.pk_org = '"+zuzhi+"' ")	// 过滤 组织
 									.append(" and  ct.pk_ct_sale       in ( "+where_pk_ct_sale+" )")	// 按 第一步的合同pk 去查询
 									.append(" and ctb.pk_ct_sale_b not in ( "+where_pk_ct_sale_b+" )")	// 不查出 第一步的合同行pk
-									.append(" and substr(ctb.vbdef3, 1, 10) <= substr(nvl(ct.vdef19,'2099-12-31 23:59:59'), 1, 10) ")	// 只取 表体-开始日期 小于等于 租金截止日期 的数据（HK 2019年1月23日17:04:07）
+									.append(" and substr(ctb.vbdef10, 1, 10) <= substr(nvl(ct.vdef19,'2099-12-31 23:59:59'), 1, 10) ")	// 只取 表体-收款日期 小于等于 租金截止日期 的数据（HK 2019年1月23日17:04:07）
 							;
 							
 							list_2 = (ArrayList<GenJftzdVO>)iUAPQueryBS.executeQuery(

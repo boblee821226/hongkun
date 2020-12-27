@@ -202,6 +202,7 @@ public class GenHtmxAction extends HelpAction {
 					bvo.setFtaxtypeflag(0);					// 扣税类别
 					
 					bvo.setVbdef3(ksrq.toString());			// 开始日期
+					bvo.setVbdef10(bvo.getVbdef3());		// 收款日期 = 开始日期
 					bvo.setVbdef4(ksrq.toString());			// 结束日期
 					bvo.setVbdef6(mianji.toString());			// 面积
 					bvo.setVbdef5(sjdj.toString());				// 单价
@@ -240,6 +241,7 @@ public class GenHtmxAction extends HelpAction {
 				bvo.setFtaxtypeflag(0);					// 扣税类别
 				
 				bvo.setVbdef3(qijian[i][0].toString());		// 开始日期
+				bvo.setVbdef10(bvo.getVbdef3());			// 收款日期 = 开始日期
 				bvo.setVbdef4(qijian[i][1].toString());		// 结束日期
 				bvo.setVbdef6(mianji.toString());			// 面积
 				bvo.setVbdef5(sjdj.toString());				// 单价
