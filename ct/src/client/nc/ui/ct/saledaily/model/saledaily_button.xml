@@ -52,6 +52,12 @@
 				<ref bean="separatorAction" />  <!-- 分割 -->
 				<ref bean="genJftzdAction" />   <!-- 生成缴费通知单 -->
 				<!-- END -->
+				
+				<!-- HK 2020年12月28日21点42分 -->
+				<!-- 增加 【生成内部交易单】按钮 -->
+				<ref bean="separatorAction" />
+				<ref bean="genNbjydAction" />
+				<!-- END -->
 
 			</list>
 		</property>
@@ -354,6 +360,14 @@
 		<property name="model" ref="ManageAppModel" />
 		<property name="cardForm" ref="billFormEditor" />
 		<property name="listForm" ref="listView" />
+	</bean>
+	<!-- END -->
+	
+	<!-- HK 2020年12月28日21点40分 -->
+	<!-- 生成内部交易单 -->
+	<bean id="genNbjydAction" class="nc.ui.ct.saledaily.action.GenNbjydAction">
+		<property name="model" ref="ManageAppModel" />
+		<property name="cardForm" ref="billFormEditor" />
 	</bean>
 	<!-- END -->
 

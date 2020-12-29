@@ -11,6 +11,7 @@ import nc.bs.framework.common.InvocationInfoProxy;
 import nc.bs.framework.common.NCLocator;
 import nc.itf.uap.IUAPQueryBS;
 import nc.itf.uap.pf.IplatFormEntry;
+import nc.jdbc.framework.processor.ArrayListProcessor;
 import nc.jdbc.framework.processor.BeanListProcessor;
 import nc.pubitf.setting.defaultdata.OrgSettingAccessor;
 import nc.ui.ct.action.HelpAction;
@@ -24,24 +25,25 @@ import nc.vo.arap.receivable.AggReceivableBillVO;
 import nc.vo.arap.receivable.ReceivableBillItemVO;
 import nc.vo.arap.receivable.ReceivableBillVO;
 import nc.vo.ct.saledaily.GenJftzdVO;
+import nc.vo.pub.BusinessException;
 import nc.vo.pub.lang.UFBoolean;
 import nc.vo.pub.lang.UFDate;
 import nc.vo.pub.lang.UFDateTime;
 import nc.vo.pub.lang.UFDouble;
 import nc.vo.pubapp.AppContext;
 
-public class GenJftzdAction extends HelpAction {
+public class GenNbjydAction extends HelpAction {
 
 	/**
-	 * 生成缴费通知单
+	 * 生成内部交易单
 	 */
 	private static final long serialVersionUID = 3201550356497809091L;
 	
 	private SaledailyBillForm cardForm = null;
 
-	  public GenJftzdAction() {
-	    this.setCode("GenJftzdAction");
-	    this.setBtnName("生成缴费通知单");
+	  public GenNbjydAction() {
+	    this.setCode("GenNbjydAction");
+	    this.setBtnName("生成内部交易单");
 	  }
 
 	  @Override
@@ -145,7 +147,8 @@ public class GenJftzdAction extends HelpAction {
 //								.append(",ctb.norigtaxmny ")	// 合同金额
 								.append(",nvl(ctb.norigtaxmny,0)-nvl(ctb.noritotalgpmny,0) norigtaxmny ")	// 合同金额 减去 已收款金额
 								.append(",substr(ctb.vbdef10, 1, 10) busi_date ")	// 业务日期 = 表体收款日期
-								.append(",ct.pk_customer ")		// 客户
+//								.append(",ct.pk_customer ")		// 客户
+								.append(",cust.def4 pk_customer ")		// 客户档案的def4财务组织的客户
 								.append(",ct.pk_org ")			// 组织
 								.append(",ct.pk_org_v ")		// 组织版本
 								.append(",ct.vbillcode ")		// 合同号
@@ -154,14 +157,17 @@ public class GenJftzdAction extends HelpAction {
 								.append(",room.name vdef01 ")	// 房间号
 								.append(",null vdef02 ")	// 开始日期
 								.append(",null vdef03 ")	// 结算日期
+								.append(",ct.vdef16 vdef04 ")	// 房间号id
 								.append(" from ct_sale_b ctb ")
 								.append(" inner join ct_sale ct on (ctb.pk_ct_sale = ct.pk_ct_sale) ")
 								.append(" left join ar_recitem ysb on (ysb.def29 = ctb.pk_ct_sale_b and ysb.dr = 0) ")	// 应收单自定义30存主表pk，29存主表pk
 								.append(" left join bd_defdoc doc on (doc.pk_defdoc = ctb.vbdef1) ")
 								.append(" left join bd_defdoc room on (room.pk_defdoc = ct.vdef16) ")	// 房号
+								.append(" left join bd_customer cust on (ct.pk_customer = cust.pk_customer) ")	// 客户
 								.append(" where ct.dr=0 and ctb.dr=0 ")
 								.append(" and ct.blatest = 'Y' ")		// 合同最新版
 								.append(" and ct.fstatusflag = 1 ")		// 合同状态 = 生效
+								.append(" and nvl(ct.vdef20,'~') = 'Y' ")	// 内部合同 = Y
 								.append(" and ysb.pk_recitem is null ")	// 没有生成应收单的
 								.append(" and nvl(ctb.norigtaxmny,0)>nvl(ctb.noritotalgpmny,0) ")// 只取 合同金额 大于 收款金额 的
 								.append(" and substr(ctb.vbdef10, 1, 10) between '"+ksrq+"' and '"+jsrq+"' ")	// 过滤 日期范围（表体收款日期）
@@ -176,7 +182,8 @@ public class GenJftzdAction extends HelpAction {
 //								.append(",ctb.norigtaxmny ")	// 合同金额
 								.append(",nvl(ctb.norigtaxmny,0)-nvl(ctb.noritotalgpmny,0) norigtaxmny ")	// 合同金额 减去 已收款金额
 								.append(",substr(ctb.vmemo, 1, 10) busi_date ")	// 业务日期
-								.append(",ct.pk_customer ")		// 客户
+//								.append(",ct.pk_customer ")		// 客户
+								.append(",cust.def4 pk_customer ")		// 客户档案的def4财务组织的客户
 								.append(",ct.pk_org ")			// 组织
 								.append(",ct.pk_org_v ")		// 组织版本
 								.append(",ct.vbillcode ")		// 合同号
@@ -185,14 +192,17 @@ public class GenJftzdAction extends HelpAction {
 								.append(",room.name vdef01 ")	// 房间号
 								.append(",substr(ctb.vbdef3, 1, 10) vdef02 ")	// 开始日期
 								.append(",substr(ctb.vbdef4, 1, 10) vdef03 ")	// 结束日期
+								.append(",ct.vdef16 vdef04 ")	// 房间号id
 								.append(" from ct_sale_b ctb ")
 								.append(" inner join ct_sale ct on (ctb.pk_ct_sale = ct.pk_ct_sale) ")
 								.append(" left join ar_recitem ysb on (ysb.def29 = ctb.pk_ct_sale_b and ysb.dr = 0) ")	// 应收单自定义30存主表pk，29存主表pk
 								.append(" left join bd_defdoc doc on (doc.pk_defdoc = ctb.vbdef1) ")
 								.append(" left join bd_defdoc room on (room.pk_defdoc = ct.vdef16) ")	// 房号
+								.append(" left join bd_customer cust on (ct.pk_customer = cust.pk_customer) ")	// 客户
 								.append(" where ct.dr=0 and ctb.dr=0 ")
 								.append(" and ct.blatest = 'Y' ")		// 合同最新版
 								.append(" and ct.fstatusflag = 1 ")		// 合同状态 = 生效
+								.append(" and nvl(ct.vdef20,'~') = 'Y' ")	// 内部合同 = Y
 								.append(" and ysb.pk_recitem is null ")	// 没有生成应收单的
 								// 用表体的备注， 来存储 扣减行的 开始日期
 								.append(" and substr(ctb.vmemo, 1, 10) between '"+ksrq+"' and '"+jsrq+"' ")	// 过滤 日期范围
@@ -233,21 +243,25 @@ public class GenJftzdAction extends HelpAction {
 	//								.append(",ctb.norigtaxmny ")	// 合同金额
 									.append(",nvl(ctb.norigtaxmny,0) - nvl(ctb.noritotalgpmny,0) norigtaxmny ")	// 合同金额 减去 收款金额
 									.append(",substr(ctb.vbdef10, 1, 10) busi_date ")	// 业务日期 = 表体收款日期
-									.append(",ct.pk_customer ")		// 客户
+//									.append(",ct.pk_customer ")		// 客户
+									.append(",cust.def4 pk_customer ")		// 客户档案的def4财务组织的客户
 									.append(",ct.pk_org ")			// 组织
 									.append(",ct.pk_org_v ")		// 组织版本
 									.append(",ct.vbillcode ")		// 合同号
 									.append(",doc.name jflx ")		// 交费类型
 									.append(",case when instr(ct.vbillcode,'#')>0 then substr(ct.vbillcode,1,instr(ct.vbillcode,'#')-1) else ct.vbillcode end vbillcode2 ")	// 合同号2
 									.append(",room.name vdef01 ")	// 房间号
+									.append(",ct.vdef16 vdef04 ")	// 房间号id
 									.append(" from ct_sale_b ctb ")
 									.append(" inner join ct_sale ct on (ctb.pk_ct_sale = ct.pk_ct_sale) ")
 									.append(" left join ar_recitem ysb on (ysb.def29 = ctb.pk_ct_sale_b and ysb.dr = 0) ")	// 应收单自定义30存主表pk，29存主表pk
 									.append(" left join bd_defdoc doc on (doc.pk_defdoc = ctb.vbdef1) ")
 									.append(" left join bd_defdoc room on (room.pk_defdoc = ct.vdef16) ")	// 房号
+									.append(" left join bd_customer cust on (ct.pk_customer = cust.pk_customer) ")	// 客户
 									.append(" where ct.dr=0 and ctb.dr=0 ")
 									.append(" and ct.blatest = 'Y' ")		// 合同最新版
 									.append(" and ct.fstatusflag = 1 ")		// 合同状态 = 生效
+									.append(" and nvl(ct.vdef20,'~') = 'Y' ")	// 内部合同 = Y
 //									.append(" and ysb.pk_recitem is null ")	// 没有生成应收单的
 									.append(" and nvl(ctb.norigtaxmny,0)>nvl(ctb.noritotalgpmny,0) ")// 只取 合同金额 大于 收款金额 的
 									.append(" and substr(ctb.vbdef10, 1, 10) <= '"+jsrq+"' ")	// 过滤 表体收款日期<=结束日期
@@ -310,6 +324,11 @@ public class GenJftzdAction extends HelpAction {
 				    String[] Keys = new String[MAP_list.size()];
 				    Keys = MAP_list.keySet().toArray(Keys);
 				    
+//				    if (true) {
+//				    	System.out.println(MAP_list);
+//				    	return;
+//				    }
+				    
 //					for( int list_i=0;list_i<list.size();list_i++ )
 				    for( int Keys_i=0;Keys_i<Keys.length;Keys_i++ )
 					{
@@ -327,7 +346,7 @@ public class GenJftzdAction extends HelpAction {
 //						    UFDate        busi_date = PuPubVO.getUFDate(ctSaleVO.getBusi_date());	// 业务日期（取数）
 						    UFDate        busi_date = AppContext.getInstance().getBusiDate();		// 业务日期 取 登录日期
 						    
-						    String[] accperiod = GenNbjydAction.getAccperiod(busi_date, iUAPQueryBS);
+						    String[] accperiod = getAccperiod(busi_date, iUAPQueryBS);
 						    
 						    String             year = accperiod[0];					// 会计年（根据业务日期来解析）
 						    String           period = accperiod[1];					// 会计月（根据业务日期来解析）
@@ -335,8 +354,8 @@ public class GenJftzdAction extends HelpAction {
 						    String      pk_busitype = "0001N510000000000SLQ";	// 业务流程（固定）
 						    String        billclass = "ys";						// 单据大类（固定）
 						    String      pk_billtype = "F0";						// 单据类型编码（固定）
-						    String     pk_tradetype = "F0-Cxx-03";				// 应收类型（固定）
-						    String   pk_tradetypeid = "1001N5100000006402AK";	// 单据类型（固定）
+						    String     pk_tradetype = "F0-Cxx-90";				// 应收类型（固定）
+						    String   pk_tradetypeid = "1001N510000000BSKADN";	// 单据类型（固定）
 						    String      pk_currtype = "1002Z0100000000001K1";	// 币种（固定）
 						    String         pk_group = "0001N510000000000EGY";	// 集团（固定）
 						    String           guojia = "0001Z010000000079UJJ";	// 国家（固定）
@@ -411,6 +430,7 @@ public class GenJftzdAction extends HelpAction {
 							    
 							    String def_ksrq = item_vo.getVdef02();	// 免租的开始日期
 							    String def_jsrq = item_vo.getVdef03();	// 免租的结束日期
+							    String room_id = item_vo.getVdef04();	// 房间号id
 							    // 摘要 = 合同编码+交费类型+业务日期
 							    String scomment = null;
 							    if (def_ksrq == null) {
@@ -483,6 +503,7 @@ public class GenJftzdAction extends HelpAction {
 						    	
 						    	itemVOs[i].setDef30(pk_ct_sale);		// 合同主表pk
 						    	itemVOs[i].setDef29(pk_ct_sale_b);		// 合同子表pk
+						    	itemVOs[i].setDef8(room_id);			// 房号
 						    	
 						    	itemVOs[i].setScomment(scomment);		// 摘要
 						    }
@@ -529,30 +550,24 @@ public class GenJftzdAction extends HelpAction {
 	  /**
 	   * 根据日期 返回 会计年、月
 	   */
-//	  private String[] getAccperiod(UFDate date)
-//	  {
-//		  if(date==null) date = new UFDate();
-//		  
-//		  int  year = date.getYear();
-//		  int month = date.getMonth();
-//		  int   day = date.getDay();
-//		  
-//		  if(day>25)
-//		  {// 如果 日 大于25 则为下个月
-//			  month++;
-//		  }
-//		  
-//		  if( month>12 )
-//		  {// 如果 月 大于12 则年++，月为1
-//			  year++;
-//			  month=1;
-//		  }
-//		  
-//		  return new String[]{
-//				  ""+year,
-//				  (month<10)?("0"+month):(""+month)
-//		  };
-//	  }
+	  static String[] getAccperiod(UFDate date, IUAPQueryBS iUAPQueryBS) throws BusinessException
+	  {		  
+		  StringBuffer querySQL = 
+				  new StringBuffer("select a.yearmth ")
+		  			.append(" from bd_accperiodmonth a ")
+		  			.append(" where a.dr = 0 ")
+		  			.append(" and a.pk_accperiodscheme = '0001Z000000000000001' ")
+		  			.append(" and '").append(date.toString()).append("' between begindate and enddate ")
+		  ;
+		  ArrayList list = (ArrayList)iUAPQueryBS.executeQuery(
+					 querySQL.toString()
+					,new ArrayListProcessor());
+		  if (list !=null && !list.isEmpty()) {
+			  String yearmth = PuPubVO.getString_TrimZeroLenAsNull(((Object[])list.get(0))[0]);
+			  return yearmth.split("-");
+		  }
+		  throw new BusinessException("未找到会计期间。");
+	  }
 	  
 	  @Override
 	  protected boolean isActionEnable() {
