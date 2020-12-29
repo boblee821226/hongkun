@@ -53,8 +53,12 @@ public class HkOaInfoVO extends SuperVO {
 	}
 	
 	@Override
-	public String getPrimaryKey() {
+	public String getPKFieldName() {
 		return "pk_hk_oa_info";
+	}
+	@Override
+	public String getPrimaryKey() {
+		return this.pk_hk_oa_info;
 	}
 	@Override
 	public String getTableName() {

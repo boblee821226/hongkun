@@ -16,6 +16,8 @@ import nc.ui.uif2.editor.BillForm;
 import nc.ui.uif2.model.AbstractAppModel;
 import nc.vo.hkjt.oa.BackFlowResponse;
 import nc.vo.hkjt.oa.HkOaInfoVO;
+import nc.vo.hkjt.oa.HkOaSettingBillVO;
+import nc.vo.pub.BusinessException;
 import nc.vo.pub.SuperVO;
 import nc.vo.uif2.LoginContext;
 
@@ -36,6 +38,8 @@ public class BackAction extends NCAction {
 	private BillForm editor = null;
 	private String billType = null;
 	private LoginContext context = null;
+	
+	private static String backFlowURL = SendAction.baseURL + "/backFlow";
 	
 	public BackAction() {
 		setBtnName("收回OA");
@@ -84,38 +88,23 @@ public class BackAction extends NCAction {
 	}
 
 	@Override
-	public void doAction(ActionEvent e) throws Exception {
-		String idKey = "pk_paybill";		// 单据id
-		String typeKey = "pk_tradetype";	// 交易类型code
+	public void doAction(ActionEvent e) throws BusinessException {
+		// 1、获取 界面上的单据类型（交易类型）
+		String pkBillTypeCode = this.getPkBillTypeCode();
+		// 2、获取 配置信息
+		HkOaSettingBillVO settingVO = SendAction.getSettingBillVO(pkBillTypeCode);
+		
+		String idKey = SendAction.getIdKey(settingVO);		// 单据id
+//		String typeKey = "pk_tradetype";	// 交易类型code
 		/**
 		 * 收回，先做判断，必须在日志表里存在。
 		 */
-		String idValue = PuPubVO.getString_TrimZeroLenAsNull(
-				getEditor().getBillCardPanel()
-				.getHeadItem(idKey)
-				.getValueObject()
-				);
-		String typeValue = PuPubVO.getString_TrimZeroLenAsNull(
-				getEditor().getBillCardPanel()
-				.getHeadItem(typeKey)
-				.getValueObject()
-				);
-		SuperVO[] infoVOs = HYPubBO_Client.queryByCondition(
-				HkOaInfoVO.class,
-				" dr = 0 " +
-				" and billid = '" + idValue + "' " +
-				" and pk_billtypecode = '" + typeValue + "' "
-				);
-		if (infoVOs == null || infoVOs.length == 0) {
-			throw new Exception("未提交到oa，不能收回。");
-		}
-		HkOaInfoVO infoVO = (HkOaInfoVO)infoVOs[0];
+		HkOaInfoVO infoVO = getInfoVO(idKey, pkBillTypeCode);
 		/**END**/
 		Map<String, Object> req = new HashMap<>();
-		req.put("workflowid", "113");
+		req.put("workflowid", SendAction.getWorkFlowId(settingVO));
 		req.put("requestid", infoVO.getPk_hk_oa_info());
-		String res = MyHttpUtil.doGet(
-				"http://39.102.46.51/api/nctooa/backFlow", req);
+		String res = MyHttpUtil.doGet(backFlowURL, req);
 		BackFlowResponse resObj = JSONObject.parseObject(res,
 				BackFlowResponse.class);
 		if ("1".equals(resObj.getStatus())) {
@@ -126,10 +115,51 @@ public class BackAction extends NCAction {
 			// 更新按钮状态
 			this.updateStatus();
 		} else {
-			MessageDialog.showErrorDlg(this.getEditor(), "", resObj.getError());
+			MessageDialog.showErrorDlg(this.getEditor(), "OA返回信息", resObj.getError());
 		}
 	}
 
+	private HkOaInfoVO getInfoVO(String idKey, String pkBillTypeCode)
+			throws BusinessException {
+		String idValue = PuPubVO.getString_TrimZeroLenAsNull(
+				getEditor().getBillCardPanel()
+				.getHeadItem(idKey)
+				.getValueObject()
+				);
+		SuperVO[] infoVOs = HYPubBO_Client.queryByCondition(
+				HkOaInfoVO.class,
+				" dr = 0 " +
+				" and billid = '" + idValue + "' " +
+				" and pk_billtypecode = '" + pkBillTypeCode + "' "
+				);
+		if (infoVOs == null || infoVOs.length == 0) {
+			throw new BusinessException("未提交到oa，不能收回。");
+		}
+		HkOaInfoVO infoVO = (HkOaInfoVO)infoVOs[0];
+		return infoVO;
+	}
+
+	/**
+	 * 穷举出当前单据的单据类型
+	 */
+	private String getPkBillTypeCode() throws BusinessException {
+		for (String typeKey : SendAction.billTypeFields) {
+			String typeValue = null;
+			try {
+				typeValue = PuPubVO.getString_TrimZeroLenAsNull(
+						getEditor().getBillCardPanel()
+						.getHeadItem(typeKey)
+						.getValueObject()
+						);
+			} catch (NullPointerException ex) {}
+			if (typeValue != null) return typeValue;
+		}
+		throw new BusinessException("获取不到当前单据类型。");
+	}
+	
+	/**
+	 * 按钮状态控制
+	 */
 	@Override
 	protected boolean isActionEnable() {
 		if (getEditor() == null || getEditor().getBillCardPanel() == null) return false;
