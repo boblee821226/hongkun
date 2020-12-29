@@ -147,11 +147,10 @@
 		</property>
 		<property name="actions">
 			<list>
-				<ref bean="addAction" />
+				<!--<ref bean="addAction" />
 				<ref bean="editAction" />
 				<ref bean="deleteScriptAction" />
 				<ref bean="defaultQueryAction" />
-				<!--  ref bean="copyAction" /-->
 				<ref bean="separatorAction" />
 				<ref bean="defaultRefreshAction" />
 				<ref bean="separatorAction" />
@@ -159,23 +158,15 @@
 				<ref bean="unCommitScriptAction" />
 				<ref bean="approveScriptAction" />
 				<ref bean="uNApproveScriptAction" />
-				<!--ref bean="separatorAction" /-->
-				<!--ref bean="linkQueryAction" /-->
-				<!--ref bean="separatorAction" /-->
-				<!--ref bean="metaDataBasedPrintAction" /-->
-				<!--ref bean="metaDataBasedPrintActiona" /-->
-				<!--ref bean="outputAction" /-->
 				<ref bean="separatorAction" />
-				<ref bean="pFApproveStatusInfoAction" />
-
+				<ref bean="pFApproveStatusInfoAction" />-->
 			</list>
 		</property>
 		
 		<property name="editActions">
 			<list>
-				<ref bean="saveScriptAction" />
-				<ref bean="cancelAction" />
-				
+				<!--<ref bean="saveScriptAction" />
+				<ref bean="cancelAction" />-->
 			</list>
 		</property>
 
@@ -188,6 +179,83 @@
 		</property>
 		-->
 	</bean>
+	
+	<!-- BEGIN 卡片  与  列表  要设置不同的按钮 -->
+	<bean id="toftpanelActionContributors" class="nc.ui.uif2.actions.ActionContributors">
+		<property name="contributors">
+			<list>
+				<ref bean="actionsOfList" />
+				<ref bean="actionsOfCard" />
+			</list>
+		</property>
+	</bean>
+	<!-- 列表的按钮 -->
+	<bean id="actionsOfList" class="nc.ui.uif2.actions.StandAloneToftPanelActionContainer">
+		<constructor-arg ref="billListView" />
+		<property name="actions">
+			<list>
+				<ref bean="addAction" />
+				<ref bean="editAction" />
+				<ref bean="deleteScriptAction" />
+				<ref bean="defaultQueryAction" />
+				<ref bean="separatorAction" />
+				<ref bean="defaultRefreshAction" />
+				<ref bean="separatorAction" />
+				<ref bean="commitScriptAction" />
+				<ref bean="unCommitScriptAction" />
+				<ref bean="approveScriptAction" />
+				<ref bean="uNApproveScriptAction" />
+				<ref bean="separatorAction" />
+				<ref bean="pFApproveStatusInfoAction" />
+			</list>
+		</property>
+	</bean>
+	<!-- 卡片的按钮 -->
+	<bean id="actionsOfCard" class="nc.ui.uif2.actions.StandAloneToftPanelActionContainer">
+		<constructor-arg ref="billForm" />
+		<property name="actions">
+			<list>
+				<ref bean="addAction" />
+				<ref bean="editAction" />
+				<ref bean="deleteScriptAction" />
+				<ref bean="defaultQueryAction" />
+				<ref bean="separatorAction" />
+				<ref bean="refreshCardAction" />
+				<ref bean="separatorAction" />
+				<ref bean="commitScriptAction" />
+				<ref bean="unCommitScriptAction" />
+				<ref bean="approveScriptAction" />
+				<ref bean="uNApproveScriptAction" />
+				<ref bean="separatorAction" />
+				<ref bean="pFApproveStatusInfoAction" />
+				
+				<!-- HK 2020年12月26日21:13:01 -->
+				<!-- oa发送 按钮  -->
+				<ref bean="separatorAction" />
+				<ref bean="oaSendAction" />
+				<!-- oa收回 按钮  -->
+				<ref bean="separatorAction" />
+				<ref bean="oaBackAction" />
+				<!-- oa联查 按钮  -->
+				<ref bean="separatorAction" />
+				<ref bean="oaLinkAction" />
+				<!-- END -->
+				
+			</list>
+		</property>
+		<property name="editActions" ref="normEditAction" />
+		<property name="model" ref="bmModel" />
+	</bean>
+	<!-- 编辑状态的按钮 -->
+	<bean id="normEditAction" class="java.util.ArrayList">
+		<constructor-arg>
+			<list>
+				<ref bean="saveScriptAction" />
+				<ref bean="cancelAction" />
+			</list>
+		</constructor-arg>
+	</bean>
+	<!-- END 卡片列表 按钮分开 -->
 	
 	<!-- 打开节点监听 newadd-->
 	<bean id="InitDataListener" class="nc.ui.pubapp.uif2app.model.DefaultFuncNodeInitDataListener">
@@ -348,7 +416,7 @@
 	</bean>
 
 	<!--======= 动作：[newActions] [提交] ===========-->
-	<bean id="commitScriptAction" class="nc.ui.pubapp.uif2app.actions.pflow.CommitScriptAction">
+	<bean id="commitScriptAction" class="nc.ui.hkjt.oa.action.CommitScriptAction">
 		<property name="model"><ref bean="bmModel"/></property>
 		<property name="editor"><ref bean="billForm"/></property>
 		<property name="billType" value="HK38" />
@@ -358,7 +426,7 @@
 	</bean>
 
 	<!--======= 动作：[newActions] [收回] ===========-->
-	<bean id="unCommitScriptAction" class="nc.ui.pubapp.uif2app.actions.pflow.UnCommitScriptAction">
+	<bean id="unCommitScriptAction" class="nc.ui.hkjt.oa.action.UnCommitScriptAction">
 		<property name="model"><ref bean="bmModel"/></property>
 		<property name="editor"><ref bean="billForm"/></property>
 		<property name="billType" value="HK38" />
@@ -455,6 +523,33 @@
 		<property name="context"><ref bean="context" /></property>
 	</bean>
 	
+	<!-- 卡片刷新动作 -->
+	<bean id="refreshCardAction" class="nc.ui.pubapp.uif2app.actions.RefreshSingleAction">
+		<property name="model" ref="bmModel" />
+	</bean>
+	<!-- END -->
+	
+	<!-- HK 2020年12月26日21:13:09 -->
+	<!-- oa发送  按钮 -->
+	<bean id="oaSendAction" class="nc.ui.hkjt.oa.action.SendAction">
+		<property name="editor" ref="billForm" />
+		<property name="model" ref="bmModel" />
+		<property name="listView" ref="billListView" />
+	</bean>
+	<!-- oa收回  按钮 -->
+	<bean id="oaBackAction" class="nc.ui.hkjt.oa.action.BackAction">
+		<property name="editor" ref="billForm" />
+		<property name="model" ref="bmModel" />
+		<property name="listView" ref="billListView" />
+	</bean>
+	<!-- oa联查 按钮 -->
+	<bean id="oaLinkAction" class="nc.ui.erm.link.OaLinkAction">
+		<property name="editor" ref="billForm" />
+		<property name="model" ref="bmModel" />
+		<property name="listView" ref="billListView" />
+		<property name="billType" value="OA" />
+	</bean>
+	<!-- END -->
 	
 	<!-- 批量保存校验服务类 -->
 </beans>
