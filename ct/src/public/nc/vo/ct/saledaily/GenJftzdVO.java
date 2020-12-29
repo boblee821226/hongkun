@@ -24,7 +24,7 @@ public class GenJftzdVO extends SuperVO {
 	public String vdef01;	// 房间号
 	public String vdef02;	// 开始日期
 	public String vdef03;	// 截止日期
-	public String vdef04;
+	public String vdef04;	// 房间号id
 	public String vdef05;
 	
 	public String getPk_ct_sale_b() {
