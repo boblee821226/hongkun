@@ -18,14 +18,19 @@ public class GenJftzdVO extends SuperVO {
 	public String pk_org;
 	public String pk_org_v;
 	public String vbillcode;
-	public String jflx;			// 交费类型
+	public String jflx;			// 收费项目
 	public String vbillcode2;	// 去掉#之后的合同号
 	
 	public String vdef01;	// 房间号
 	public String vdef02;	// 开始日期
 	public String vdef03;	// 截止日期
 	public String vdef04;	// 房间号id
-	public String vdef05;
+	public String vdef05;	// 区域id
+	public String vdef06;	// 收费项目id
+	public String vdef07;
+	public String vdef08;
+	public String vdef09;
+	public String vdef10;
 	
 	public String getPk_ct_sale_b() {
 		return pk_ct_sale_b;
@@ -116,6 +121,36 @@ public class GenJftzdVO extends SuperVO {
 	}
 	public void setVdef05(String vdef05) {
 		this.vdef05 = vdef05;
+	}
+	public String getVdef06() {
+		return vdef06;
+	}
+	public void setVdef06(String vdef06) {
+		this.vdef06 = vdef06;
+	}
+	public String getVdef07() {
+		return vdef07;
+	}
+	public void setVdef07(String vdef07) {
+		this.vdef07 = vdef07;
+	}
+	public String getVdef08() {
+		return vdef08;
+	}
+	public void setVdef08(String vdef08) {
+		this.vdef08 = vdef08;
+	}
+	public String getVdef09() {
+		return vdef09;
+	}
+	public void setVdef09(String vdef09) {
+		this.vdef09 = vdef09;
+	}
+	public String getVdef10() {
+		return vdef10;
+	}
+	public void setVdef10(String vdef10) {
+		this.vdef10 = vdef10;
 	}
 	
 }

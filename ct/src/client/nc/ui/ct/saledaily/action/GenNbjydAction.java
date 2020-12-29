@@ -152,16 +152,18 @@ public class GenNbjydAction extends HelpAction {
 								.append(",ct.pk_org ")			// 组织
 								.append(",ct.pk_org_v ")		// 组织版本
 								.append(",ct.vbillcode ")		// 合同号
-								.append(",doc.name jflx ")		// 交费类型
+								.append(",doc.name jflx ")		// 收费项目
 								.append(",case when instr(ct.vbillcode,'#')>0 then substr(ct.vbillcode,1,instr(ct.vbillcode,'#')-1) else ct.vbillcode end vbillcode2 ")	// 合同号2
 								.append(",room.name vdef01 ")	// 房间号
 								.append(",null vdef02 ")	// 开始日期
 								.append(",null vdef03 ")	// 结算日期
 								.append(",ct.vdef16 vdef04 ")	// 房间号id
+								.append(",ctb.vbdef1 vdef06 ")	// 收费项目id
+								.append(",ct.vdef15 vdef05 ")	// 区域id
 								.append(" from ct_sale_b ctb ")
 								.append(" inner join ct_sale ct on (ctb.pk_ct_sale = ct.pk_ct_sale) ")
 								.append(" left join ar_recitem ysb on (ysb.def29 = ctb.pk_ct_sale_b and ysb.dr = 0) ")	// 应收单自定义30存主表pk，29存主表pk
-								.append(" left join bd_defdoc doc on (doc.pk_defdoc = ctb.vbdef1) ")
+								.append(" left join bd_defdoc doc on (doc.pk_defdoc = ctb.vbdef1) ")	// 收费项目
 								.append(" left join bd_defdoc room on (room.pk_defdoc = ct.vdef16) ")	// 房号
 								.append(" left join bd_customer cust on (ct.pk_customer = cust.pk_customer) ")	// 客户
 								.append(" where ct.dr=0 and ctb.dr=0 ")
@@ -187,12 +189,14 @@ public class GenNbjydAction extends HelpAction {
 								.append(",ct.pk_org ")			// 组织
 								.append(",ct.pk_org_v ")		// 组织版本
 								.append(",ct.vbillcode ")		// 合同号
-								.append(",doc.name jflx ")		// 交费类型
+								.append(",doc.name jflx ")		// 收费项目
 								.append(",case when instr(ct.vbillcode,'#')>0 then substr(ct.vbillcode,1,instr(ct.vbillcode,'#')-1) else ct.vbillcode end vbillcode2 ")	// 合同号2
 								.append(",room.name vdef01 ")	// 房间号
 								.append(",substr(ctb.vbdef3, 1, 10) vdef02 ")	// 开始日期
 								.append(",substr(ctb.vbdef4, 1, 10) vdef03 ")	// 结束日期
 								.append(",ct.vdef16 vdef04 ")	// 房间号id
+								.append(",ctb.vbdef1 vdef06 ")	// 收费项目id
+								.append(",ct.vdef15 vdef05 ")	// 区域id
 								.append(" from ct_sale_b ctb ")
 								.append(" inner join ct_sale ct on (ctb.pk_ct_sale = ct.pk_ct_sale) ")
 								.append(" left join ar_recitem ysb on (ysb.def29 = ctb.pk_ct_sale_b and ysb.dr = 0) ")	// 应收单自定义30存主表pk，29存主表pk
@@ -248,10 +252,12 @@ public class GenNbjydAction extends HelpAction {
 									.append(",ct.pk_org ")			// 组织
 									.append(",ct.pk_org_v ")		// 组织版本
 									.append(",ct.vbillcode ")		// 合同号
-									.append(",doc.name jflx ")		// 交费类型
+									.append(",doc.name jflx ")		// 收费项目
 									.append(",case when instr(ct.vbillcode,'#')>0 then substr(ct.vbillcode,1,instr(ct.vbillcode,'#')-1) else ct.vbillcode end vbillcode2 ")	// 合同号2
 									.append(",room.name vdef01 ")	// 房间号
 									.append(",ct.vdef16 vdef04 ")	// 房间号id
+									.append(",ctb.vbdef1 vdef06 ")	// 收费项目id
+									.append(",ct.vdef15 vdef05 ")	// 区域id
 									.append(" from ct_sale_b ctb ")
 									.append(" inner join ct_sale ct on (ctb.pk_ct_sale = ct.pk_ct_sale) ")
 									.append(" left join ar_recitem ysb on (ysb.def29 = ctb.pk_ct_sale_b and ysb.dr = 0) ")	// 应收单自定义30存主表pk，29存主表pk
@@ -414,7 +420,7 @@ public class GenNbjydAction extends HelpAction {
 						    headVO.setSendcountryid( guojia );	// 发货国bd_countryzone
 						    headVO.setTaxcountryid( guojia );	// 报税国
 						    
-//						    headVO.setDef30(pk_ct_sale);	// 合同主表pk（待定）
+						    headVO.setDef30("1001N5100000006P2IQA");	// 是否责任凭证 = 是
 //						    headVO.setScomment(scomment);	// 摘要（待定）
 						    
 						    ReceivableBillItemVO[] itemVOs = new ReceivableBillItemVO[vo_list.size()];
@@ -431,6 +437,8 @@ public class GenNbjydAction extends HelpAction {
 							    String def_ksrq = item_vo.getVdef02();	// 免租的开始日期
 							    String def_jsrq = item_vo.getVdef03();	// 免租的结束日期
 							    String room_id = item_vo.getVdef04();	// 房间号id
+							    String quyu_id = item_vo.getVdef05();	// 区域id
+							    String sfxm_id = item_vo.getVdef06();	// 收费项目
 							    // 摘要 = 合同编码+交费类型+业务日期
 							    String scomment = null;
 							    if (def_ksrq == null) {
@@ -504,6 +512,8 @@ public class GenNbjydAction extends HelpAction {
 						    	itemVOs[i].setDef30(pk_ct_sale);		// 合同主表pk
 						    	itemVOs[i].setDef29(pk_ct_sale_b);		// 合同子表pk
 						    	itemVOs[i].setDef8(room_id);			// 房号
+						    	itemVOs[i].setDef1(sfxm_id);	// 收费项目pk
+						    	itemVOs[i].setDef9(quyu_id);	// 区域pk
 						    	
 						    	itemVOs[i].setScomment(scomment);		// 摘要
 						    }
