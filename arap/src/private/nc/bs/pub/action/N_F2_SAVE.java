@@ -10,12 +10,14 @@ import hd.vo.pub.tools.PuPubVO;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.List;
 
 import nc.bs.arap.actions.N_BASE_ACTION;
 import nc.bs.dao.BaseDAO;
 import nc.jdbc.framework.processor.ArrayListProcessor;
 import nc.vo.arap.gathering.AggGatheringBillVO;
 import nc.vo.arap.gathering.GatheringBillItemVO;
+import nc.vo.arap.gathering.GatheringBillVO;
 import nc.vo.fipub.exception.ExceptionHandler;
 import nc.vo.pub.compiler.PfParameterVO;
 
@@ -106,16 +108,13 @@ public class N_F2_SAVE extends N_BASE_ACTION{
 			AggGatheringBillVO[] return_obj = (AggGatheringBillVO[])obj;
 			String after_type = return_obj[0].getParentVO().getAttributeValue("pk_tradetypeid").toString();
 			String pk = return_obj[0].getPrimaryKey();
-			
+			BaseDAO daseDAO = new BaseDAO();
 			/**
 			 * 2019年4月15日15:23:08
 			 * 单据类型修改
 			 */
 			if(!after_type.equals(befor_type))
 			{// 如果保存前后的 类型不一致，则需要 修改
-			
-				BaseDAO daseDAO = new BaseDAO();
-				
 				String updateSQL = 
 						" update ar_gatherbill " +
 						" set pk_tradetypeid = '"+befor_type+"' " +
@@ -127,6 +126,45 @@ public class N_F2_SAVE extends N_BASE_ACTION{
 				if(flag>0)
 				{
 					return_obj[0].getParentVO().setAttributeValue("pk_tradetypeid",befor_type);
+				}
+			}
+			/***END***/
+			
+			/**
+			 * 2020年12月30日23点11分
+			 * 更新 上游合同的 累计收款  noritotalgpmny、ntotalgpmny
+			 * money_cr、local_money_cr 
+			 */
+			for (AggGatheringBillVO item : return_obj) {
+				GatheringBillVO hVO = item.getHeadVO();
+				GatheringBillItemVO[] bVOs = item.getBodyVOs();
+				Integer sysCode = hVO.getSyscode();
+				String pk_tradetype = hVO.getPk_tradetype();	// F2-Cxx-90
+				ArrayList<String> pkList = new ArrayList<>();
+				for (GatheringBillItemVO bItem : bVOs) {
+					String def29 = PuPubVO.getString_TrimZeroLenAsNull(bItem.getDef29());
+					if (def29 != null) pkList.add(def29);
+				}
+				if (sysCode == 0 && "F2-Cxx-90".equals(pk_tradetype) && !pkList.isEmpty()) {
+					String pkListStr = PuPubVO.getSqlInByList(pkList);
+					String updateSQL = "update ct_sale_b htb " +
+							 " set htb.ntotalgpmny = (select sum(skb.local_money_cr) " +
+								                     " from ar_gatheritem skb " +
+								                     " inner join ar_gatherbill sk on skb.pk_gatherbill = sk.pk_gatherbill " +
+								                     " where skb.dr = 0 and sk.dr = 0 " +
+								                     " and sk.src_syscode = 0 and sk.pk_tradetype = 'F2-Cxx-90' " +
+								                     " and skb.def29 = htb.pk_ct_sale_b " +
+								                     " group by skb.def29) " +
+		                     ", htb.noritotalgpmny = (select sum(skb.money_cr) " +
+								                     " from ar_gatheritem skb " +
+								                     " inner join ar_gatherbill sk on skb.pk_gatherbill = sk.pk_gatherbill " +
+								                     " where skb.dr = 0 and sk.dr = 0 " +
+								                     " and sk.src_syscode = 0 and sk.pk_tradetype = 'F2-Cxx-90' " +
+								                     " and skb.def29 = htb.pk_ct_sale_b " +
+								                     " group by skb.def29) " +
+						     " where htb.pk_ct_sale_b in " + pkListStr + " " 
+						     ;
+					int flag = daseDAO.executeUpdate(updateSQL);
 				}
 			}
 			/***END***/
