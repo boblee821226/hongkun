@@ -7,7 +7,6 @@ import java.awt.event.ActionEvent;
 import nc.bs.ml.NCLangResOnserver;
 import nc.bs.uif2.IActionCode;
 import nc.itf.pubapp.pub.exception.IResumeException;
-import nc.uap.ws.message.MessageUtil;
 import nc.ui.ct.action.CtScriptPFlowAction;
 import nc.ui.ct.model.CTModel;
 import nc.ui.ct.view.CtUIState;
