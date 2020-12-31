@@ -47,38 +47,7 @@ public class N_F2_DELETE extends N_BASE_ACTION {
 			 */
 			AggGatheringBillVO[] return_obj = (AggGatheringBillVO[])paraVo.m_preValueVos;
 			BaseDAO daseDAO = new BaseDAO();
-			for (AggGatheringBillVO item : return_obj) {
-				GatheringBillVO hVO = item.getHeadVO();
-				GatheringBillItemVO[] bVOs = item.getBodyVOs();
-				Integer sysCode = hVO.getSyscode();
-				String pk_tradetype = hVO.getPk_tradetype();	// F2-Cxx-90
-				ArrayList<String> pkList = new ArrayList<>();
-				for (GatheringBillItemVO bItem : bVOs) {
-					String def29 = PuPubVO.getString_TrimZeroLenAsNull(bItem.getDef29());
-					if (def29 != null) pkList.add(def29);
-				}
-				if (sysCode == 0 && "F2-Cxx-90".equals(pk_tradetype) && !pkList.isEmpty()) {
-					String pkListStr = PuPubVO.getSqlInByList(pkList);
-					String updateSQL = "update ct_sale_b htb " +
-							 " set htb.ntotalgpmny = (select sum(skb.local_money_cr) " +
-								                     " from ar_gatheritem skb " +
-								                     " inner join ar_gatherbill sk on skb.pk_gatherbill = sk.pk_gatherbill " +
-								                     " where skb.dr = 0 and sk.dr = 0 " +
-								                     " and sk.src_syscode = 0 and sk.pk_tradetype = 'F2-Cxx-90' " +
-								                     " and skb.def29 = htb.pk_ct_sale_b " +
-								                     " group by skb.def29) " +
-		                     ", htb.noritotalgpmny = (select sum(skb.money_cr) " +
-								                     " from ar_gatheritem skb " +
-								                     " inner join ar_gatherbill sk on skb.pk_gatherbill = sk.pk_gatherbill " +
-								                     " where skb.dr = 0 and sk.dr = 0 " +
-								                     " and sk.src_syscode = 0 and sk.pk_tradetype = 'F2-Cxx-90' " +
-								                     " and skb.def29 = htb.pk_ct_sale_b " +
-								                     " group by skb.def29) " +
-						     " where htb.pk_ct_sale_b in " + pkListStr + " " 
-						     ;
-					int flag = daseDAO.executeUpdate(updateSQL);
-				}
-			}
+			N_F2_SAVE.back2ct(return_obj, daseDAO);
 			/***END***/
 			
 			return obj;

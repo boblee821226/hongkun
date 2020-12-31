@@ -14,6 +14,7 @@ import java.util.List;
 
 import nc.bs.arap.actions.N_BASE_ACTION;
 import nc.bs.dao.BaseDAO;
+import nc.bs.dao.DAOException;
 import nc.jdbc.framework.processor.ArrayListProcessor;
 import nc.vo.arap.gathering.AggGatheringBillVO;
 import nc.vo.arap.gathering.GatheringBillItemVO;
@@ -134,45 +135,60 @@ public class N_F2_SAVE extends N_BASE_ACTION{
 			 * 2020年12月30日23点11分
 			 * 更新 上游合同的 累计收款  noritotalgpmny、ntotalgpmny
 			 * money_cr、local_money_cr 
+			 * 只取 协同单据 src_syscode = 9
 			 */
-			for (AggGatheringBillVO item : return_obj) {
-				GatheringBillVO hVO = item.getHeadVO();
-				GatheringBillItemVO[] bVOs = item.getBodyVOs();
-				Integer sysCode = hVO.getSyscode();
-				String pk_tradetype = hVO.getPk_tradetype();	// F2-Cxx-90
-				ArrayList<String> pkList = new ArrayList<>();
-				for (GatheringBillItemVO bItem : bVOs) {
-					String def29 = PuPubVO.getString_TrimZeroLenAsNull(bItem.getDef29());
-					if (def29 != null) pkList.add(def29);
-				}
-				if (sysCode == 0 && "F2-Cxx-90".equals(pk_tradetype) && !pkList.isEmpty()) {
-					String pkListStr = PuPubVO.getSqlInByList(pkList);
-					String updateSQL = "update ct_sale_b htb " +
-							 " set htb.ntotalgpmny = (select sum(skb.local_money_cr) " +
-								                     " from ar_gatheritem skb " +
-								                     " inner join ar_gatherbill sk on skb.pk_gatherbill = sk.pk_gatherbill " +
-								                     " where skb.dr = 0 and sk.dr = 0 " +
-								                     " and sk.src_syscode = 0 and sk.pk_tradetype = 'F2-Cxx-90' " +
-								                     " and skb.def29 = htb.pk_ct_sale_b " +
-								                     " group by skb.def29) " +
-		                     ", htb.noritotalgpmny = (select sum(skb.money_cr) " +
-								                     " from ar_gatheritem skb " +
-								                     " inner join ar_gatherbill sk on skb.pk_gatherbill = sk.pk_gatherbill " +
-								                     " where skb.dr = 0 and sk.dr = 0 " +
-								                     " and sk.src_syscode = 0 and sk.pk_tradetype = 'F2-Cxx-90' " +
-								                     " and skb.def29 = htb.pk_ct_sale_b " +
-								                     " group by skb.def29) " +
-						     " where htb.pk_ct_sale_b in " + pkListStr + " " 
-						     ;
-					int flag = daseDAO.executeUpdate(updateSQL);
-				}
-			}
+			back2ct(return_obj, daseDAO);
 			/***END***/
 			
 			return obj;
 			
 		} catch (Exception exception) {
 			throw ExceptionHandler.handleException(this.getClass(), exception);
+		}
+	}
+
+	/**
+	 * 2020年12月30日23点11分
+	 * 更新 上游合同的 累计收款  noritotalgpmny、ntotalgpmny
+	 * money_cr、local_money_cr 
+	 * 只取 协同单据 src_syscode = 9
+	 */
+	static void back2ct(AggGatheringBillVO[] return_obj, BaseDAO daseDAO)
+			throws DAOException {
+		for (AggGatheringBillVO item : return_obj) {
+			GatheringBillVO hVO = item.getHeadVO();
+			GatheringBillItemVO[] bVOs = item.getBodyVOs();
+			Integer sysCode = hVO.getSyscode();
+			if (sysCode != 9) continue;
+			String pk_tradetype = hVO.getPk_tradetype();	// F2-Cxx-90
+			if (!"F2-Cxx-90".equals(pk_tradetype)) continue;
+			ArrayList<String> pkList = new ArrayList<>();
+			for (GatheringBillItemVO bItem : bVOs) {
+				String def29 = PuPubVO.getString_TrimZeroLenAsNull(bItem.getDef29());
+				if (def29 != null) pkList.add(def29);
+			}
+			if (pkList.isEmpty()) continue;
+			{// 进行同步
+				String pkListStr = PuPubVO.getSqlInByList(pkList);
+				String updateSQL = "update ct_sale_b htb " +
+						 " set htb.ntotalgpmny = (select sum(skb.local_money_cr) " +
+							                     " from ar_gatheritem skb " +
+							                     " inner join ar_gatherbill sk on skb.pk_gatherbill = sk.pk_gatherbill " +
+							                     " where skb.dr = 0 and sk.dr = 0 " +
+							                     " and sk.src_syscode = 9 and sk.pk_tradetype = 'F2-Cxx-90' " +
+							                     " and skb.def29 = htb.pk_ct_sale_b " +
+							                     " group by skb.def29) " +
+		                 ", htb.noritotalgpmny = (select sum(skb.money_cr) " +
+							                     " from ar_gatheritem skb " +
+							                     " inner join ar_gatherbill sk on skb.pk_gatherbill = sk.pk_gatherbill " +
+							                     " where skb.dr = 0 and sk.dr = 0 " +
+							                     " and sk.src_syscode = 9 and sk.pk_tradetype = 'F2-Cxx-90' " +
+							                     " and skb.def29 = htb.pk_ct_sale_b " +
+							                     " group by skb.def29) " +
+					     " where htb.pk_ct_sale_b in " + pkListStr + " " 
+					     ;
+				int flag = daseDAO.executeUpdate(updateSQL);
+			}
 		}
 	}
 
