@@ -1,0 +1,29 @@
+package nc.bs.hkjt.arap.account.ace.bp;
+
+import nc.impl.pubapp.pattern.data.bill.BillUpdate;
+import nc.vo.pub.VOStatus;
+import nc.vo.hkjt.arap.account.AccountBillVO;
+
+/**
+ * 标准单据审核的BP
+ */
+public class AceHk_arap_accoutApproveBP {
+
+	/**
+	 * 审核动作
+	 * 
+	 * @param vos
+	 * @param script
+	 * @return
+	 */
+	public AccountBillVO[] approve(AccountBillVO[] clientBills,
+			AccountBillVO[] originBills) {
+		for (AccountBillVO clientBill : clientBills) {
+			clientBill.getParentVO().setStatus(VOStatus.UPDATED);
+		}
+		BillUpdate<AccountBillVO> update = new BillUpdate<AccountBillVO>();
+		AccountBillVO[] returnVos = update.update(clientBills, originBills);
+		return returnVos;
+	}
+
+}
