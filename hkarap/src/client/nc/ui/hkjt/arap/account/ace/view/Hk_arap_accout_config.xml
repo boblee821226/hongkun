@@ -147,26 +147,27 @@
 		</property>
 		<property name="actions">
 			<list>
-				<ref bean="addAction" />
+				<!--<ref bean="addAction" />-->
 				<ref bean="editAction" />
-				<ref bean="deleteScriptAction" />
+				<ref bean="separatorAction" />
+				<!--<ref bean="deleteScriptAction" />-->
 				<ref bean="defaultQueryAction" />
-				<ref bean="copyAction" />
+				<!--<ref bean="copyAction" />-->
 				<ref bean="separatorAction" />
 				<ref bean="defaultRefreshAction" />
 				<ref bean="separatorAction" />
-				<ref bean="commitScriptAction" />
+				<!--<ref bean="commitScriptAction" />
 				<ref bean="unCommitScriptAction" />
 				<ref bean="approveScriptAction" />
 				<ref bean="uNApproveScriptAction" />
-				<ref bean="separatorAction" />
-				<ref bean="linkQueryAction" />
+				<ref bean="separatorAction" />-->
+				<!--<ref bean="linkQueryAction" />
 				<ref bean="separatorAction" />
 				<ref bean="metaDataBasedPrintAction" />
-				<ref bean="metaDataBasedPrintActiona" />
+				<ref bean="metaDataBasedPrintActiona" />-->
 				<ref bean="outputAction" />
-				<ref bean="separatorAction" />
-				<ref bean="pFApproveStatusInfoAction" />
+				<!--<ref bean="separatorAction" />
+				<ref bean="pFApproveStatusInfoAction" />-->
 
 			</list>
 		</property>

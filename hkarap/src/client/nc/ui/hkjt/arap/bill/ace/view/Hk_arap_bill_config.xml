@@ -67,6 +67,13 @@
 		<property name="nodekey" value="bt" />
 		<property name="multiSelectionEnable" value="false" />
 		<property name="templateContainer" ref="templateContainer"/>
+		<property name="showTotalLineTabcodes" >
+			<list>
+				<value>pk_hk_arap_bill_b</value>
+				<value>pk_hk_arap_bill_c</value>
+				<value>pk_hk_arap_bill_d</value>
+			</list>
+		</property>
 	</bean>
 
 	<!--====== 视图元素：[卡片界面工具栏和返回按钮控件实例对象] ==============-->
@@ -88,9 +95,16 @@
 		<!-- 表体行操作按钮注册，这只是一组默认设置，开发人员需要自己在此添加其他需要的表体行操作按钮 -->
 		<property name="bodyLineActions">
 			<list>
-				<bean class="nc.ui.pubapp.uif2app.actions.BodyAddLineAction" />
+				<!--<bean class="nc.ui.pubapp.uif2app.actions.BodyAddLineAction" />
 				<bean class="nc.ui.pubapp.uif2app.actions.BodyInsertLineAction" />
-				<bean class="nc.ui.pubapp.uif2app.actions.BodyDelLineAction" />
+				<bean class="nc.ui.pubapp.uif2app.actions.BodyDelLineAction" />-->
+			</list>
+		</property>
+		<property name="showTotalLineTabcodes" >
+			<list>
+				<value>pk_hk_arap_bill_b</value>
+				<value>pk_hk_arap_bill_c</value>
+				<value>pk_hk_arap_bill_d</value>
 			</list>
 		</property>
 	</bean>
@@ -147,27 +161,14 @@
 		</property>
 		<property name="actions">
 			<list>
-				<ref bean="addAction" />
 				<ref bean="editAction" />
 				<ref bean="deleteScriptAction" />
+				<ref bean="separatorAction" />
 				<ref bean="defaultQueryAction" />
-				<ref bean="copyAction" />
 				<ref bean="separatorAction" />
 				<ref bean="defaultRefreshAction" />
 				<ref bean="separatorAction" />
-				<ref bean="commitScriptAction" />
-				<ref bean="unCommitScriptAction" />
-				<ref bean="approveScriptAction" />
-				<ref bean="uNApproveScriptAction" />
-				<ref bean="separatorAction" />
-				<ref bean="linkQueryAction" />
-				<ref bean="separatorAction" />
-				<ref bean="metaDataBasedPrintAction" />
-				<ref bean="metaDataBasedPrintActiona" />
 				<ref bean="outputAction" />
-				<ref bean="separatorAction" />
-				<ref bean="pFApproveStatusInfoAction" />
-
 			</list>
 		</property>
 		
