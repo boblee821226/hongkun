@@ -5,16 +5,9 @@
 
 package nc.bs.pub.action;
 
-import hd.vo.pub.tools.PuPubVO;
-
-import java.util.ArrayList;
 import java.util.Hashtable;
 
 import nc.bs.arap.actions.N_BASE_ACTION;
-import nc.bs.dao.BaseDAO;
-import nc.vo.arap.gathering.AggGatheringBillVO;
-import nc.vo.arap.gathering.GatheringBillItemVO;
-import nc.vo.arap.gathering.GatheringBillVO;
 import nc.vo.fipub.exception.ExceptionHandler;
 import nc.vo.pub.BusinessException;
 import nc.vo.pub.compiler.PfParameterVO;
@@ -40,17 +33,6 @@ public class N_F2_MODIFY extends N_BASE_ACTION {
 			obj = runClass("nc.bs.arap.actions.GatheringbillEditSaveBatchBSAction", "updateVOs",
 				"&context:nc.vo.pub.AggregatedValueObject[]", paraVo, m_keyHas);
 			afterCheck();
-			
-			/**
-			 * 2020年12月30日23点11分
-			 * 更新 上游合同的 累计收款  noritotalgpmny、ntotalgpmny
-			 * money_cr、local_money_cr 
-			 */
-			AggGatheringBillVO[] return_obj = (AggGatheringBillVO[])obj;
-			BaseDAO daseDAO = new BaseDAO();
-			N_F2_SAVE.back2ct(return_obj, daseDAO);
-			/***END***/
-			
 			return obj;
 		} catch (Exception ex) {
 			throw ExceptionHandler.handleException(this.getClass(), ex);
