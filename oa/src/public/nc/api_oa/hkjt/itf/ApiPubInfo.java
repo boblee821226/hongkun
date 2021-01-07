@@ -141,11 +141,12 @@ public class ApiPubInfo {
 	 * 解锁
 	 */
 	public static synchronized void unLock() throws BusinessException {
-		if (isLocked) {
-			isLocked = false;
-		} else {
-			throw new BusinessException("缓存正在更新，请稍后再试。");
-		}
+//		if (isLocked) {
+//			isLocked = false;
+//		} else {
+//			throw new BusinessException("缓存正在更新，请稍后再试。");
+//		}
+		isLocked = false;
 	}
 	
 }
