@@ -83,6 +83,7 @@ public class SendAction extends NCAction {
 	static String[] billTypeFields = new String[]{
 			"pk_tradetype",		// F3
 			"vbilltypecode",	// HK38
+			"transi_type",	// 4D48
 		};
 	
 	/**
@@ -328,12 +329,26 @@ public class SendAction extends NCAction {
 	 */
 	private void setDataTitle(Map<String, Object> billData, HkOaSettingBillVO settingVO) throws BusinessException {
 		
+		String[] titleInfo = this.getTitleKey(settingVO);
+		String key = titleInfo[0];
+		String formula = titleInfo[1];
+		
 		String title = PuPubVO.getString_TrimZeroLenAsNull(
 				getEditor().getBillCardPanel()
-				.getHeadItem(this.getTitleKey(settingVO))
+				.getHeadItem(key)	// 表头
 				.getValueObject()
 				);
-		billData.put("title", title);		// 标题
+//		if (title == null) throw new BusinessException("单据上没有标题。");
+		// 翻译标题
+		if (formula == null) billData.put("title", title);		// 标题
+		FormulaParseFather m_formulaParse = new FormulaParse();
+		
+		formula = formula.replaceAll("@@@@@@", title);
+		if (m_formulaParse.setExpress(formula)) {
+			String translateValue = m_formulaParse.getValue();
+			if (translateValue == null) throw new BusinessException("标题翻译错误。");
+			billData.put("title", translateValue);	// 标题
+		}
 	}
 
 	/**
@@ -680,10 +695,13 @@ public class SendAction extends NCAction {
 	/**
 	 * 获得title字段
 	 */
-	private String getTitleKey(HkOaSettingBillVO settingVO) throws BusinessException {
+	private String[] getTitleKey(HkOaSettingBillVO settingVO) throws BusinessException {
 		for(HkOaSettingHVO hVO : settingVO.getHVOs()) {
 			if (PuPubVO.getUFBoolean_NullAs(hVO.getIs_title(), UFBoolean.FALSE).booleanValue()) {
-				return hVO.getField_nc();
+				return new String[]{
+						hVO.getField_nc()
+						, hVO.getFormula()
+				};
 			}
 		}
 		throw new BusinessException("配置里没有标明title字段。");
