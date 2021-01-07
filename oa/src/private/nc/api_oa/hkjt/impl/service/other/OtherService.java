@@ -45,22 +45,7 @@ public class OtherService {
 		BaseDAO dao = new BaseDAO();
 		HYPubBO hyDao = new HYPubBO();
 		String workflowid = billType.replace("OA-", "");
-//		/**
-//		 * 先查询单据
-//		 */
-//		for (int i = 0; i < param.length; i++) {
-//			AggregatedValueObject billVO = OtherServiceQUERY.getBillVO(param[i], account, billType);
-//			billVOlist.add(billVO);
-//		}
-//		/**
-//		 * 循环处理：提交
-//		 */
-//		for (int i = 0; i < billVOlist.size(); i++) {
-//			AggregatedValueObject billVO = billVOlist.get(i);
-//			// 提交
-//			Object saveRes = getIplatFormEntry().processAction("SAVE", billType, null, billVO, null, null);
-//			billVO = (nc.vo.ep.bx.JKVO)saveRes;
-//		}
+
 		for (HashMap billVO : param) {
 			String requestid = PuPubVO.getString_TrimZeroLenAsNull(billVO.get("requestid"));
 			String url = PuPubVO.getString_TrimZeroLenAsNull(billVO.get("url"));
