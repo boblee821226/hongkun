@@ -107,7 +107,8 @@ public class GenNbjydAction extends HelpAction {
 		if( UIDialog.ID_OK != dlg.showModal()) return;
 		
 		Runnable checkRun =new Runnable(){
-	        public void run()
+	        @SuppressWarnings("unchecked")
+			public void run()
 	        {
 		        //线程对话框：系统运行提示框
 	            BannerDialog dialog = new BannerDialog(getCardForm());
@@ -149,14 +150,15 @@ public class GenNbjydAction extends HelpAction {
 								.append(",substr(ctb.vbdef10, 1, 10) busi_date ")	// 业务日期 = 表体收款日期
 //								.append(",ct.pk_customer ")		// 客户
 								.append(",cust.def4 pk_customer ")		// 客户档案的def4财务组织的客户
+								.append(",cust.name vdef07 ")	// 客户name
 								.append(",ct.pk_org ")			// 组织
 								.append(",ct.pk_org_v ")		// 组织版本
 								.append(",ct.vbillcode ")		// 合同号
 								.append(",doc.name jflx ")		// 收费项目
 								.append(",case when instr(ct.vbillcode,'#')>0 then substr(ct.vbillcode,1,instr(ct.vbillcode,'#')-1) else ct.vbillcode end vbillcode2 ")	// 合同号2
 								.append(",room.name vdef01 ")	// 房间号
-								.append(",null vdef02 ")	// 开始日期
-								.append(",null vdef03 ")	// 结算日期
+								.append(",substr(ctb.vbdef3, 1, 10) vdef02 ")		// 开始日期
+								.append(",substr(ctb.vbdef4, 1, 10) vdef03 ")		// 结束日期
 								.append(",ct.vdef16 vdef04 ")	// 房间号id
 								.append(",ctb.vbdef1 vdef06 ")	// 收费项目id
 								.append(",ct.vdef15 vdef05 ")	// 区域id
@@ -194,6 +196,7 @@ public class GenNbjydAction extends HelpAction {
 								.append(",substr(ctb.vmemo, 1, 10) busi_date ")	// 业务日期
 //								.append(",ct.pk_customer ")		// 客户
 								.append(",cust.def4 pk_customer ")		// 客户档案的def4财务组织的客户
+								.append(",cust.name vdef07 ")	// 客户name
 								.append(",ct.pk_org ")			// 组织
 								.append(",ct.pk_org_v ")		// 组织版本
 								.append(",ct.vbillcode ")		// 合同号
@@ -265,12 +268,15 @@ public class GenNbjydAction extends HelpAction {
 									.append(",substr(ctb.vbdef10, 1, 10) busi_date ")	// 业务日期 = 表体收款日期
 //									.append(",ct.pk_customer ")		// 客户
 									.append(",cust.def4 pk_customer ")		// 客户档案的def4财务组织的客户
+									.append(",cust.name vdef07 ")	// 客户name
 									.append(",ct.pk_org ")			// 组织
 									.append(",ct.pk_org_v ")		// 组织版本
 									.append(",ct.vbillcode ")		// 合同号
 									.append(",doc.name jflx ")		// 收费项目
 									.append(",case when instr(ct.vbillcode,'#')>0 then substr(ct.vbillcode,1,instr(ct.vbillcode,'#')-1) else ct.vbillcode end vbillcode2 ")	// 合同号2
 									.append(",room.name vdef01 ")	// 房间号
+									.append(",substr(ctb.vbdef3, 1, 10) vdef02 ")		// 开始日期
+									.append(",substr(ctb.vbdef4, 1, 10) vdef03 ")		// 结束日期
 									.append(",ct.vdef16 vdef04 ")	// 房间号id
 									.append(",ctb.vbdef1 vdef06 ")	// 收费项目id
 									.append(",ct.vdef15 vdef05 ")	// 区域id
@@ -424,7 +430,6 @@ public class GenNbjydAction extends HelpAction {
 						    headVO.setGloballocal(UFDouble.ZERO_DBL);	// 全局本币金额
 						    headVO.setGrouplocal(UFDouble.ZERO_DBL);	// 集团本币金额
 						   
-						    
 						    headVO.setIsflowbill(UFBoolean.FALSE);		// 是否流程单据
 						    headVO.setIsinit(UFBoolean.FALSE);			// 期初标志
 						    headVO.setIsreded(UFBoolean.FALSE);			// 是否红冲过
@@ -446,7 +451,6 @@ public class GenNbjydAction extends HelpAction {
 						    headVO.setTaxcountryid( guojia );	// 报税国
 						    
 						    headVO.setDef30("1001N5100000006P2IQA");	// 是否责任凭证 = 是
-//						    headVO.setScomment(scomment);	// 摘要（待定）
 						    
 						    ReceivableBillItemVO[] itemVOs = new ReceivableBillItemVO[vo_list.size()];
 						    
@@ -459,21 +463,24 @@ public class GenNbjydAction extends HelpAction {
 							    String     pk_ct_sale_b = item_vo.getPk_ct_sale_b();	// 合同子表pk
 							    String       pk_ct_sale = item_vo.getPk_ct_sale();		// 合同主表pk
 							    
-							    String def_ksrq = item_vo.getVdef02();	// 免租的开始日期
-							    String def_jsrq = item_vo.getVdef03();	// 免租的结束日期
+							    String room_no = item_vo.getVdef01();	// 房间号
+							    String def_ksrq = item_vo.getVdef02();	// 开始日期
+							    String def_jsrq = item_vo.getVdef03();	// 结束日期
 							    String room_id = item_vo.getVdef04();	// 房间号id
 							    String quyu_id = item_vo.getVdef05();	// 区域id
-							    String sfxm_id = item_vo.getVdef06();	// 收费项目
-							    // 摘要 = 合同编码+交费类型+业务日期
-							    String scomment = null;
-							    if (def_ksrq == null) {
-							    	scomment = item_vo.getVbillcode()+"【"+item_vo.getVdef01()+"】-"+item_vo.getJflx()+"-"+item_vo.getBusi_date();
-							    } else {
-							    	scomment = item_vo.getVbillcode()+"【"+item_vo.getVdef01()+"】-" +
-							    			item_vo.getJflx()+"-" +
-							    			def_ksrq + "至" + def_jsrq
-							    			;
-							    }
+							    String sfxm_id = item_vo.getVdef06();	// 收费项目id
+							    String cust_name = item_vo.getVdef07();	// 客户名称
+							    String sfxm_name = item_vo.getJflx();	// 收费项目
+							    // 摘要 = 客户名称+房间号+开始日期+截止日期+收费项目
+							    String scomment = cust_name + "【"+room_no+"】" + def_ksrq + "至" + def_jsrq + sfxm_name;
+//							    if (def_ksrq == null) {
+//							    	scomment = item_vo.getVbillcode()+"【"+item_vo.getVdef01()+"】-"+item_vo.getJflx()+"-"+item_vo.getBusi_date();
+//							    } else {
+//							    	scomment = item_vo.getVbillcode()+"【"+item_vo.getVdef01()+"】-" +
+//							    			item_vo.getJflx()+"-" +
+//							    			def_ksrq + "至" + def_jsrq
+//							    			;
+//							    }
 							    
 							    total_jine = total_jine.add(jine);
 							    
@@ -539,6 +546,8 @@ public class GenNbjydAction extends HelpAction {
 						    	itemVOs[i].setDef8(room_id);			// 房号
 						    	itemVOs[i].setDef1(sfxm_id);	// 收费项目pk
 						    	itemVOs[i].setDef9(quyu_id);	// 区域pk
+						    	itemVOs[i].setDef3(def_ksrq);	// 开始日期
+						    	itemVOs[i].setDef4(def_jsrq);	// 结束日期
 						    	
 						    	itemVOs[i].setScomment(scomment);		// 摘要
 						    }
