@@ -204,7 +204,7 @@ public class PluginAction_FetchValue extends AbstractTbPluginAction {
 								+ "      left join fa_category k on b.pk_category=k.pk_category "
 								+ "        left join org_dept n on b.pk_mandept=n.pk_dept and b.pk_org=n.pk_org   left join fa_deptscale fd on fd.link_key=b.pk_usedept"
 								+ " where b.dr =0 and c.status_name='在用' and d.depmethod_name='平均年限法(一)'   and b.asset_state ='exist' "
-								+ "     and b.accyear=to_char(sysdate,'yyyy')  "
+							
 								+ "     and substr(k.cate_code,1,4) in ('1001','1201') and b.servicemonth-b.usedmonth-1>0          "
 								+ "    and n.name not in ('技师三部','综合三部','技师二部')           and b.period='12' and b.pk_org='" + mainorg + "'  and fd.pk_dept ='"
 								+ key + "'  and b.accyear='" + (yea - 1) + "' order by b.pk_category desc";// yea要减1
@@ -216,7 +216,7 @@ public class PluginAction_FetchValue extends AbstractTbPluginAction {
 								+ "      left join fa_category k on b.pk_category=k.pk_category "
 								+ "        left join org_dept n on b.pk_mandept=n.pk_dept and b.pk_org=n.pk_org   left join fa_deptscale fd on fd.link_key=b.pk_usedept"
 								+ " where b.dr =0 and c.status_name='在用' and d.depmethod_name='平均年限法(一)'   and b.asset_state ='exist' "
-								+ "     and b.accyear=to_char(sysdate,'yyyy')  "
+							
 								+ "     and substr(k.cate_code,1,4) in ('1001','1201') and b.servicemonth-b.usedmonth-1>0          "
 								+ "    and n.name not in ('技师三部','综合三部','技师二部')           and b.period='11' and b.pk_org='" + mainorg + "'  and fd.pk_dept ='"
 								+ key + "'  and b.accyear='" + (yea - 1) + "' order by b.pk_category desc";// yea要减1
@@ -2236,6 +2236,7 @@ public class PluginAction_FetchValue extends AbstractTbPluginAction {
 //					+" WHERE	dd.invallidate1 >= '"+starttime+"' and 	ct_sale_b.vbdef4 >= '"+starttime+"' AND ct_sale_b.vbdef3 <= '"+endtime+"' AND ct_sale_b.vbdef1 IN (	'1001N5100000000HNWBR',	'1001N5100000006XQ06S','1001N5100000006XQ04W') group by dd.pk_ct_sale";
 //			ArrayList<Map<String, String>> countqt = (ArrayList<Map<String, String>>)iquerybs.executeQuery(countqtsql,new MapListProcessor());
 			if(count!=null&&count.size()>0){
+				// 增行工具类1001N5100000006SB945
 				CellContentUtil util = new CellContentUtil(tbSheetViewer);
 				util.addMultiLine(1,count.size());
 				//查询所有符合条件（2019-12-26---2020-12-25）的单据
@@ -2259,6 +2260,7 @@ public class PluginAction_FetchValue extends AbstractTbPluginAction {
 						String invallidate=null;
 						String pk_ct_sale="";
 						String rzj=null;
+//						String vbdef3 =sdf.format(new Date());
 						String vbdef3=null;
 						String vbdef4=null;
 						String cusname=emps.get(i).get("cusname")==null?"":emps.get(i).get("cusname").toString();
@@ -2271,6 +2273,7 @@ public class PluginAction_FetchValue extends AbstractTbPluginAction {
 						invallidate=emps.get(i).get("invallidate")==null?"":emps.get(i).get("invallidate").toString();//截止日期
 						String sqlrzj="select vbdef5 from(select  row_nUMBER() OVER(partition by vbdef5 order by vbdef3) as id, vbdef5,vbdef3  from ct_sale_b where pk_ct_sale='"+pk_ct_sale+"' and  vbdef3<='"+endtime+"' and vbdef1='1001N51000000001UQ09'  "
 								+" and vbdef4>='"+starttime+"' and nvl(dr,0)=0  order by vbdef3)  where id = 1";
+//						String sqlrzj="select vbdef5 from(select vbdef5 from ct_sale_b where pk_ct_sale='"+pk_ct_sale+"' and  vbdef3<='"+endtime+"' and vbdef1='1001N51000000001UQ09'  and vbdef4>='"+starttime+"' and nvl(dr,0)=0 order by vbdef3 ) group by  vbdef5";
 						ArrayList<Map<String, Object>> list = (ArrayList<Map<String, Object>>)iquerybs.executeQuery(sqlrzj,new MapListProcessor());
 						int size=list.size();
 						if(list!=null&&size>0){
@@ -2502,7 +2505,6 @@ public class PluginAction_FetchValue extends AbstractTbPluginAction {
 					// TODO 自动生成的 catch 块
 					e1.printStackTrace();
 				}
-								
 				Calendar cal3 = Calendar.getInstance();
 				int tt = 0;
 				cal3.setTime(amonth.get(0).getBegindate().toDate());
@@ -2571,12 +2573,7 @@ public class PluginAction_FetchValue extends AbstractTbPluginAction {
 						break;
 					}
 					for (int i2 = 0; i2 < rowno-6; i2++) {// 赋值
-						//lily 新增校验 2019-12-23
-						int d=coldate+i-12;
-						if(d<coldate&&d>coldate-13){
-							csModel.setCellValue(i3, coldate + i - 12, Long.toString(dayss + 1));
-						}
-						
+						csModel.setCellValue(i3, coldate + i - 12, Long.toString(dayss + 1));
 					}
 
 				}

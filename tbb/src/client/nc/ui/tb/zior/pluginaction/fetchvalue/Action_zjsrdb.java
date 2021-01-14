@@ -80,9 +80,9 @@ public class Action_zjsrdb implements Action_itf {
 			13,	// 5单价
 			14,	// 6开始日期
 			15,	// 7截至日期
-			28,	// 8数据来源=日租型
+			28 + 1,	// 8数据来源=日租型    HK税率提到月的前面，所以顺序+1
 		};
-		Integer monthBeginCol = 16 - 1;
+		Integer monthBeginCol = 16 - 1 + 1;	// HK税率提到月的前面，所以顺序+1
 		
 		String yearFirstDate = "" + year + "-01-01";
 		String yearLastDate = "" + year + "-12-31";
