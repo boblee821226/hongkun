@@ -102,8 +102,16 @@ public class OaLinkAction extends NCAction {
 	public void doAction(ActionEvent e) throws BusinessException {
 		String url = null;
 		if (this.getBillType() != null && this.getBillType().startsWith("OA")) {
-			url = PuPubVO.getString_TrimZeroLenAsNull(
-					this.getEditor().getBillCardPanel().getHeadItem("oa_url"));
+			
+			BillItem oaUrl = this.getEditor().getBillCardPanel().getHeadItem("oa_url");
+			if (oaUrl == null) {
+				oaUrl = this.getEditor().getBillCardPanel().getHeadItem("oaURL");
+			}
+			
+			if (oaUrl != null) {
+				url = PuPubVO.getString_TrimZeroLenAsNull(oaUrl.getValueObject());
+			}
+			
 		} else {
 			JKBXVO selectedData = (JKBXVO) getModel().getSelectedData();
 			url = PuPubVO.getString_TrimZeroLenAsNull(selectedData.getParentVO().getZyx26());
