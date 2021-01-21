@@ -91,9 +91,9 @@ public class N263XServiceQUERY {
 		 */
 		StringBuffer whereSQL = 
 		new StringBuffer(" where ( ")
-				.append(" pk_org = '").append(pk_org).append("' ")
+//				.append(" pk_org = '").append(pk_org).append("' ")
 //				.append(" and djrq = '").append(djrq).append("' ")
-				.append(" and djbh = '").append(djbh).append("' ")
+				.append(" djbh = '").append(djbh).append("' ")
 				.append(" and QCBZ = 'N' and DR = 0 ")
 				.append(" and djlxbm = '").append(billType).append("' ")
 				.append(" and nvl(zyx26,'~') <> '~' ")
