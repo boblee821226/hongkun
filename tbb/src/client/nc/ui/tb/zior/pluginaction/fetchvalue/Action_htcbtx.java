@@ -177,8 +177,10 @@ public class Action_htcbtx implements Action_itf {
 				.append(" and ht.fstatusflag in (1, 6) ")
 				.append(" and htb.norigtaxmny <> 0.00 ")
 				// 表体开始日期 or 表体结束日期  在本年内
+				// or 开始日期 < 本年第一天  结束日期 > 本年最后一天
 				.append(" and (substr(htb.vbdef3,1,10) between '").append(yearFirstDate).append("' and '").append(yearLastDate).append("' ")
 				.append(" 	or substr(htb.vbdef4,1,10) between '").append(yearFirstDate).append("' and '").append(yearLastDate).append("' ")
+				.append("	or (substr(htb.vbdef3,1,10) < '").append(yearFirstDate).append("' and substr(htb.vbdef4,1,10) > '").append(yearLastDate).append("') ")
 				.append(" ) ")
 				// 表体开始日期 <= 表头截止日期
 				.append(" and substr(htb.vbdef3,1,10) <= substr(nvl(replace(ht.invallidate, '~', ''), '2099-12-31'), 1, 10) ")
@@ -219,8 +221,10 @@ public class Action_htcbtx implements Action_itf {
 				.append(" and ht.fstatusflag in (1, 6) ")
 				.append(" and htb.norigtaxmny <> 0.00 ")
 				// 表体开始日期 or 表体结束日期  在本年内
+				// or 开始日期 < 本年第一天  结束日期 > 本年最后一天
 				.append(" and (substr(htb.vbdef3,1,10) between '").append(yearFirstDate).append("' and '").append(yearLastDate).append("' ")
 				.append(" 	or substr(htb.vbdef4,1,10) between '").append(yearFirstDate).append("' and '").append(yearLastDate).append("' ")
+				.append("	or (substr(htb.vbdef3,1,10) < '").append(yearFirstDate).append("' and substr(htb.vbdef4,1,10) > '").append(yearLastDate).append("') ")
 				.append(" ) ")
 				// 表体开始日期 <= 表头截止日期
 				.append(" and substr(htb.vbdef3,1,10) <= substr(nvl(replace(ht.invallidate, '~', ''), '2099-12-31'), 1, 10) ")
