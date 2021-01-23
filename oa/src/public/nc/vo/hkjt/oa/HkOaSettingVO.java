@@ -20,6 +20,11 @@ public class HkOaSettingVO extends SuperVO {
 	private String workflowid;
 	private String url_data;
 	private String url_file;
+	private String table_code_1;
+	private String table_code_2;
+	private String table_code_3;
+	private String table_code_4;
+	private String table_code_5;
 	private UFDateTime ts;
 	private Integer dr;
 	
@@ -85,6 +90,36 @@ public class HkOaSettingVO extends SuperVO {
 	}
 	public void setDr(Integer dr) {
 		this.dr = dr;
+	}
+	public String getTable_code_1() {
+		return table_code_1;
+	}
+	public void setTable_code_1(String table_code_1) {
+		this.table_code_1 = table_code_1;
+	}
+	public String getTable_code_2() {
+		return table_code_2;
+	}
+	public void setTable_code_2(String table_code_2) {
+		this.table_code_2 = table_code_2;
+	}
+	public String getTable_code_3() {
+		return table_code_3;
+	}
+	public void setTable_code_3(String table_code_3) {
+		this.table_code_3 = table_code_3;
+	}
+	public String getTable_code_4() {
+		return table_code_4;
+	}
+	public void setTable_code_4(String table_code_4) {
+		this.table_code_4 = table_code_4;
+	}
+	public String getTable_code_5() {
+		return table_code_5;
+	}
+	public void setTable_code_5(String table_code_5) {
+		this.table_code_5 = table_code_5;
 	}
 	
 }
