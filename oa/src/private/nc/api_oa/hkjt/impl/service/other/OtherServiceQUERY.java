@@ -47,19 +47,7 @@ public class OtherServiceQUERY {
 		 */
 		JkBxQueryVO[] queryVOs = new JkBxQueryVO[billVOs.length];
 		for (int i = 0; i < billVOs.length; i++) {
-//			nc.vo.ep.bx.JKVO billVO = billVOs[i];
-//			if (billVO == null) throw new BusinessException("单据不存在");
-//			Integer spzt = billVO.getParentVO().getSpzt();	// 0=审批未通过，1=审批通过，2=审批进行中，3=提交，-1=自由， 
-//			Boolean callable = Boolean.FALSE;
-//			if (spzt == 3 || spzt == -1) { // 只有 提交态 和 自由态 才能收回
-//				callable = Boolean.TRUE;
-//			}
-//			JkHeadVO jkHeadVO = param[i].getHead();
-//			queryVOs[i] = new JkBxQueryVO();
-//			queryVOs[i].setCallable(callable);
-//			queryVOs[i].setDjbh(jkHeadVO.getDjbh());
-//			queryVOs[i].setDjrq(jkHeadVO.getDjrq());
-//			queryVOs[i].setSzgs(jkHeadVO.getSzgs());
+			
 		}
 		
 		return queryVOs;

@@ -14,6 +14,7 @@ import nc.itf.uap.pf.IplatFormEntry;
 import nc.ui.trade.business.HYPubBO_Client;
 import nc.vo.hkjt.oa.HkOaInfoVO;
 import nc.vo.hkjt.zulin.tiaozheng.TzBillVO;
+import nc.vo.pcm.contractschedule.ContractScheduleBillVO;
 import nc.vo.pub.AggregatedValueObject;
 import nc.vo.pub.BusinessException;
 import nc.vo.pub.SuperVO;
@@ -93,16 +94,15 @@ public class OtherService {
 				}
 				TzBillVO queryBill = queryBills[0];
 				getIplatFormEntry().processAction("SAVE", type, null, queryBill, null, null);
+			} else if ("4D48".equals(parentType)) {	// 进度款单
+				BillQuery<ContractScheduleBillVO> query = new BillQuery<>(ContractScheduleBillVO.class);
+				ContractScheduleBillVO[] queryBills = query.query(new String[]{id});
+				if (queryBills == null || queryBills.length == 0) {
+					throw new BusinessException("NC里的单据不存在，无法归档。");
+				}
+				ContractScheduleBillVO queryBill = queryBills[0];
+				getIplatFormEntry().processAction("SAVE", type, null, queryBill, null, null);
 			}
-//			String updateSQL_3 = 
-//				" update hk_oa_info " +
-//				" set oa_url = '"+url+"' " +
-//				" , oa_status = '已归档' " +
-//				" where dr = 0 " +
-//				" and pk_hk_oa_info = '"+requestid+"' " + 
-//				" and workflowid = '" + workflowid + "' "
-//			;
-//			Integer res_3 = dao.executeUpdate(updateSQL_3);
 			
 			hyDao.update(infoVO);
 			

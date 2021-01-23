@@ -1,10 +1,22 @@
 package nc.api_oa.hkjt.impl.service.other;
 
+import hd.vo.pub.tools.PuPubVO;
+
+import java.util.ArrayList;
 import java.util.HashMap;
 
+import nc.bs.dao.BaseDAO;
 import nc.bs.framework.common.NCLocator;
+import nc.bs.trade.business.HYPubBO;
+import nc.impl.pubapp.pattern.data.bill.BillQuery;
 import nc.itf.uap.pf.IplatFormEntry;
+import nc.vo.hkjt.oa.HkOaInfoVO;
+import nc.vo.hkjt.zulin.tiaozheng.TzBillVO;
+import nc.vo.pcm.contractschedule.ContractScheduleBillVO;
+import nc.vo.pub.AggregatedValueObject;
 import nc.vo.pub.BusinessException;
+import nc.vo.pub.SuperVO;
+import nc.vo.pub.lang.UFDateTime;
 
 public class OtherServiceDELETE {
 	
@@ -32,32 +44,76 @@ public class OtherServiceDELETE {
 			, String action
 			, String userId) 
 			throws BusinessException  {
-		HashMap[] param = (HashMap[])paramObj;
-		nc.vo.ep.bx.JKVO[] billVOs = new nc.vo.ep.bx.JKVO[param.length];
-		/**
-		 * 查找vo
-		 */
-		for (int i = 0; i < param.length; i++) {
-//			billVOs[i] = OtherServiceQUERY.getJkVO(param[i], account, billType);
-		}		
-		/**
-		 * 循环处理：收回
-		 */
-		for (int i = 0; i < billVOs.length; i++) {
-			nc.vo.ep.bx.JKVO billVO = billVOs[i];
-			if (billVO == null) throw new BusinessException("单据不存在");
-			Integer spzt = billVO.getParentVO().getSpzt();	// 0=审批未通过，1=审批通过，2=审批进行中，3=提交，-1=自由， 
-			if (3 == spzt) { // 收回
-				Object res = getIplatFormEntry().processAction("UNSAVE", billType, null, billVO, null, null);
-				billVO = (nc.vo.ep.bx.JKVO)res;
-				spzt = billVO.getParentVO().getSpzt();
-				// TODO：更改日志表的状态。
-			} else {
-				throw new BusinessException("状态不对，无法收回。");
-			}
-		}
 		
-		return null;
+		HashMap[] param = (HashMap[])paramObj;
+		ArrayList<AggregatedValueObject> billVOlist = new ArrayList<>();
+		BaseDAO dao = new BaseDAO();
+		HYPubBO hyDao = new HYPubBO();
+		String workflowid = billType.replace("OA-", "");
+			
+		for (HashMap billVO : param) {
+			String requestid = PuPubVO.getString_TrimZeroLenAsNull(billVO.get("requestid"));
+			String url = PuPubVO.getString_TrimZeroLenAsNull(billVO.get("url"));
+			
+			// 根据 requestId、billType
+			SuperVO[] infoVOs = hyDao.queryByCondition(
+					HkOaInfoVO.class,
+					" dr = 0 "
+					+ " and pk_hk_oa_info = '"+requestid+"' "
+					+ " and workflowid = '" + workflowid + "' "
+					);
+			if (infoVOs == null || infoVOs.length <=0) {
+				throw new BusinessException("NC里没有提交信息，无法归档。");
+			}
+			HkOaInfoVO infoVO = (HkOaInfoVO)infoVOs[0];
+			String id = infoVO.getBillid();
+			String type = infoVO.getPk_billtypecode();
+			String parentType = infoVO.getParentbilltype();
+			infoVO.setOa_url(null);
+			infoVO.setOa_status("已发送");
+			infoVO.setReceive_ts(null);
+			
+			if ("F3".equals(parentType)) {	// 付款单
+				// TODO 如何判断已经被下个人进行了审批
+				throw new BusinessException("NC里已经进行了审批，无法收回。");
+//				String updateSQL_1 = 
+//					" update sm_msg_content " +
+//					" set receiver = substr(receiver, 1, length(receiver)-3) " +
+//					" where detail like '" + id + "@" + type + "@%' " +
+//					" and destination = 'inbox' " +
+//					" and receiver like '%-oa' "
+//				;
+//				String updateSQL_2 = 
+//					" update pub_workflownote " +
+//					" set checkman = substr(checkman, 1, length(checkman)-3) " +
+//					" where pk_billtype = '" + type + "' and billid = '" + id + "' " +
+//					" and checkman like '%-oa' "
+//				;
+//				Integer res_1 = dao.executeUpdate(updateSQL_1);
+//				Integer res_2 = dao.executeUpdate(updateSQL_2);
+				
+			} else if ("HK38".equals(parentType)) {	// 租赁月报调整单
+				BillQuery<TzBillVO> query = new BillQuery<>(TzBillVO.class);
+				TzBillVO[] queryBills = query.query(new String[]{id});
+				if (queryBills == null || queryBills.length == 0) {
+					throw new BusinessException("NC里的单据不存在，无法收回。");
+				}
+				TzBillVO queryBill = queryBills[0];
+				getIplatFormEntry().processAction("UNSAVEBILL", type, null, queryBill, null, null);
+			} else if ("4D48".equals(parentType)) {	// 进度款单
+				BillQuery<ContractScheduleBillVO> query = new BillQuery<>(ContractScheduleBillVO.class);
+				ContractScheduleBillVO[] queryBills = query.query(new String[]{id});
+				if (queryBills == null || queryBills.length == 0) {
+					throw new BusinessException("NC里的单据不存在，无法收回。");
+				}
+				ContractScheduleBillVO queryBill = queryBills[0];
+				getIplatFormEntry().processAction("UNSAVEBILL", type, null, queryBill, null, null);
+			}
+			
+			hyDao.update(infoVO);
+			
+		}
+		return "成功";
 	}
 	
 }
