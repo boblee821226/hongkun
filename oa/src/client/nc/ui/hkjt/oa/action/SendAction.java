@@ -144,6 +144,8 @@ public class SendAction extends NCAction {
 		String pkBillTypeCode = this.getPkBillTypeCode();
 		// 2、获取 配置信息
 		HkOaSettingBillVO settingVO = getSettingBillVO(pkBillTypeCode);
+		String tableCode1 = settingVO.getVo().getTable_code_1();
+		String tableCode2 = settingVO.getVo().getTable_code_2();
 		// 3、获取对照关系
 		Map<String, String>[] mapper = getMapper(settingVO);
 		Map<String, String> Mapper_head = mapper[0];
@@ -182,7 +184,9 @@ public class SendAction extends NCAction {
 		setDataItem(Mapper_item, billData, t_mapper_item);
 		// 如果有页签二的对照关系
 		// 则需要处理封装页签二的数据
-		setDataItem2(Mapper_item2, billData, t_mapper_item2);
+		if (Mapper_item2 != null && !Mapper_item2.isEmpty()) {
+			setDataItem2(Mapper_item2, billData, t_mapper_item2, tableCode2);
+		}
 		// 获得head
 		Map<String, Object> oa_head = (Map<String, Object>)billData.get("head");
 		// 上传附件
@@ -224,6 +228,7 @@ public class SendAction extends NCAction {
 		      Map<String, String> Mapper_item2
 			, Map<String, Object> billData
 			, Map<String, String> translate_Map_item2
+			, String tableCode
 			) throws BusinessException {
 		
 		List<HashMap<String, Object>> oa_item2 = new ArrayList<>();
@@ -232,7 +237,7 @@ public class SendAction extends NCAction {
 		if (Mapper_item2.isEmpty()) return;
 		
 		for (int rowIndex = 0; rowIndex < this.getEditor()
-				.getBillCardPanel().getBillModel("").getRowCount(); rowIndex++) {
+				.getBillCardPanel().getBillModel(tableCode).getRowCount(); rowIndex++) {
 			HashMap<String, Object> item2 = new HashMap<>();
 			for (Entry<String, String> one : Mapper_item2.entrySet()) {
 				String ncKey = one.getValue();
