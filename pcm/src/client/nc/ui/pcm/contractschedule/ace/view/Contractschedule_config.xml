@@ -481,8 +481,20 @@
 				<!-- HK 2020年8月26日22:55:53 -->
 				<!-- 审批中修改：进度款单-->
 				<ref bean="billEditAction" />
-				<ref bean="separatorAction" />
 				<!-- END -->
+				
+				<!-- HK 2020年12月26日21:13:01 -->
+				<!-- oa发送 按钮  -->
+				<ref bean="separatorAction" />
+				<ref bean="oaSendAction" />
+				<!-- oa收回 按钮  -->
+				<ref bean="separatorAction" />
+				<ref bean="oaBackAction" />
+				<!-- oa联查 按钮  -->
+				<ref bean="separatorAction" />
+				<ref bean="oaLinkAction" />
+				<!-- END -->
+				
 			</list>
 		</property>
 
@@ -490,7 +502,7 @@
 		<property name="editActions">
 			<list>
 				<ref bean="saveAction" />
-				<ref bean="saveAndCommitAction" />
+				<!--<ref bean="saveAndCommitAction" />-->
 				<ref bean="separatorAction" />
 				<ref bean="cancelAction" />
 			</list>
@@ -518,6 +530,28 @@
 		<property name="powercheck" value="true" />
 		<property name="billType" value="4D48" />
 		<property name="billCodeName" value="bill_code"></property>
+	</bean>
+	<!-- END -->
+	
+	<!-- HK 2021年1月1日00:07:32 -->
+	<!-- oa发送  按钮 -->
+	<bean id="oaSendAction" class="nc.ui.hkjt.oa.action.SendAction">
+		<property name="editor" ref="billFormEditor" />
+		<property name="model" ref="manageAppModel" />
+		<property name="listView" ref="listView" />
+	</bean>
+	<!-- oa收回  按钮 -->
+	<bean id="oaBackAction" class="nc.ui.hkjt.oa.action.BackAction">
+		<property name="editor" ref="billFormEditor" />
+		<property name="model" ref="manageAppModel" />
+		<property name="listView" ref="listView" />
+	</bean>
+	<!-- oa联查 按钮 -->
+	<bean id="oaLinkAction" class="nc.ui.erm.link.OaLinkAction">
+		<property name="editor" ref="billFormEditor" />
+		<property name="model" ref="manageAppModel" />
+		<property name="listView" ref="listView" />
+		<property name="billType" value="OA" />
 	</bean>
 	<!-- END -->
 
@@ -611,8 +645,8 @@
 		<property name="model" ref="manageAppModel" />
 	</bean>
 
-	<!-- 提交 -->
-	<bean id="commitAction" class="nc.ui.pm.action.CommitAction">
+	<!-- 提交 nc.ui.pm.action.CommitAction -->
+	<bean id="commitAction" class="nc.ui.hkjt.oa.action.CommitScriptAction">
 		<property name="model" ref="manageAppModel" />
 		<property name="editor" ref="billFormEditor" />
 		<property name="billType" value="4D48" />
@@ -620,8 +654,8 @@
 		<property name="filledUpInFlow" value="true" />
 		<property name="tpaProgressUtil" ref="tpaProgressUtil" />
 	</bean>
-	<!-- 收回 -->
-	<bean id="unCommitAction" class="nc.ui.pm.action.UnCommitAction">
+	<!-- 收回 nc.ui.pm.action.UnCommitAction -->
+	<bean id="unCommitAction" class="nc.ui.hkjt.oa.action.UnCommitScriptAction">
 		<property name="model" ref="manageAppModel" />
 		<property name="editor" ref="billFormEditor" />
 		<property name="billType" value="4D48" />
