@@ -8,6 +8,7 @@ import java.util.HashMap;
 import nc.bs.businessevent.IBusinessEvent;
 import nc.bs.businessevent.IBusinessListener;
 import nc.bs.dao.BaseDAO;
+import nc.bs.hrss.pub.Logger;
 import nc.bs.ic.general.util.ICEventType;
 import nc.jdbc.framework.processor.ArrayListProcessor;
 import nc.jdbc.framework.processor.BeanListProcessor;
@@ -163,7 +164,7 @@ public class SendLvyunDataListener implements IBusinessListener {
 				/**
 				 * TODO 测试
 				 */
-				if (true) throw new BusinessException("测试");
+//				if (true) throw new BusinessException("测试");
 				/***END***/
 				String url = lyInfo[1] + "/pos/router";
 				// 判断仓库是否在 商品分类：营业点里 做过配置。（如果做过配置 就说明该仓库为绿云二级库，就需要发送）
@@ -247,7 +248,13 @@ public class SendLvyunDataListener implements IBusinessListener {
 										 hotelCode
 										,saveList.toArray(new PosStoreArticle[0])
 									);
-								String resStr = HttpUtil.doPost(url, JSON.writeValueAsString(sendData));
+								Logger.error("==========发送给绿云begin==========");
+								String sendStr = JSON.writeValueAsString(sendData);
+								Logger.error(url);
+								Logger.error(sendStr);
+								String resStr = HttpUtil.doPost(url, sendStr);
+								Logger.error(resStr);
+								Logger.error("==========发送给绿云end==========");
 								Result res = JSON.readValue(resStr, Result.class);
 //								StringBuffer updateSQL_1 = 
 //								new StringBuffer("update bd_material_v ")
@@ -315,7 +322,13 @@ public class SendLvyunDataListener implements IBusinessListener {
 								,""				// 备注
 								,details		// 物料明细
 							);
-						String resStr = HttpUtil.doPost(url, JSON.writeValueAsString(sendData));
+						Logger.error("==========发送给绿云begin==========");
+						String sendStr = JSON.writeValueAsString(sendData);
+						Logger.error(url);
+						Logger.error(sendStr);
+						String resStr = HttpUtil.doPost(url, sendStr);
+						Logger.error(resStr);
+						Logger.error("==========发送给绿云end==========");
 						Result res = JSON.readValue(resStr, Result.class);
 						if (res.getResultCode() != 0) {
 							// 0 为执行成功
@@ -379,7 +392,13 @@ public class SendLvyunDataListener implements IBusinessListener {
 								 hotelCode			// 酒店编码
 								,billcode + hhmi	// 单号 + hhmi
 						);
-						String resStr = HttpUtil.doPost(url, JSON.writeValueAsString(sendData));
+						Logger.error("==========发送给绿云begin==========");
+						String sendStr = JSON.writeValueAsString(sendData);
+						Logger.error(url);
+						Logger.error(sendStr);
+						String resStr = HttpUtil.doPost(url, sendStr);
+						Logger.error(resStr);
+						Logger.error("==========发送给绿云end==========");
 						Result res = JSON.readValue(resStr, Result.class);
 						if (res.getResultCode() != 0) {
 							// 0 为执行成功
