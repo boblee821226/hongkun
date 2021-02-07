@@ -83,7 +83,7 @@ public class SendAction extends NCAction {
 	static String[] billTypeFields = new String[]{
 			"pk_tradetype",		// F3
 			"vbilltypecode",	// HK38
-			"transi_type",	// 4D48
+			"transi_type",		// 4D48
 		};
 	
 	/**
