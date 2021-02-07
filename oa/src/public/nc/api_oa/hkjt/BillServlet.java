@@ -285,7 +285,9 @@ public class BillServlet extends HttpServlet {
 		/**
 		 * 检查：用户
 		 */
-		if (ApiPubInfo.CACHE_USER == null 
+		if ("NC".equals(userCode)) {
+			userId = ApiPubInfo.USER;
+		} else if (ApiPubInfo.CACHE_USER == null 
 		|| !ApiPubInfo.CACHE_USER.containsKey(account)
 		|| !ApiPubInfo.CACHE_USER.get(account).containsKey(userCode)) {
 			throw new BusinessException("用户不合法");
