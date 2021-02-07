@@ -2940,7 +2940,8 @@ public class Hg_hzshujuMaintainImpl implements IHG_hzshujuMaintain {
 				+ begindate.substring(0, 10)
 				+ " 00:00:00' dbilldate,count(*) checkoutperson from hk_srgk_hg_zhangdan h left join ");
 		sb.append("hk_srgk_hg_zhangdan_b b on h.pk_hk_dzpt_hg_zhangdan=b.pk_hk_dzpt_hg_zhangdan where nvl(h.dr,0)=0 and nvl(b.dr,0)=0  ");
-		sb.append(" and b.sq_name in ('男门票','女门票','浴资') and h.pk_org in (" + pk_org
+		sb.append(" and b.sq_name in ('男门票','女门票','浴资','男无柜手牌','女无柜手牌','亲子手牌')" +
+				  " and h.pk_org in (" + pk_org
 				+ ") ");
 		sb.append(" and to_date(h.dbilldate,'yyyy-mm-dd hh24:mi:ss')>=to_date('"
 				+ begindate + "','yyyy-mm-dd hh24:mi:ss') ");
