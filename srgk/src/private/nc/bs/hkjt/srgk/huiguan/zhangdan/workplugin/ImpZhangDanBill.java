@@ -9,9 +9,12 @@ import java.sql.Clob;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
 import java.util.regex.Matcher;
@@ -184,8 +187,8 @@ public class ImpZhangDanBill implements IBackgroundWorkPlugin {
 		};//西山
 		
 		String[] dateP = new String[]{
-			"2020-10-08",
-			"2020-10-08"
+			"2021-02-06",
+			"2021-02-06"
 		};
 		
 		HashMap<String,String> infoMap=getDefaultInfo(pk_orgs[0]);//得到配置表信息
@@ -367,6 +370,8 @@ public class ImpZhangDanBill implements IBackgroundWorkPlugin {
 				 */
 //				 +" and aa.BillId in ('SN202010080132-06') "
 //				 +" and aa.BillId in ('SN202010080169-06-302') "
+//				 + " and aa.BillId in ('SN202101310139-06') "
+				 + " and aa.BillId in ('SN202102060253-06') "
 				 /***END***/
 				;
 			
@@ -414,6 +419,8 @@ public class ImpZhangDanBill implements IBackgroundWorkPlugin {
 				 * 2020年1月20日12:10:59
 				 */
 //				 +" and aa.BillId='SN202001190152-06' "
+//				 + " and aa.BillId in ('SN202101310139-06') "
+				 + " and aa.BillId in ('SN202102060253-06') "
 				 /***END***/
 				 ;
 			
@@ -435,9 +442,194 @@ public class ImpZhangDanBill implements IBackgroundWorkPlugin {
 			 */
 			ZhangdanBillVO[] aggvos=getZhangDanAggVOs(infoMap,list4,infoMap.get("pk_org"),hkjt_hg_pub_session);
 			/**
+			 * 将 男女门票的金额分摊到其它门票金额上
+			 */
+			if (true) {
+				Map<String, Integer> from_map = new HashMap<>();
+				from_map.put("男门票", 1);
+				from_map.put("女门票", 1);
+				from_map.put("男无柜手牌", 1);
+				from_map.put("女无柜手牌", 1);
+				from_map.put("亲子手牌", 1);
+				// 超时、增量（将金额加到门票上，不再进行分摊）
+				from_map.put("超时男门票", 0);
+				from_map.put("超时女门票", 0);
+				from_map.put("超时男无柜手牌", 0);
+				from_map.put("超时女无柜手牌", 0);
+				from_map.put("超时亲子手牌", 0);
+				from_map.put("儿童浴资119元", 0);
+				from_map.put("儿童浴资169元", 0);
+				from_map.put("儿童门票", 0);
+				from_map.put("超时儿童门票", 0);
+				Map<String, Integer> distinct_map = new HashMap<>();
+				distinct_map.put("蓝鹦鹉探险乐园", 1);
+				distinct_map.put("水果吧", 1);
+				distinct_map.put("元气空间门票", 1);
+				distinct_map.put("温泉门票", 1);
+				distinct_map.put("自助夜宵", 1);
+				distinct_map.put("自助晚餐", 1);
+				distinct_map.put("自助午餐", 1);
+				distinct_map.put("自助早餐", 1);
+//				Map<String, Integer> to_map = new HashMap<>();
+//				to_map.put("男门票", 1);
+//				to_map.put("女门票", 1);
+//				to_map.put("男无柜手牌", 1);
+//				to_map.put("女无柜手牌", 1);
+//				to_map.put("亲子手牌", 1);
+//				to_map.put("蓝鹦鹉探险乐园", 1);
+//				to_map.put("水果吧", 1);
+//				to_map.put("元气空间门票", 1);
+//				to_map.put("温泉门票", 1);
+//				to_map.put("自助夜宵", 1);
+//				to_map.put("自助晚餐", 1);
+//				to_map.put("自助午餐", 1);
+//				to_map.put("自助早餐", 1);
+				String[] field_list = new String[] {
+//						"yingshou",		//	应收
+//						"youhui_zidong",//	自动优惠
+//						"youhui_shougong",//手工优惠
+//						"shishou",		//	实收（优惠后）
+//						"youhui_kabili",//	卡比例优惠
+						"shouru",		//	确认收入（目前只关注于 拆分 收入）
+//						"daijinquan",	// 	代金券
+//						"miandan",		//	免单
+//						"fenqu",		//	分区金额（优惠）
+//						"youhui_sg_01",	//	微信集赞
+//						"youhui_qt",	//	优惠_其它
+//						"cika",			//	次卡
+//						"xianjin",		//	现金
+//						"pos",			//	POS
+//						"zhipiao",		//	支票
+//						"wanglai",		//	往来
+//						"huiyuanka",	//	会员卡
+//						"vbdef01",		//	分区金额（收入）
+				};
+				
+				// 先去掉同一手牌的重复数据
+				// 汇总from的数据，清空from数据
+				// 将数据分摊到 to数据项
+				for (ZhangdanBillVO billVO : aggvos) {
+					Map<String, List<ZhangdanBVO>> bVO_map = new HashMap<>();	// 手牌下待分摊的数据
+					Map<String, ZhangdanBVO> total_map = new HashMap<>();	// 门票合计 key=手牌
+					Map<String, Integer> count_map = new HashMap<>();		// 其它门票去重所用
+					Map<String, Integer> weight_map = new HashMap<>();		// 权重（总） key=手牌
+					Map<String, Integer> weight_sq_map = new HashMap<>();	// 权重（门票） key=手牌+门票
+					ZhangdanBVO[] bVOs = (ZhangdanBVO[])billVO.getChildrenVO();
+//					List<ZhangdanBVO> bVO_list = new ArrayList<>(Arrays.asList(bVOs));
+					// 第一步：循环、准备数据
+					for (ZhangdanBVO bVO : bVOs) {
+						String keyId = bVO.getKeyid();		// 手牌
+						String sqName = bVO.getSq_name();	// 门票
+						String keySq = keyId + "####" + sqName;	// 手牌 + 门票
+						// 汇总from的数据
+						if (from_map.containsKey(sqName)) {
+							if (!total_map.containsKey(keyId)) {
+								total_map.put(keyId, new ZhangdanBVO());
+							}
+							ZhangdanBVO total = total_map.get(keyId);
+							for (String field : field_list) {
+								total.setAttributeValue(field, 
+										PuPubVO.getUFDouble_NullAsZero(total.getAttributeValue(field))
+									.add(PuPubVO.getUFDouble_NullAsZero(bVO.getAttributeValue(field))));
+								// 清空from数据
+								bVO.setAttributeValue(field, null);
+							}
+							// 权重
+							if (!sqName.startsWith("超时")
+							 || !sqName.startsWith("儿童")
+							) {
+								if (!weight_map.containsKey(keyId)) {
+									weight_map.put(keyId, from_map.get(sqName));
+								} else {
+									weight_map.put(keyId, weight_map.get(keyId) + from_map.get(sqName));
+								}
+								if (!weight_sq_map.containsKey(keySq)) {
+									weight_sq_map.put(keySq, from_map.get(sqName));
+								} else {
+									weight_sq_map.put(keySq, weight_sq_map.get(keySq) + from_map.get(sqName));
+								}
+								if (!bVO_map.containsKey(keyId)) {
+									List<ZhangdanBVO> list_temp = new ArrayList<>();
+									list_temp.add(bVO);
+									bVO_map.put(keyId, list_temp);
+								} else {
+									bVO_map.get(keyId).add(bVO);
+								}
+							}
+						}
+						// 去重
+						if (distinct_map.containsKey(sqName)) {
+							// 检查收入字段是否为空，如果为空就说明是需要分摊的，
+							UFDouble shouRu = bVO.getShouru();	// 收入
+							if (shouRu == null && !count_map.containsKey(keySq)) {
+								count_map.put(keySq, 1);
+								// 权重
+								if (!weight_map.containsKey(keyId)) {
+									weight_map.put(keyId, distinct_map.get(sqName));
+								} else {
+									weight_map.put(keyId, weight_map.get(keyId) + distinct_map.get(sqName));
+								}
+								if (!weight_sq_map.containsKey(keySq)) {
+									weight_sq_map.put(keySq, distinct_map.get(sqName));
+								} else {
+									weight_sq_map.put(keySq, weight_sq_map.get(keySq) + distinct_map.get(sqName));
+								}
+								if (!bVO_map.containsKey(keyId)) {
+									List<ZhangdanBVO> list_temp = new ArrayList<>();
+									list_temp.add(bVO);
+									bVO_map.put(keyId, list_temp);
+								} else {
+									bVO_map.get(keyId).add(bVO);
+								}
+							} else {
+//								bVO_list.remove(bVO);
+							}
+						}
+					}
+					// 第二步：进行分摊
+					for (Map.Entry<String, List<ZhangdanBVO>> entry : bVO_map.entrySet()) {
+						String keyId = entry.getKey();
+						ZhangdanBVO totalData = total_map.get(keyId);	// 待分摊总额
+						ZhangdanBVO sharedData = new ZhangdanBVO();	// 已经分摊的
+						List<ZhangdanBVO> listTemp = entry.getValue();
+						Integer weight = weight_map.get(keyId);	// 该手牌的总权重
+						for (int i = 0; i < listTemp.size(); i++) {
+							// 进行分摊处理
+							ZhangdanBVO bVO = listTemp.get(i);
+							String sqName = bVO.getSq_name();	// 门票
+							String keySq = keyId + "####" + sqName;	// 手牌 + 门票
+							Integer weightSq = weight_sq_map.get(keySq);	// 权重（门票） key=手牌+门票
+							for (String field : field_list) {
+								if (i != listTemp.size() - 1) {
+									// 非最后一笔，按权重分摊
+									UFDouble money = PuPubVO.getUFDouble_NullAsZero(totalData.getAttributeValue(field));
+									UFDouble share = money.multiply(weightSq).div(weight).setScale(2, UFDouble.ROUND_HALF_UP);
+									sharedData.setAttributeValue(field,
+										PuPubVO.getUFDouble_NullAsZero(sharedData.getAttributeValue(field))
+											.add(share));
+									bVO.setAttributeValue(field, share);
+								} else {
+									// 最后一笔 进行倒挤
+									UFDouble share = PuPubVO.getUFDouble_NullAsZero(totalData.getAttributeValue(field))
+											.sub(PuPubVO.getUFDouble_NullAsZero(sharedData.getAttributeValue(field)));
+									bVO.setAttributeValue(field, share);
+								}
+							}
+						}
+					}
+					System.out.println(total_map);
+				}
+			}
+			/**
+			 * 测试
+			 */
+//			if (true) {
+//				throw new BusinessException("测试");
+//			}
+			/**
 			 * 进行保存
 			 */
-			IHg_zhangdanMaintain itf=NCLocator.getInstance().lookup(IHg_zhangdanMaintain.class);
+			IHg_zhangdanMaintain itf = NCLocator.getInstance().lookup(IHg_zhangdanMaintain.class);
 			InvocationInfoProxy.getInstance().setUserId(HKJT_PUB.MAKER);//设置制单人
 			if(aggvos!=null&&aggvos.length>0)
 			{
