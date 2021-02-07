@@ -27,6 +27,7 @@ import nc.bs.pub.pflock.VOLockData;
 import nc.bs.pub.taskmanager.TaskManagerDMO;
 import nc.bs.pub.taskmanager.WfTaskManager;
 import nc.bs.pub.workflownote.WorknoteManager;
+import nc.bs.trade.business.HYPubBO;
 import nc.bs.wfengine.engine.ActivityInstance;
 import nc.bs.wfengine.engine.EngineService;
 import nc.bs.wfengine.engine.ProcessInstance;
@@ -48,6 +49,7 @@ import nc.message.attachment.AttachmentReturnExcutor;
 import nc.message.vo.AttachmentVO;
 import nc.ui.pf.pub.PFClientBizRetObj;
 import nc.ui.pub.pf.IPFClientBizProcess;
+import nc.vo.hkjt.oa.HkOaSettingVO;
 import nc.vo.jcom.lang.StringUtil;
 import nc.vo.ml.NCLangRes4VoTransl;
 import nc.vo.pf.change.PfUtilBaseTools;
@@ -1440,19 +1442,25 @@ public class WorkflowMachineImpl implements IWorkflowMachine {
 					if (
 						type.startsWith("F3")	// 付款
 					) {
-						String updateSQL_1 = 
-							" update sm_msg_content " +
-							" set receiver = receiver || '-oa' " +
-							" where detail like '" + id + "@" + type + "@%' " +
-							" and destination = 'inbox' "
-						;
-						String updateSQL_2 = 
-							" update pub_workflownote " +
-							" set checkman = checkman || '-oa' " +
-							" where pk_billtype = '" + type + "' and billid = '" + id + "' "
-						;
-						Integer res_1 = dao.executeUpdate(updateSQL_1);
-						Integer res_2 = dao.executeUpdate(updateSQL_2);
+						// 并且是在配置表里存在的，才进行以下操作。
+						boolean isExist = false;
+						HkOaSettingVO[] vos = (HkOaSettingVO[])(new HYPubBO().queryByCondition(HkOaSettingVO.class, "dr=0 and parentbilltype = '"+type+"'"));
+						if (vos != null && vos.length > 0) isExist = true;
+						if (isExist) {
+							String updateSQL_1 = 
+								" update sm_msg_content " +
+								" set receiver = receiver || '-oa' " +
+								" where detail like '" + id + "@" + type + "@%' " +
+								" and destination = 'inbox' "
+							;
+							String updateSQL_2 = 
+								" update pub_workflownote " +
+								" set checkman = checkman || '-oa' " +
+								" where pk_billtype = '" + type + "' and billid = '" + id + "' "
+							;
+							Integer res_1 = dao.executeUpdate(updateSQL_1);
+							Integer res_2 = dao.executeUpdate(updateSQL_2);
+						}
 					}
 				}
 				/***END***/
