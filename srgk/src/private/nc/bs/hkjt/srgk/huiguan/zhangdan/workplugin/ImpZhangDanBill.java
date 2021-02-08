@@ -371,7 +371,8 @@ public class ImpZhangDanBill implements IBackgroundWorkPlugin {
 //				 +" and aa.BillId in ('SN202010080132-06') "
 //				 +" and aa.BillId in ('SN202010080169-06-302') "
 //				 + " and aa.BillId in ('SN202101310139-06') "
-				 + " and aa.BillId in ('SN202102060253-06') "
+//				 + " and aa.BillId in ('SN202102060253-06') "
+//				 + " and aa.BillId in ('SN202102060268-06') "
 				 /***END***/
 				;
 			
@@ -420,7 +421,8 @@ public class ImpZhangDanBill implements IBackgroundWorkPlugin {
 				 */
 //				 +" and aa.BillId='SN202001190152-06' "
 //				 + " and aa.BillId in ('SN202101310139-06') "
-				 + " and aa.BillId in ('SN202102060253-06') "
+//				 + " and aa.BillId in ('SN202102060253-06') "
+//				 + " and aa.BillId in ('SN202102060268-06') "
 				 /***END***/
 				 ;
 			
@@ -470,20 +472,8 @@ public class ImpZhangDanBill implements IBackgroundWorkPlugin {
 				distinct_map.put("自助晚餐", 1);
 				distinct_map.put("自助午餐", 1);
 				distinct_map.put("自助早餐", 1);
-//				Map<String, Integer> to_map = new HashMap<>();
-//				to_map.put("男门票", 1);
-//				to_map.put("女门票", 1);
-//				to_map.put("男无柜手牌", 1);
-//				to_map.put("女无柜手牌", 1);
-//				to_map.put("亲子手牌", 1);
-//				to_map.put("蓝鹦鹉探险乐园", 1);
-//				to_map.put("水果吧", 1);
-//				to_map.put("元气空间门票", 1);
-//				to_map.put("温泉门票", 1);
-//				to_map.put("自助夜宵", 1);
-//				to_map.put("自助晚餐", 1);
-//				to_map.put("自助午餐", 1);
-//				to_map.put("自助早餐", 1);
+				distinct_map.put("乐园自助晚餐", 1);
+				distinct_map.put("乐园自助午餐", 1);
 				String[] field_list = new String[] {
 //						"yingshou",		//	应收
 //						"youhui_zidong",//	自动优惠
@@ -521,6 +511,11 @@ public class ImpZhangDanBill implements IBackgroundWorkPlugin {
 						String keyId = bVO.getKeyid();		// 手牌
 						String sqName = bVO.getSq_name();	// 门票
 						String keySq = keyId + "####" + sqName;	// 手牌 + 门票
+						UFDouble shouRu = bVO.getShouru();	// 收入金额
+						// 数据备份，将收入 备份到 vbdef10
+						if (shouRu != null) {
+							bVO.setVbdef10(shouRu.toString());
+						}
 						// 汇总from的数据
 						if (from_map.containsKey(sqName)) {
 							if (!total_map.containsKey(keyId)) {
@@ -559,8 +554,7 @@ public class ImpZhangDanBill implements IBackgroundWorkPlugin {
 						}
 						// 去重
 						if (distinct_map.containsKey(sqName)) {
-							// 检查收入字段是否为空，如果为空就说明是需要分摊的，
-							UFDouble shouRu = bVO.getShouru();	// 收入
+							// 检查收入字段是否为空，如果为空就说明是需要分摊的。
 							if (shouRu == null && !count_map.containsKey(keySq)) {
 								count_map.put(keySq, 1);
 								// 权重
@@ -709,6 +703,40 @@ public class ImpZhangDanBill implements IBackgroundWorkPlugin {
 		HashMap<String,HashSet<String>> fenqumap = null;	// 不用 这个变量
 		/**END*/
 		
+		/**
+		 * HK 档案数据
+		 * key=商品名称、value=商品分类
+		 */
+		Map<String, String> map_man = new HashMap<>();		// 男
+		map_man.put("男门票", "男门票");
+		map_man.put("超时男门票", "男门票");
+		map_man.put("男无柜手牌", "男门票");
+		map_man.put("超时男无柜手牌", "男门票");
+		Map<String, String> map_woman = new HashMap<>();	// 女
+		map_woman.put("女门票", "女门票");
+		map_woman.put("超时女门票", "女门票");
+		map_woman.put("女无柜手牌", "女门票");
+		map_woman.put("超时女无柜手牌", "女门票");
+		Map<String, String> map_child = new HashMap<>();	// 儿童（要找到主手牌 是男是女）
+		map_child.put("儿童浴资119元", null);
+		map_child.put("儿童浴资169元", null);
+		map_child.put("儿童门票", null);
+		map_child.put("超时儿童门票", null);
+		Map<String, String> map_qinzi = new HashMap<>();	// 亲子
+		map_qinzi.put("亲子手牌", "超时亲子手牌");
+		Map<String, String> map_distinct = new HashMap<>();	// 要分摊到的项目上
+		map_distinct.put("蓝鹦鹉探险乐园", "蓝鹦鹉探险乐园（拆分）");
+		map_distinct.put("元气空间门票", "元气空间门票（拆分）");
+		map_distinct.put("温泉门票", "温泉门票（拆分）");
+		map_distinct.put("水果吧", "水果吧（拆分）");
+		map_distinct.put("自助夜宵", "自助夜宵（拆分）");
+		map_distinct.put("自助晚餐", "自助晚餐（拆分）");
+		map_distinct.put("自助午餐", "自助午餐（拆分）");
+		map_distinct.put("自助早餐", "自助早餐（拆分）");
+		map_distinct.put("乐园自助晚餐", "乐园自助晚餐（拆分）");
+		map_distinct.put("乐园自助午餐", "乐园自助午餐（拆分）");
+		/***END***/
+		
 		for (ZhangdanHVO zhangdanHVO : hvos) {
 			ZhangdanBillVO aggvo=new ZhangdanBillVO();
 			zhangdanHVO.setPk_org(pk_org);
@@ -718,7 +746,13 @@ public class ImpZhangDanBill implements IBackgroundWorkPlugin {
 			zhangdanHVO.setVbilltypecode("HK01");//单据类型
 			aggvo.setParentVO(zhangdanHVO);
 			
-			ArrayList<ZhangdanBVO> bvos=bodyvoMaps.get(zhangdanHVO.getVbillcode());
+			ArrayList<ZhangdanBVO> bvos_01 = bodyvoMaps.get(zhangdanHVO.getVbillcode());
+			
+			ZhangdanBVO[] bvos_arr = bvos_01.toArray(new ZhangdanBVO[0]);
+			
+			Arrays.sort(bvos_arr);	// 排序，确保 儿童的在最后处理。
+			
+			List<ZhangdanBVO> bvos = new ArrayList<>(Arrays.asList(bvos_arr));
 			
 			/**
 			 * 针对 表体进行 尾差的处理， 如果 表体之和 不等于 账单表头的数据， 则需要叠加到 最后一行上， 确保 表头、表体 数据一致
@@ -749,9 +783,42 @@ public class ImpZhangDanBill implements IBackgroundWorkPlugin {
 			
 			if(bvos!=null)//ZSN201506150002-01 贵宾楼
 			{
+				Map<String, String> map_hand = new HashMap<>();	// 手牌对应的主 商品分类
 				for (int i = 0; i < bvos.size(); i++) {
 					ZhangdanBVO bvo=bvos.get(i);
 					bvo.setVrowno(String.valueOf((i+1)*10));//给行号赋值
+					/**
+					 * HK 进行商品分类的判断赋值
+					 */
+					{
+						String sqName = bvo.getSq_name();	// 商品名称
+						if ("自助午餐".equals(sqName)) {
+							System.out.println();
+						}
+						String keyId = bvo.getKeyid();	// 手牌号
+						String sqflName = null;	// 商品分类名称
+						if (map_man.containsKey(sqName)) {// 男
+							sqflName = map_man.get(sqName);
+						} else if (map_woman.containsKey(sqName)) {// 女
+							sqflName = map_woman.get(sqName);
+						} else if (map_qinzi.containsKey(sqName)) {// 亲子
+							sqflName = map_qinzi.get(sqName);
+						} else if (map_child.containsKey(sqName)) {// 儿童
+							// 先排序，确保儿童在最后才进行处理。
+							bvo.setSqfl_name(map_hand.get(keyId));
+						} else if (map_distinct.containsKey(sqName)) {// 要拆分到的项目
+							// 应收不为0，才需要拆分。
+							if (PuPubVO.getUFDouble_ZeroAsNull(bvo.getYingshou()) == null) {
+								bvo.setSqfl_name(map_distinct.get(sqName));
+							}
+						}
+						
+						if (sqflName != null) {
+							bvo.setSqfl_name(sqflName);
+							map_hand.put(keyId, sqflName);
+						}
+					}
+					/***END***/
 					SpflHVO spflVO=spfl.get(pk_org_spfl+"@@"+bvo.getSqfl_name());
 					if(spflVO!=null){
 						bvo.setSqfl_id(spflVO.getPk_hk_srgk_hg_spfl());//根据业务系统商品分类名称，为账单表体赋值NC系统商品分类id
