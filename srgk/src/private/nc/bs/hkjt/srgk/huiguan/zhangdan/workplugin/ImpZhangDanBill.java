@@ -373,6 +373,7 @@ public class ImpZhangDanBill implements IBackgroundWorkPlugin {
 //				 + " and aa.BillId in ('SN202101310139-06') "
 //				 + " and aa.BillId in ('SN202102060253-06') "
 //				 + " and aa.BillId in ('SN202102060268-06') "
+//				 + " and aa.BillId in ('SN202102060165-06') "
 				 /***END***/
 				;
 			
@@ -423,6 +424,7 @@ public class ImpZhangDanBill implements IBackgroundWorkPlugin {
 //				 + " and aa.BillId in ('SN202101310139-06') "
 //				 + " and aa.BillId in ('SN202102060253-06') "
 //				 + " and aa.BillId in ('SN202102060268-06') "
+//				 + " and aa.BillId in ('SN202102060165-06') "
 				 /***END***/
 				 ;
 			
@@ -611,7 +613,14 @@ public class ImpZhangDanBill implements IBackgroundWorkPlugin {
 							}
 						}
 					}
-					System.out.println(total_map);
+					// 第三步：数据整理，将确认收入为0的进行清空
+					for (ZhangdanBVO bVO : bVOs) {
+						UFDouble shouRu = bVO.getShouru();
+						if (shouRu != null && shouRu.compareTo(UFDouble.ZERO_DBL) == 0) {
+							bVO.setShouru(null);
+						}
+					}
+//					System.out.println(total_map);
 				}
 			}
 			/**
@@ -781,6 +790,17 @@ public class ImpZhangDanBill implements IBackgroundWorkPlugin {
 			}
 			/**END*/
 			
+			if(bvos==null||bvos.size()==0)continue;//如果表体数据为空，则滤掉表头数据
+			
+			aggvo.setChildrenVO(bvos.toArray(new ZhangdanBVO[]{}));
+			/**
+			 * 测试测试
+			 * 主要分摊算法
+			 */
+			execBodyValues(aggvo,session,infoMap.get("vpnname"),fenqumap);//计算表体 [卡比例优惠][现金][POS][会员卡][确认收入]的值
+			/**END**/
+			aggvos.add(aggvo);
+			
 			if(bvos!=null)//ZSN201506150002-01 贵宾楼
 			{
 				Map<String, String> map_hand = new HashMap<>();	// 手牌对应的主 商品分类
@@ -792,9 +812,9 @@ public class ImpZhangDanBill implements IBackgroundWorkPlugin {
 					 */
 					{
 						String sqName = bvo.getSq_name();	// 商品名称
-						if ("自助午餐".equals(sqName)) {
-							System.out.println();
-						}
+//						if ("自助午餐".equals(sqName)) {
+//							System.out.println();
+//						}
 						String keyId = bvo.getKeyid();	// 手牌号
 						String sqflName = null;	// 商品分类名称
 						if (map_man.containsKey(sqName)) {// 男
@@ -808,7 +828,10 @@ public class ImpZhangDanBill implements IBackgroundWorkPlugin {
 							bvo.setSqfl_name(map_hand.get(keyId));
 						} else if (map_distinct.containsKey(sqName)) {// 要拆分到的项目
 							// 应收不为0，才需要拆分。
-							if (PuPubVO.getUFDouble_ZeroAsNull(bvo.getYingshou()) == null) {
+//							if (PuPubVO.getUFDouble_ZeroAsNull(bvo.getYingshou()) == null) {
+//								bvo.setSqfl_name(map_distinct.get(sqName));
+//							}
+							if (bvo.getShouru() == null) {
 								bvo.setSqfl_name(map_distinct.get(sqName));
 							}
 						}
@@ -888,17 +911,7 @@ public class ImpZhangDanBill implements IBackgroundWorkPlugin {
 					}
 				}
 			}
-		
-			if(bvos==null||bvos.size()==0)continue;//如果表体数据为空，则滤掉表头数据
 			
-			aggvo.setChildrenVO(bvos.toArray(new ZhangdanBVO[]{}));
-			/**
-			 * 测试测试
-			 * 主要分摊算法
-			 */
-			execBodyValues(aggvo,session,infoMap.get("vpnname"),fenqumap);//计算表体 [卡比例优惠][现金][POS][会员卡][确认收入]的值
-			/**END**/
-			aggvos.add(aggvo);
 		}
 		
 		return aggvos.toArray(new ZhangdanBillVO[]{});
