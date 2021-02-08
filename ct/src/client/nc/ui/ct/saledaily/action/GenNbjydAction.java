@@ -162,6 +162,8 @@ public class GenNbjydAction extends HelpAction {
 								.append(",ct.vdef16 vdef04 ")	// 房间号id
 								.append(",ctb.vbdef1 vdef06 ")	// 收费项目id
 								.append(",ct.vdef15 vdef05 ")	// 区域id
+								.append(",ct.depid pk_deptid ")	// 部门
+								.append(",ct.depid_v pk_deptid_v ")	// 部门v
 								.append(" from ct_sale_b ctb ")
 								.append(" inner join ct_sale ct on (ctb.pk_ct_sale = ct.pk_ct_sale) ")
 								.append(" left join (" +
@@ -208,6 +210,8 @@ public class GenNbjydAction extends HelpAction {
 								.append(",ct.vdef16 vdef04 ")	// 房间号id
 								.append(",ctb.vbdef1 vdef06 ")	// 收费项目id
 								.append(",ct.vdef15 vdef05 ")	// 区域id
+								.append(",ct.depid pk_deptid ")	// 部门
+								.append(",ct.depid_v pk_deptid_v ")	// 部门v
 								.append(" from ct_sale_b ctb ")
 								.append(" inner join ct_sale ct on (ctb.pk_ct_sale = ct.pk_ct_sale) ")
 								.append(" left join (" +
@@ -280,6 +284,8 @@ public class GenNbjydAction extends HelpAction {
 									.append(",ct.vdef16 vdef04 ")	// 房间号id
 									.append(",ctb.vbdef1 vdef06 ")	// 收费项目id
 									.append(",ct.vdef15 vdef05 ")	// 区域id
+									.append(",ct.depid pk_deptid ")	// 部门
+									.append(",ct.depid_v pk_deptid_v ")	// 部门v
 									.append(" from ct_sale_b ctb ")
 									.append(" inner join ct_sale ct on (ctb.pk_ct_sale = ct.pk_ct_sale) ")
 									.append(" left join (" +
@@ -399,7 +405,8 @@ public class GenNbjydAction extends HelpAction {
 						    String           pk_org = ctSaleVO.getPk_org();		// 组织（取数）
 						    String         pk_org_v = ctSaleVO.getPk_org_v();	// 组织版本（取数）
 						    String      pk_customer = ctSaleVO.getPk_customer();// 客户（取数）
-						    
+						    String		  pk_deptid = ctSaleVO.getPk_deptid();	// 部门
+						    String		pk_deptid_v = ctSaleVO.getPk_deptid_v();// 部门v
 //						    UFDouble           jine = ctSaleVO.getNorigtaxmny();	// 金额
 						    
 //						    String     pk_ct_sale_b = ctSaleVO.getPk_ct_sale_b();	// 合同子表pk
@@ -443,6 +450,9 @@ public class GenNbjydAction extends HelpAction {
 						    headVO.setPk_org_v( pk_org_v );		// 应收财务组织版本
 						    headVO.setSett_org( pk_org );		// 结算财务组织
 						    headVO.setSett_org_v( pk_org_v );	// 结算财务组织版本
+						    
+						    headVO.setPk_deptid(pk_deptid);		// 部门
+						    headVO.setPk_deptid_v(pk_deptid_v);	// 部门v
 						    
 						    headVO.setSrc_syscode(0);		// 单据来源系统（0=应收系统）
 						    headVO.setSyscode(0);			// 单据所属系统（0=应收系统）
@@ -531,6 +541,9 @@ public class GenNbjydAction extends HelpAction {
 						    	itemVOs[i].setPk_org_v( pk_org_v );		// 应收组织版本
 						    	itemVOs[i].setSett_org( pk_org );		// 结算组织
 						    	itemVOs[i].setSett_org_v( pk_org_v );	// 结算组织版本
+						    	
+						    	itemVOs[i].setPk_deptid(pk_deptid);		// 部门
+						    	itemVOs[i].setPk_deptid_v(pk_deptid_v);	// 部门v
 						    	
 						    	itemVOs[i].setRececountryid( guojia );				// 收货国
 						    	
