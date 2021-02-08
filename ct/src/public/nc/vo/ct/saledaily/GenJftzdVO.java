@@ -21,13 +21,16 @@ public class GenJftzdVO extends SuperVO {
 	public String jflx;			// 收费项目
 	public String vbillcode2;	// 去掉#之后的合同号
 	
+	private String pk_deptid;	// 部门
+	private String pk_deptid_v;	// 部门v
+	
 	public String vdef01;	// 房间号
 	public String vdef02;	// 开始日期
 	public String vdef03;	// 截止日期
 	public String vdef04;	// 房间号id
 	public String vdef05;	// 区域id
 	public String vdef06;	// 收费项目id
-	public String vdef07;
+	public String vdef07;	// 客户名称
 	public String vdef08;
 	public String vdef09;
 	public String vdef10;
@@ -151,6 +154,18 @@ public class GenJftzdVO extends SuperVO {
 	}
 	public void setVdef10(String vdef10) {
 		this.vdef10 = vdef10;
+	}
+	public String getPk_deptid() {
+		return pk_deptid;
+	}
+	public void setPk_deptid(String pk_deptid) {
+		this.pk_deptid = pk_deptid;
+	}
+	public String getPk_deptid_v() {
+		return pk_deptid_v;
+	}
+	public void setPk_deptid_v(String pk_deptid_v) {
+		this.pk_deptid_v = pk_deptid_v;
 	}
 	
 }
