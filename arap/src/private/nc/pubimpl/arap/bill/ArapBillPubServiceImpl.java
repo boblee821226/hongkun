@@ -27,6 +27,9 @@ import nc.vo.arap.basebill.BaseAggVO;
 import nc.vo.arap.gathering.AggGatheringBillVO;
 import nc.vo.arap.gathering.GatheringBillItemVO;
 import nc.vo.arap.gathering.GatheringBillVO;
+import nc.vo.arap.payable.AggPayableBillVO;
+import nc.vo.arap.payable.PayableBillItemVO;
+import nc.vo.arap.payable.PayableBillVO;
 import nc.vo.arap.pf.PFCheckVO;
 import nc.vo.arap.pub.ArapBillTypeInfo;
 import nc.vo.arap.service.ServiceVO;
@@ -114,50 +117,94 @@ public class ArapBillPubServiceImpl implements IArapBillPubService {
 		this.setBillCode(new AggregatedValueObject[]{bill});
 		AggregatedValueObject res = ArrayUtil.getFirstInArrays(update(new BaseAggVO[] { bill }));
 		
-		if (res instanceof AggGatheringBillVO){
-			/**
-			  * HK 2021年1月5日01:11:22
-			  * 回写合同
-			  */
-			AggGatheringBillVO item = (AggGatheringBillVO)res;
-			BaseDAO daseDAO = new BaseDAO();
-			GatheringBillVO hVO = item.getHeadVO();
-			GatheringBillItemVO[] bVOs = item.getBodyVOs();
+		if (res instanceof AggPayableBillVO) {
+			String tradeTypeCode = "F1-Cxx-90";	// 内部交易应付单
+			AggPayableBillVO billVO = (AggPayableBillVO)res;
+			PayableBillVO hVO = billVO.getHeadVO();
+			PayableBillItemVO[] bVOs = billVO.getBodyVOs();
 			Integer sysCode = hVO.getSyscode();
-			if (sysCode != 0) return res;	// 只处理 协同生成的
-			String pk_tradetype = hVO.getPk_tradetype();	// F2-Cxx-90 
-			if (!"F2-Cxx-90".equals(pk_tradetype)) return res;// 只处理 内部交易付款单
+			if (sysCode != 1) return res;	// 应付
+			String pk_tradetype = hVO.getPk_tradetype();
+			if (!tradeTypeCode.equals(pk_tradetype)) return res;
 			ArrayList<String> pkList = new ArrayList<>();
-			for (GatheringBillItemVO bItem : bVOs) {
+			for (PayableBillItemVO bItem : bVOs) {
 				String def29 = PuPubVO.getString_TrimZeroLenAsNull(bItem.getDef29());
 				if (def29 != null) pkList.add(def29);
 			}
 			if (pkList.isEmpty()) return res;	// 合同pk为空  不处理
 			{// 进行同步
+				BaseDAO daseDAO = new BaseDAO();
 				String pkListStr = PuPubVO.getSqlInByList(pkList);
 				String updateSQL = "update ct_sale_b htb " +
-				 " set htb.ntotalgpmny = nvl((select sum(skb.local_money_cr) " +
-					                     " from ar_gatheritem skb " +
-					                     " inner join ar_gatherbill sk on skb.pk_gatherbill = sk.pk_gatherbill " +
-					                     " where skb.dr = 0 and sk.dr = 0 " +
-					                     " and sk.coordflag = 1 " +	// 只取确认状态的
-					                     " and sk.src_syscode = 9 and sk.pk_tradetype = 'F2-Cxx-90' " +
-					                     " and skb.def29 = htb.pk_ct_sale_b " +
-					                     " group by skb.def29), 0) " +
-                 ", htb.noritotalgpmny = nvl((select sum(skb.money_cr) " +
-					                     " from ar_gatheritem skb " +
-					                     " inner join ar_gatherbill sk on skb.pk_gatherbill = sk.pk_gatherbill " +
-					                     " where skb.dr = 0 and sk.dr = 0 " +
-					                     " and sk.coordflag = 1 " +	// 只取确认状态的
-					                     " and sk.src_syscode = 9 and sk.pk_tradetype = 'F2-Cxx-90' " +
-					                     " and skb.def29 = htb.pk_ct_sale_b " +
-					                     " group by skb.def29), 0) " +
+				 " set htb.ntotalgpmny = nvl((select sum(yfb.local_money_cr) " +
+					                     " from ap_payableitem yfb " +
+					                     " inner join ap_payablebill yf on yfb.pk_payablebill = yf.pk_payablebill " +
+					                     " where yfb.dr = 0 and yf.dr = 0 " +
+					                     " and yf.coordflag = 1 " +	// 只取确认状态的
+					                     " and yf.src_syscode = 9 and yf.pk_tradetype = '" + tradeTypeCode + "' " +
+					                     " and yfb.def29 = htb.pk_ct_sale_b " +
+					                     " group by yfb.def29), 0) " +
+                 ", htb.noritotalgpmny = nvl((select sum(yfb.money_cr) " +
+					                     " from ap_payableitem yfb " +
+					                     " inner join ap_payablebill yf on yfb.pk_payablebill = yf.pk_payablebill " +
+					                     " where yfb.dr = 0 and yf.dr = 0 " +
+					                     " and yf.coordflag = 1 " +	// 只取确认状态的
+					                     " and yf.src_syscode = 9 and yf.pk_tradetype = '" + tradeTypeCode + "' " +
+					                     " and yfb.def29 = htb.pk_ct_sale_b " +
+					                     " group by yfb.def29), 0) " +
 			     " where htb.pk_ct_sale_b in " + pkListStr + " " 
 			     ;
 				int flag = daseDAO.executeUpdate(updateSQL);
 				System.out.println(flag);
 			}
 		}
+		
+//		if (res instanceof AggGatheringBillVO){
+//			/**
+//			  * HK 2021年1月5日01:11:22
+//			  * 内部交易付款单，回写合同。F2-Cxx-90
+//			  * 2021年2月8日19:42:37
+//			  * 改为 内部交易应付单 来进行回写。F1-Cxx-90 (ap_payablebill)
+//			  */
+//			AggGatheringBillVO item = (AggGatheringBillVO)res;
+//			BaseDAO daseDAO = new BaseDAO();
+//			GatheringBillVO hVO = item.getHeadVO();
+//			GatheringBillItemVO[] bVOs = item.getBodyVOs();
+//			Integer sysCode = hVO.getSyscode();
+//			if (sysCode != 0) return res;	// 应收
+//			String pk_tradetype = hVO.getPk_tradetype();	// F2-Cxx-90 
+//			if (!"F2-Cxx-90".equals(pk_tradetype)) return res;// 只处理 内部交易付款单
+//			ArrayList<String> pkList = new ArrayList<>();
+//			for (GatheringBillItemVO bItem : bVOs) {
+//				String def29 = PuPubVO.getString_TrimZeroLenAsNull(bItem.getDef29());
+//				if (def29 != null) pkList.add(def29);
+//			}
+//			if (pkList.isEmpty()) return res;	// 合同pk为空  不处理
+//			{// 进行同步
+//				String pkListStr = PuPubVO.getSqlInByList(pkList);
+//				String updateSQL = "update ct_sale_b htb " +
+//				 " set htb.ntotalgpmny = nvl((select sum(skb.local_money_cr) " +
+//					                     " from ar_gatheritem skb " +
+//					                     " inner join ar_gatherbill sk on skb.pk_gatherbill = sk.pk_gatherbill " +
+//					                     " where skb.dr = 0 and sk.dr = 0 " +
+//					                     " and sk.coordflag = 1 " +	// 只取确认状态的
+//					                     " and sk.src_syscode = 9 and sk.pk_tradetype = 'F2-Cxx-90' " +
+//					                     " and skb.def29 = htb.pk_ct_sale_b " +
+//					                     " group by skb.def29), 0) " +
+//                 ", htb.noritotalgpmny = nvl((select sum(skb.money_cr) " +
+//					                     " from ar_gatheritem skb " +
+//					                     " inner join ar_gatherbill sk on skb.pk_gatherbill = sk.pk_gatherbill " +
+//					                     " where skb.dr = 0 and sk.dr = 0 " +
+//					                     " and sk.coordflag = 1 " +	// 只取确认状态的
+//					                     " and sk.src_syscode = 9 and sk.pk_tradetype = 'F2-Cxx-90' " +
+//					                     " and skb.def29 = htb.pk_ct_sale_b " +
+//					                     " group by skb.def29), 0) " +
+//			     " where htb.pk_ct_sale_b in " + pkListStr + " " 
+//			     ;
+//				int flag = daseDAO.executeUpdate(updateSQL);
+//				System.out.println(flag);
+//			}
+//		}
 		
 		return res;
 	}
