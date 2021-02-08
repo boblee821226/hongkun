@@ -1,5 +1,10 @@
 package nc.vo.hkjt.srgk.huiguan.zhangdan;
 
+import hd.vo.pub.tools.PuPubVO;
+
+import java.util.HashMap;
+import java.util.Map;
+
 import nc.vo.pub.IVOMeta;
 import nc.vo.pub.SuperVO;
 import nc.vo.pub.lang.UFBoolean;
@@ -8,7 +13,7 @@ import nc.vo.pub.lang.UFDateTime;
 import nc.vo.pub.lang.UFDouble;
 import nc.vo.pubapp.pattern.model.meta.entity.vo.VOMetaFactory;
 
-public class ZhangdanBVO extends SuperVO {
+public class ZhangdanBVO extends SuperVO implements Comparable<ZhangdanBVO> {
 /**
 *≤ø√≈∏∏ID
 */
@@ -1488,4 +1493,25 @@ this.setAttributeValue( ZhangdanBVO.ZHIPIAO,zhipiao);
   public IVOMeta getMetaData() {
     return VOMetaFactory.getInstance().getVOMeta("hkjt.hg_ZhangdanBVO");
   }
+
+@Override
+public int compareTo (ZhangdanBVO other) {
+	
+	Map<String, Integer> map = new HashMap<>();
+	map.put("∂˘ÕØ√≈∆±", 1);
+	map.put("≥¨ ±∂˘ÕØ√≈∆±", 2);
+	map.put("∂˘ÕØ‘°◊ 119‘™", 3);
+	map.put("∂˘ÕØ‘°◊ 169‘™", 4);
+	
+	String thisSqName = this.getSq_name();
+	String otherSqName = other.getSq_name();
+	
+	Integer thisSqIndex = PuPubVO.getInteger_NullAs(map.get(thisSqName), 0);
+	Integer otherSqIndex = PuPubVO.getInteger_NullAs(map.get(otherSqName), 0);
+	
+	if (thisSqIndex > otherSqIndex) return 1;
+	else if (thisSqIndex < otherSqIndex) return -1;
+	
+	return 0;
+}
 }
