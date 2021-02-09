@@ -5,7 +5,9 @@ import hd.vo.pub.tools.PuPubVO;
 import java.util.ArrayList;
 
 import nc.bs.dao.BaseDAO;
+import nc.bs.hkjt.arap.workplugin.ImpLyArapData;
 import nc.bs.hkjt.huiyuan.workplugin.HuiyuanPlugin;
+import nc.bs.hkjt.plugin.UpdateCachePlugin;
 import nc.bs.hkjt.srgk.huiguan.zhangdan.workplugin.ImpZhangDanBill;
 import nc.bs.hkjt.srgk.jiudian.workplugin.ImpJiudianData;
 import nc.bs.hkjt.srgk.jiudian.workplugin.ImpJiudianData_xr;
@@ -268,14 +270,14 @@ public class Hk_fp_billMaintainImpl extends AceHk_fp_billPubServiceImpl
 		/**
 		 * ’Àµ•≤‚ ‘
 		 */
-//		ImpZhangDanBill bb = new ImpZhangDanBill();
-//		Object result = bb.executeTest(obj);
+		ImpZhangDanBill bb = new ImpZhangDanBill();
+		Object result = bb.executeTest(obj);
 		
 		/**
 		 * ª·‘±≤‚ ‘
 		 */
-		HuiyuanPlugin hy = new HuiyuanPlugin();
-		Object result = hy.executeTest(obj);
+//		HuiyuanPlugin hy = new HuiyuanPlugin();
+//		Object result = hy.executeTest(obj);
 		
 		/**
 		 * Œ˜»Ì≤‚ ‘
@@ -306,6 +308,18 @@ public class Hk_fp_billMaintainImpl extends AceHk_fp_billPubServiceImpl
 		 */
 //		ImpLvyunOutData lvyunOut = new ImpLvyunOutData();
 //		Object result = lvyunOut.executeTest(obj);
+		
+		/**
+		 * ¬Ã‘∆”¶ ’’ÀŒÒ
+		 */
+//		ImpLyArapData lvyun = new ImpLyArapData();
+//		Object result = lvyun.executeTest(obj);
+		
+		/**
+		 * µµ∞∏ª∫¥Ê
+		 */
+//		UpdateCachePlugin cache = new UpdateCachePlugin();
+//		Object result = cache.test(obj);
 		
 		return result;
 	}
