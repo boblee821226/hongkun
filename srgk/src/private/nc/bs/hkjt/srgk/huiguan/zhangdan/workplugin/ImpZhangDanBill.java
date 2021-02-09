@@ -25,6 +25,7 @@ import nc.bs.dao.DAOException;
 import nc.bs.framework.common.InvocationInfoProxy;
 import nc.bs.framework.common.NCLocator;
 import nc.bs.framework.core.service.TimeService;
+import nc.bs.hrss.pub.Logger;
 import nc.bs.pub.pa.PreAlertObject;
 import nc.bs.pub.taskcenter.BgWorkingContext;
 import nc.bs.pub.taskcenter.IBackgroundWorkPlugin;
@@ -187,8 +188,8 @@ public class ImpZhangDanBill implements IBackgroundWorkPlugin {
 		};//西山
 		
 		String[] dateP = new String[]{
-			"2021-02-06",
-			"2021-02-06"
+			"2021-02-08",
+			"2021-02-08"
 		};
 		
 		HashMap<String,String> infoMap=getDefaultInfo(pk_orgs[0]);//得到配置表信息
@@ -374,6 +375,8 @@ public class ImpZhangDanBill implements IBackgroundWorkPlugin {
 //				 + " and aa.BillId in ('SN202102060253-06') "
 //				 + " and aa.BillId in ('SN202102060268-06') "
 //				 + " and aa.BillId in ('SN202102060165-06') "
+//				 + " and aa.BillId in ('SN202102080090-06') "
+//				 + " and aa.BillId in ('SN202102080107-06') "
 				 /***END***/
 				;
 			
@@ -425,6 +428,8 @@ public class ImpZhangDanBill implements IBackgroundWorkPlugin {
 //				 + " and aa.BillId in ('SN202102060253-06') "
 //				 + " and aa.BillId in ('SN202102060268-06') "
 //				 + " and aa.BillId in ('SN202102060165-06') "
+//				 + " and aa.BillId in ('SN202102080090-06') "
+//				 + " and aa.BillId in ('SN202102080107-06') "
 				 /***END***/
 				 ;
 			
@@ -456,15 +461,15 @@ public class ImpZhangDanBill implements IBackgroundWorkPlugin {
 				from_map.put("女无柜手牌", 1);
 				from_map.put("亲子手牌", 1);
 				// 超时、增量（将金额加到门票上，不再进行分摊）
-				from_map.put("超时男门票", 0);
-				from_map.put("超时女门票", 0);
-				from_map.put("超时男无柜手牌", 0);
-				from_map.put("超时女无柜手牌", 0);
-				from_map.put("超时亲子手牌", 0);
-				from_map.put("儿童浴资119元", 0);
-				from_map.put("儿童浴资169元", 0);
-				from_map.put("儿童门票", 0);
-				from_map.put("超时儿童门票", 0);
+				from_map.put("超时男门票", 1);
+				from_map.put("超时女门票", 1);
+				from_map.put("超时男无柜手牌", 1);
+				from_map.put("超时女无柜手牌", 1);
+				from_map.put("超时亲子手牌", 1);
+				from_map.put("儿童浴资119元", 1);
+				from_map.put("儿童浴资169元", 1);
+				from_map.put("儿童门票", 1);
+				from_map.put("超时儿童门票", 1);
 				Map<String, Integer> distinct_map = new HashMap<>();
 				distinct_map.put("蓝鹦鹉探险乐园", 1);
 				distinct_map.put("水果吧", 1);
@@ -501,124 +506,147 @@ public class ImpZhangDanBill implements IBackgroundWorkPlugin {
 				// 汇总from的数据，清空from数据
 				// 将数据分摊到 to数据项
 				for (ZhangdanBillVO billVO : aggvos) {
-					Map<String, List<ZhangdanBVO>> bVO_map = new HashMap<>();	// 手牌下待分摊的数据
-					Map<String, ZhangdanBVO> total_map = new HashMap<>();	// 门票合计 key=手牌
-					Map<String, Integer> count_map = new HashMap<>();		// 其它门票去重所用
-					Map<String, Integer> weight_map = new HashMap<>();		// 权重（总） key=手牌
-					Map<String, Integer> weight_sq_map = new HashMap<>();	// 权重（门票） key=手牌+门票
-					ZhangdanBVO[] bVOs = (ZhangdanBVO[])billVO.getChildrenVO();
-//					List<ZhangdanBVO> bVO_list = new ArrayList<>(Arrays.asList(bVOs));
-					// 第一步：循环、准备数据
-					for (ZhangdanBVO bVO : bVOs) {
-						String keyId = bVO.getKeyid();		// 手牌
-						String sqName = bVO.getSq_name();	// 门票
-						String keySq = keyId + "####" + sqName;	// 手牌 + 门票
-						UFDouble shouRu = bVO.getShouru();	// 收入金额
-						// 数据备份，将收入 备份到 vbdef10
-						if (shouRu != null) {
-							bVO.setVbdef10(shouRu.toString());
-						}
-						// 汇总from的数据
-						if (from_map.containsKey(sqName)) {
-							if (!total_map.containsKey(keyId)) {
-								total_map.put(keyId, new ZhangdanBVO());
-							}
-							ZhangdanBVO total = total_map.get(keyId);
-							for (String field : field_list) {
-								total.setAttributeValue(field, 
-										PuPubVO.getUFDouble_NullAsZero(total.getAttributeValue(field))
-									.add(PuPubVO.getUFDouble_NullAsZero(bVO.getAttributeValue(field))));
-								// 清空from数据
-								bVO.setAttributeValue(field, null);
-							}
-							// 权重
-							if (!sqName.startsWith("超时")
-							 || !sqName.startsWith("儿童")
-							) {
-								if (!weight_map.containsKey(keyId)) {
-									weight_map.put(keyId, from_map.get(sqName));
-								} else {
-									weight_map.put(keyId, weight_map.get(keyId) + from_map.get(sqName));
-								}
-								if (!weight_sq_map.containsKey(keySq)) {
-									weight_sq_map.put(keySq, from_map.get(sqName));
-								} else {
-									weight_sq_map.put(keySq, weight_sq_map.get(keySq) + from_map.get(sqName));
-								}
-								if (!bVO_map.containsKey(keyId)) {
-									List<ZhangdanBVO> list_temp = new ArrayList<>();
-									list_temp.add(bVO);
-									bVO_map.put(keyId, list_temp);
-								} else {
-									bVO_map.get(keyId).add(bVO);
-								}
-							}
-						}
-						// 去重
-						if (distinct_map.containsKey(sqName)) {
-							// 检查收入字段是否为空，如果为空就说明是需要分摊的。
-							if (shouRu == null && !count_map.containsKey(keySq)) {
-								count_map.put(keySq, 1);
-								// 权重
-								if (!weight_map.containsKey(keyId)) {
-									weight_map.put(keyId, distinct_map.get(sqName));
-								} else {
-									weight_map.put(keyId, weight_map.get(keyId) + distinct_map.get(sqName));
-								}
-								if (!weight_sq_map.containsKey(keySq)) {
-									weight_sq_map.put(keySq, distinct_map.get(sqName));
-								} else {
-									weight_sq_map.put(keySq, weight_sq_map.get(keySq) + distinct_map.get(sqName));
-								}
-								if (!bVO_map.containsKey(keyId)) {
-									List<ZhangdanBVO> list_temp = new ArrayList<>();
-									list_temp.add(bVO);
-									bVO_map.put(keyId, list_temp);
-								} else {
-									bVO_map.get(keyId).add(bVO);
-								}
-							} else {
-//								bVO_list.remove(bVO);
-							}
-						}
-					}
-					// 第二步：进行分摊
-					for (Map.Entry<String, List<ZhangdanBVO>> entry : bVO_map.entrySet()) {
-						String keyId = entry.getKey();
-						ZhangdanBVO totalData = total_map.get(keyId);	// 待分摊总额
-						ZhangdanBVO sharedData = new ZhangdanBVO();	// 已经分摊的
-						List<ZhangdanBVO> listTemp = entry.getValue();
-						Integer weight = weight_map.get(keyId);	// 该手牌的总权重
-						for (int i = 0; i < listTemp.size(); i++) {
-							// 进行分摊处理
-							ZhangdanBVO bVO = listTemp.get(i);
+					try {
+						Map<String, List<ZhangdanBVO>> bVO_map = new HashMap<>();	// 手牌下待分摊的数据
+						Map<String, ZhangdanBVO> total_map = new HashMap<>();	// 门票合计 key=手牌
+						Map<String, Integer> count_map = new HashMap<>();		// 其它门票去重所用
+						Map<String, Integer> weight_map = new HashMap<>();		// 权重（总） key=手牌
+						Map<String, Integer> weight_sq_map = new HashMap<>();	// 权重（门票） key=手牌+门票
+						ZhangdanBVO[] bVOs = (ZhangdanBVO[])billVO.getChildrenVO();
+	//					List<ZhangdanBVO> bVO_list = new ArrayList<>(Arrays.asList(bVOs));
+						// 第一步：循环、准备数据
+						for (ZhangdanBVO bVO : bVOs) {
+							String keyId = bVO.getKeyid();		// 手牌
 							String sqName = bVO.getSq_name();	// 门票
 							String keySq = keyId + "####" + sqName;	// 手牌 + 门票
-							Integer weightSq = weight_sq_map.get(keySq);	// 权重（门票） key=手牌+门票
-							for (String field : field_list) {
-								if (i != listTemp.size() - 1) {
-									// 非最后一笔，按权重分摊
-									UFDouble money = PuPubVO.getUFDouble_NullAsZero(totalData.getAttributeValue(field));
-									UFDouble share = money.multiply(weightSq).div(weight).setScale(2, UFDouble.ROUND_HALF_UP);
-									sharedData.setAttributeValue(field,
-										PuPubVO.getUFDouble_NullAsZero(sharedData.getAttributeValue(field))
-											.add(share));
-									bVO.setAttributeValue(field, share);
+							UFDouble shouRu = bVO.getShouru();	// 收入金额
+							// 数据备份，将收入 备份到 vbdef10
+							if (shouRu != null) {
+								bVO.setVbdef10(shouRu.toString());
+							}
+							// 汇总from的数据
+							if (from_map.containsKey(sqName)) {
+								if (!total_map.containsKey(keyId)) {
+									total_map.put(keyId, new ZhangdanBVO());
+								}
+								ZhangdanBVO total = total_map.get(keyId);
+								for (String field : field_list) {
+									total.setAttributeValue(field, 
+											PuPubVO.getUFDouble_NullAsZero(total.getAttributeValue(field))
+										.add(PuPubVO.getUFDouble_NullAsZero(bVO.getAttributeValue(field))));
+									// 清空from数据
+									bVO.setAttributeValue(field, null);
+								}
+								// 权重
+								if (!sqName.startsWith("超时")
+								 || !sqName.startsWith("儿童")
+								) {
+									if (!weight_map.containsKey(keyId)) {
+										weight_map.put(keyId, from_map.get(sqName));
+									} else {
+										weight_map.put(keyId, weight_map.get(keyId) + from_map.get(sqName));
+									}
+									if (!weight_sq_map.containsKey(keySq)) {
+										weight_sq_map.put(keySq, from_map.get(sqName));
+									} else {
+										weight_sq_map.put(keySq, weight_sq_map.get(keySq) + from_map.get(sqName));
+									}
+									if (!bVO_map.containsKey(keyId)) {
+										List<ZhangdanBVO> list_temp = new ArrayList<>();
+										list_temp.add(bVO);
+										bVO_map.put(keyId, list_temp);
+									} else {
+										bVO_map.get(keyId).add(bVO);
+									}
+								}
+								// 超时的处理
+								// 如果有超时，但是没有原始，则也需要添加上。 
+								// 前提是 已经排序，确保原始的在前，超时的在后。
+								if (sqName.startsWith("超时")) {
+									if (!weight_map.containsKey(keyId)) {
+										weight_map.put(keyId, from_map.get(sqName));
+									}
+									if (!weight_sq_map.containsKey(keySq)) {
+										weight_sq_map.put(keySq, from_map.get(sqName));
+									}
+								}
+							}
+							// 去重
+							if (distinct_map.containsKey(sqName)) {
+								// 检查收入字段是否为空，如果为空就说明是需要分摊的。
+								if (shouRu == null && !count_map.containsKey(keySq)) {
+									count_map.put(keySq, 1);
+									// 权重
+									if (!weight_map.containsKey(keyId)) {
+										weight_map.put(keyId, distinct_map.get(sqName));
+									} else {
+										weight_map.put(keyId, weight_map.get(keyId) + distinct_map.get(sqName));
+									}
+									if (!weight_sq_map.containsKey(keySq)) {
+										weight_sq_map.put(keySq, distinct_map.get(sqName));
+									} else {
+										weight_sq_map.put(keySq, weight_sq_map.get(keySq) + distinct_map.get(sqName));
+									}
+									if (!bVO_map.containsKey(keyId)) {
+										List<ZhangdanBVO> list_temp = new ArrayList<>();
+										list_temp.add(bVO);
+										bVO_map.put(keyId, list_temp);
+									} else {
+										bVO_map.get(keyId).add(bVO);
+									}
 								} else {
-									// 最后一笔 进行倒挤
-									UFDouble share = PuPubVO.getUFDouble_NullAsZero(totalData.getAttributeValue(field))
-											.sub(PuPubVO.getUFDouble_NullAsZero(sharedData.getAttributeValue(field)));
-									bVO.setAttributeValue(field, share);
+	//								bVO_list.remove(bVO);
 								}
 							}
 						}
-					}
-					// 第三步：数据整理，将确认收入为0的进行清空
-					for (ZhangdanBVO bVO : bVOs) {
-						UFDouble shouRu = bVO.getShouru();
-						if (shouRu != null && shouRu.compareTo(UFDouble.ZERO_DBL) == 0) {
-							bVO.setShouru(null);
+						// 第二步：进行分摊
+						for (Map.Entry<String, List<ZhangdanBVO>> entry : bVO_map.entrySet()) {
+							String keyId = entry.getKey();
+							ZhangdanBVO totalData = total_map.get(keyId);	// 待分摊总额
+							if (totalData == null) {
+								// 如果 合计为空，则不需要拆分
+								continue;
+							}
+							ZhangdanBVO sharedData = new ZhangdanBVO();	// 已经分摊的
+							List<ZhangdanBVO> listTemp = entry.getValue();
+							Integer weight = weight_map.get(keyId);	// 该手牌的总权重
+							if (weight == null) {
+								// 如果总权重为空，说明 没有门票了，不需要拆分
+								continue;
+							}
+							for (int i = 0; i < listTemp.size(); i++) {
+								// 进行分摊处理
+								ZhangdanBVO bVO = listTemp.get(i);
+								String sqName = bVO.getSq_name();	// 门票
+								String keySq = keyId + "####" + sqName;	// 手牌 + 门票
+								Integer weightSq = weight_sq_map.get(keySq);	// 权重（门票） key=手牌+门票
+								for (String field : field_list) {
+									if (i != listTemp.size() - 1) {
+										// 非最后一笔，按权重分摊
+										UFDouble money = PuPubVO.getUFDouble_NullAsZero(totalData.getAttributeValue(field));
+										UFDouble share = money.multiply(weightSq).div(weight).setScale(2, UFDouble.ROUND_HALF_UP);
+										sharedData.setAttributeValue(field,
+											PuPubVO.getUFDouble_NullAsZero(sharedData.getAttributeValue(field))
+												.add(share));
+										bVO.setAttributeValue(field, share);
+									} else {
+										// 最后一笔 进行倒挤
+										UFDouble share = PuPubVO.getUFDouble_NullAsZero(totalData.getAttributeValue(field))
+												.sub(PuPubVO.getUFDouble_NullAsZero(sharedData.getAttributeValue(field)));
+										bVO.setAttributeValue(field, share);
+									}
+								}
+							}
 						}
+						// 第三步：数据整理，将确认收入为0的进行清空
+						for (ZhangdanBVO bVO : bVOs) {
+							UFDouble shouRu = bVO.getShouru();
+							if (shouRu != null && shouRu.compareTo(UFDouble.ZERO_DBL) == 0) {
+								bVO.setShouru(null);
+							}
+						}
+					} catch (Exception ex) {
+						throw new BusinessException("账单号：" + billVO.getParentVO().getVbillcode() + ex);
 					}
 //					System.out.println(total_map);
 				}
@@ -732,7 +760,8 @@ public class ImpZhangDanBill implements IBackgroundWorkPlugin {
 		map_child.put("儿童门票", null);
 		map_child.put("超时儿童门票", null);
 		Map<String, String> map_qinzi = new HashMap<>();	// 亲子
-		map_qinzi.put("亲子手牌", "超时亲子手牌");
+		map_qinzi.put("亲子手牌", "女门票");
+		map_qinzi.put("超时亲子手牌", "女门票");
 		Map<String, String> map_distinct = new HashMap<>();	// 要分摊到的项目上
 		map_distinct.put("蓝鹦鹉探险乐园", "蓝鹦鹉探险乐园（拆分）");
 		map_distinct.put("元气空间门票", "元气空间门票（拆分）");
