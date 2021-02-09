@@ -150,14 +150,22 @@ public class N264XService {
 		UFDateTime currTime = new UFDateTime();	// 当前时间
 		String djbh = srcHVO.getDjbh();			// 单据编号
 		UFDate djrq = new UFDateTime(srcHVO.getDjrq()).getDate();	// 单据日期
-		String djbt = srcHVO.getDjbt();			// 单据标题
+		String bt = srcHVO.getBt();			// 标题
 		String bz = "1002Z0100000000001K1";		// 币种
 		String pk_group = InvocationInfoProxy.getInstance().getGroupId();	// 集团
+		String bxdwStr = srcHVO.getFycdgs();	// 报销单位（除了投资单，用投资方，其它的都用费用承担公司）
 		String fycdgsStr = srcHVO.getFycdgs();	// 费用承担公司（除了人员所在公司，其它的都用费用承担公司）
 		String fycdbmStr = srcHVO.getFycdbm();	// 费用承担部门
 		String szgsStr = srcHVO.getSzgs();		// 所在公司（只是 人员所在公司）
 		String szbmStr = srcHVO.getSzbm();		// 所在部门
 		UFBoolean isShare = PuPubVO.getUFBoolean_NullAs(srcHVO.getFt(), UFBoolean.FALSE);	// 是否分摊
+		
+		if ("264X-Cxx-06".equals(billTypeCode)) {
+			// 投资业务审批单，对 报销单位 和 费用承担公司 重新赋值
+			bxdwStr = srcHVO.getTzf();
+			fycdgsStr = srcHVO.getSzgs();
+			fycdbmStr = srcHVO.getSzbm();
+		}
 		
 		if (
 			ApiPubInfo.CACHE_DOC.get(account)==null
@@ -174,19 +182,28 @@ public class N264XService {
 		if (szgs_map == null) {throw new BusinessException("所在公司不匹配：" + szgsStr);}
 		String szgs = szgs_map.get("id");
 		String szgs_v = szgs_map.get("vid");
+		
 		HashMap<String,String> szbm_map = ApiPubInfo.CACHE_DOC.get(account).get("org_dept").get(szbmStr);
 		if (szbm_map == null) {throw new BusinessException("所在部门不匹配：" + szbmStr);}
 		String szbm = szbm_map.get("id");
 		String szbm_v = szbm_map.get("vid");
+		
 		HashMap<String,String> fycdgs_map = ApiPubInfo.CACHE_DOC.get(account).get("org_orgs").get(fycdgsStr);
 		if (fycdgs_map == null) {throw new BusinessException("费用承担公司不匹配：" + fycdgsStr);}
 		String fycdgs = fycdgs_map.get("id");
 		String fycdgs_v = fycdgs_map.get("vid");
+		
+		HashMap<String,String> bxdw_map = ApiPubInfo.CACHE_DOC.get(account).get("org_orgs").get(bxdwStr);
+		if (bxdw_map == null) {throw new BusinessException("报销单位不匹配：" + bxdwStr);}
+		String bxdw = bxdw_map.get("id");
+		String bxdw_v = bxdw_map.get("vid");
+		
 		String fkyhzh = fycdgs_map.get("account");		// 付款银行账户
 		HashMap<String,String> fycdbm_map = ApiPubInfo.CACHE_DOC.get(account).get("org_dept").get(fycdbmStr);
 		if (fycdbm_map == null) {throw new BusinessException("费用承担部门不匹配：" + fycdbmStr);}
 		String fycdbm = fycdbm_map.get("id");
 		String fycdbm_v = fycdbm_map.get("vid");
+		
 		String userId = InvocationInfoProxy.getInstance().getUserId();
 		String zdrStr = srcHVO.getZdr();	// 制单人
 		HashMap<String,String> zdr_map = ApiPubInfo.CACHE_DOC.get(account).get("bd_psndoc").get(zdrStr);
@@ -291,11 +308,11 @@ public class N264XService {
 		distHVO.setDr(0);
 		
 		distHVO.setPk_group(pk_group);	// 集团
-		distHVO.setPk_org(fycdgs);
-		distHVO.setPk_org_v(fycdgs_v);
+		distHVO.setPk_org(bxdw);		// 报销组织
+		distHVO.setPk_org_v(bxdw_v);	// 报销组织v
+		distHVO.setPk_fiorg(bxdw);		// 报销财务组织
 		distHVO.setPk_payorg(fycdgs);
 		distHVO.setPk_payorg_v(fycdgs_v);
-		distHVO.setPk_fiorg(fycdgs);
 		distHVO.setFydwbm(fycdgs);		// 费用承担公司
 		distHVO.setFydwbm_v(fycdgs_v);
 		
@@ -350,7 +367,7 @@ public class N264XService {
 		distHVO.setSxbz(0);			// 生效标志
 		distHVO.setSzxmid(szxm);	// 收支项目
 		
-		distHVO.setZyx12(djbt);		// 标题
+		distHVO.setZyx12(bt);		// 标题
 		distHVO.setZyx18("1001N51000000011M2L4"); // 是否结算中心付款（暂时默认为否）
 		distHVO.setZyx26(url);	// url
 		
@@ -411,6 +428,46 @@ public class N264XService {
 		String billTypeCode = PuPubVO.getString_TrimZeroLenAsNull(param.get("billTypeCode"));
 		
 		nc.vo.ep.bx.BXBusItemVO distBVO = new nc.vo.ep.bx.BXBusItemVO();
+		
+		if ("264X-Cxx-06".equals(billTypeCode)) {
+			// 投资单：金额重新赋值
+			jshj = PuPubVO.getUFDouble_NullAsZero(srcBVO.getTzje1());	// 投资金额
+		} else if ("264X-Cxx-07".equals(billTypeCode)) {
+			// 差旅费：字段赋值
+			/**
+			 * cfrq	出发日期	"项目主键	defitem1"
+				fhrq	到达日期	"项目主键	defitem2"
+				ccdd	出差地点	"项目主键	defitem4"
+				ccts	出差天数	"项目主键	defitem9"
+				jtgj	交通工具	"项目主键	defitem8"
+				jtf	交通费	"项目主键	defitem10"
+				zsfy	住宿费用	"项目主键	defitem11"
+				bxf	保险费	"项目主键	defitem12"
+				cfbz	餐费补助	"项目主键	defitem13"
+				qtfy	其他费用	"项目主键	defitem14"
+			 */
+			String cfrq = srcBVO.getCfrq();	// 出发日期
+			String fhrq = srcBVO.getFhrq();	// 到达日期
+			String ccdd = srcBVO.getCcdd();	// 出差地点
+			String jtgj = srcBVO.getJtgj();	// 交通工具
+			UFDouble ccts = PuPubVO.getUFDouble_NullAsZero(srcBVO.getCcts()); // 出差天数
+			UFDouble jtf = PuPubVO.getUFDouble_NullAsZero(srcBVO.getJtf()); // 交通费
+			UFDouble zsfy = PuPubVO.getUFDouble_NullAsZero(srcBVO.getZsfy()); // 住宿费用
+			UFDouble bxf = PuPubVO.getUFDouble_NullAsZero(srcBVO.getBxf()); // 保险费
+			UFDouble cfbz = PuPubVO.getUFDouble_NullAsZero(srcBVO.getCfbz()); // 餐费补助
+			UFDouble qtfy = PuPubVO.getUFDouble_NullAsZero(srcBVO.getQtfy()); // 其他费用
+			
+			distBVO.setDefitem1(cfrq);
+			distBVO.setDefitem2(fhrq);
+			distBVO.setDefitem4(ccdd);
+			distBVO.setDefitem9(ccts);
+			distBVO.setDefitem8(jtgj);
+			distBVO.setDefitem10(jtf);
+			distBVO.setDefitem11(zsfy);
+			distBVO.setDefitem12(bxf);
+			distBVO.setDefitem13(cfbz);
+			distBVO.setDefitem14(qtfy);
+		}
 		
 		distBVO.setDefitem5(sxsm);				// 事项说明
 		distBVO.setDefitem7(jshj.toString());	// 价税合计
