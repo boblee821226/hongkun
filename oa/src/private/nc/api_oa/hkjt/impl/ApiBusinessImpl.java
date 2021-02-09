@@ -2,6 +2,8 @@ package nc.api_oa.hkjt.impl;
 
 import java.util.HashMap;
 
+import com.alibaba.fastjson.JSONObject;
+
 import nc.api.zhiyun.vo.RequestParamVO;
 import nc.api_oa.hkjt.impl.service.DocService;
 import nc.api_oa.hkjt.impl.service.PublicService;
@@ -209,7 +211,7 @@ public class ApiBusinessImpl implements ApiBusinessItf {
 			paramObj.setBillType("DOC");
 			paramObj.setAction("WRITE");
 			try {
-				String res = MyHttpUtil.doPost(url, paramObj);
+				String res = MyHttpUtil.doPost(url, JSONObject.toJSONString(paramObj));
 				System.out.println("==res:" + res + "==");
 			} catch (Exception ex) {
 				
