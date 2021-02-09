@@ -29,6 +29,8 @@ public class BxHeadVO implements Serializable {
 	private String gys;			// 收款-供应商 y
 	private String kh;			// 收款-客户 y
 	private String ksyhzh;		// 收款-客商-银行账户 y
+	private String bt;	// 标题（日常费用审批单   工资福利审批单  往来付款审批单  zdy12）
+	private String url;	// oa路径
 	/**
 	 * 工程付款
 	 */
@@ -40,8 +42,15 @@ public class BxHeadVO implements Serializable {
 	 * 分摊费用
 	 */
 	private Boolean ft;	// 是否分摊
+	/**
+	 * 投资业务审批单
+	 */
+	private Double tzje1;	// 投资金额1
+	private String tzf;		// 投资方
+	/**
+	 * 差旅费审批单
+	 */
 	
-	private String url;	// oa路径
 	
 	public String getDjbh() {
 		return djbh;
@@ -180,6 +189,24 @@ public class BxHeadVO implements Serializable {
 	}
 	public void setFt(Boolean ft) {
 		this.ft = ft;
+	}
+	public String getBt() {
+		return bt;
+	}
+	public void setBt(String bt) {
+		this.bt = bt;
+	}
+	public Double getTzje1() {
+		return tzje1;
+	}
+	public void setTzje1(Double tzje1) {
+		this.tzje1 = tzje1;
+	}
+	public String getTzf() {
+		return tzf;
+	}
+	public void setTzf(String tzf) {
+		this.tzf = tzf;
 	}
 	
 }
