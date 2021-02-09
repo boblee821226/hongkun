@@ -77,6 +77,7 @@ public class SendAction extends NCAction {
 	static String baseURL = "http://39.102.46.51/api/nctooa";
 	private static String createFlowURL = baseURL + "/createFlow";
 	private static String uploadFileURL = baseURL + "/uploadFile";
+	private static String pre_tail = "##preTail##";
 	/**
 	 * 所有可能的单据类型字段
 	 */
@@ -200,7 +201,7 @@ public class SendAction extends NCAction {
 		req.setBillType(workflowid);	// oa的单据类型
 		req.setAction("WRITE");
 		req.setData(billDataStr);
-		String res = MyHttpUtil.doPost(createFlowURL, req);
+		String res = MyHttpUtil.doPost(createFlowURL, JSONObject.toJSONString(req));
 		CreateFlowResponse resObj = JSONObject.parseObject(res,
 				CreateFlowResponse.class);
 		if ("1".equals(resObj.getStatus())) {
@@ -314,12 +315,23 @@ public class SendAction extends NCAction {
 		for (Entry<String, String> one : Mapper_head.entrySet()) {
 			String ncKey = one.getValue();
 			String oaKey = one.getKey();
+			boolean isTail = ncKey.startsWith(pre_tail);
+			if (isTail) ncKey = ncKey.replaceFirst(pre_tail, "");
 			try {
-				String ncValue = PuPubVO.getString_TrimZeroLenAsNull(
-						getEditor().getBillCardPanel()
-						.getHeadItem(ncKey)
-						.getValueObject()
-						);
+				String ncValue;
+				if (!isTail) {
+					ncValue = PuPubVO.getString_TrimZeroLenAsNull(
+							getEditor().getBillCardPanel()
+							.getHeadItem(ncKey)
+							.getValueObject()
+							);
+				} else {
+					ncValue = PuPubVO.getString_TrimZeroLenAsNull(
+							getEditor().getBillCardPanel()
+							.getTailItem(ncKey)
+							.getValueObject()
+							);
+				}
 				oa_head.put(oaKey, ncValue);
 			} catch (Exception ex) {
 				throw new BusinessException("表头【" + ncKey + "】字段不存在");
@@ -431,8 +443,16 @@ public class SendAction extends NCAction {
 		HkOaSettingB1VO[] b1VOs = settingVO.getB1VOs();
 		HkOaSettingB2VO[] b2VOs = settingVO.getB2VOs();
 		for (HkOaSettingHVO hVO : hVOs) {
-			if (PuPubVO.getUFBoolean_NullAs(hVO.getIs_tail(), UFBoolean.FALSE).booleanValue()) continue;
-			Mapper_head.put(hVO.getField_oa(), hVO.getField_nc());
+			// 制单人  和  标题  跳过
+			if (PuPubVO.getUFBoolean_NullAs(hVO.getIs_creator(), UFBoolean.FALSE).booleanValue()) continue;
+			if (PuPubVO.getUFBoolean_NullAs(hVO.getIs_title(), UFBoolean.FALSE).booleanValue()) continue;
+
+			String value = hVO.getField_nc();
+			// 是表尾 ，需要加前缀做处理
+			if (PuPubVO.getUFBoolean_NullAs(hVO.getIs_tail(), UFBoolean.FALSE).booleanValue()) {
+				value = pre_tail + value;
+			}
+			Mapper_head.put(hVO.getField_oa(), value);
 		}
 		for (HkOaSettingB1VO b1VO : b1VOs) {
 			Mapper_item.put(b1VO.getField_oa(), b1VO.getField_nc());
