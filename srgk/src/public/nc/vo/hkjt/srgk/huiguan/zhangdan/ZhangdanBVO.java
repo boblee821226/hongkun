@@ -7,8 +7,6 @@ import java.util.Map;
 
 import nc.vo.pub.IVOMeta;
 import nc.vo.pub.SuperVO;
-import nc.vo.pub.lang.UFBoolean;
-import nc.vo.pub.lang.UFDate;
 import nc.vo.pub.lang.UFDateTime;
 import nc.vo.pub.lang.UFDouble;
 import nc.vo.pubapp.pattern.model.meta.entity.vo.VOMetaFactory;
@@ -1498,10 +1496,20 @@ this.setAttributeValue( ZhangdanBVO.ZHIPIAO,zhipiao);
 public int compareTo (ZhangdanBVO other) {
 	
 	Map<String, Integer> map = new HashMap<>();
-	map.put("儿童门票", 1);
-	map.put("超时儿童门票", 2);
+	map.put("男门票", 1);
+	map.put("女门票", 1);
+	map.put("男无柜手牌", 1);
+	map.put("女无柜手牌", 1);
+	map.put("亲子手牌", 1);
+	map.put("超时男门票", 2);
+	map.put("超时女门票", 2);
+	map.put("超时男无柜手牌", 2);
+	map.put("超时女无柜手牌", 2);
+	map.put("超时亲子手牌", 2);
+	map.put("儿童门票", 3);
 	map.put("儿童浴资119元", 3);
-	map.put("儿童浴资169元", 4);
+	map.put("儿童浴资169元", 3);
+	map.put("超时儿童门票", 4);
 	
 	String thisSqName = this.getSq_name();
 	String otherSqName = other.getSq_name();
