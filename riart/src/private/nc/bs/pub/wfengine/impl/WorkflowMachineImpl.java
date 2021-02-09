@@ -1436,7 +1436,6 @@ public class WorkflowMachineImpl implements IWorkflowMachine {
 				 * HK 2020年11月12日21:30:47
 				 */
 				if (true) {
-					BaseDAO dao = new BaseDAO();
 					String id = paraVo.m_billId;
 					String type = paraVo.m_billType;
 					if (
@@ -1444,9 +1443,10 @@ public class WorkflowMachineImpl implements IWorkflowMachine {
 					) {
 						// 并且是在配置表里存在的，才进行以下操作。
 						boolean isExist = false;
-						HkOaSettingVO[] vos = (HkOaSettingVO[])(new HYPubBO().queryByCondition(HkOaSettingVO.class, "dr=0 and parentbilltype = '"+type+"'"));
+						HkOaSettingVO[] vos = (HkOaSettingVO[])(new HYPubBO().queryByCondition(HkOaSettingVO.class, "dr=0 and pk_billtypecode = '"+type+"'"));
 						if (vos != null && vos.length > 0) isExist = true;
 						if (isExist) {
+							BaseDAO dao = new BaseDAO();
 							String updateSQL_1 = 
 								" update sm_msg_content " +
 								" set receiver = receiver || '-oa' " +
