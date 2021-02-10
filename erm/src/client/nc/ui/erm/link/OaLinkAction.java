@@ -77,12 +77,13 @@ public class OaLinkAction extends NCAction {
 	@Override
 	protected boolean isActionEnable() {
 		if (this.getBillType() != null && this.getBillType().startsWith("OA")) {
-			if (getEditor() == null || getEditor().getBillCardPanel() == null) return false;
-			BillItem item = getEditor().getBillCardPanel().getHeadItem("oa_status");
-			if (item != null) {
-				String itemValue = PuPubVO.getString_TrimZeroLenAsNull(item.getValueObject());
-				if ("�ѹ鵵".equals(itemValue)) return true;
-			}
+//			if (getEditor() == null || getEditor().getBillCardPanel() == null) return false;
+//			BillItem item = getEditor().getBillCardPanel().getHeadItem("oa_status");
+//			if (item != null) {
+//				String itemValue = PuPubVO.getString_TrimZeroLenAsNull(item.getValueObject());
+//				if ("�ѹ鵵".equals(itemValue)) return true;
+//			}
+			return true;
 		} else {
 			JKBXVO selectedData = (JKBXVO) getModel().getSelectedData();
 			if (selectedData == null) {
@@ -95,7 +96,7 @@ public class OaLinkAction extends NCAction {
 			}
 			return true;
 		}
-		return false;
+//		return false;
 	}
 	
 	@Override
