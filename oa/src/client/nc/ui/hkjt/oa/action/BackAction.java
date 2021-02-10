@@ -162,12 +162,14 @@ public class BackAction extends NCAction {
 	 */
 	@Override
 	protected boolean isActionEnable() {
-		if (getEditor() == null || getEditor().getBillCardPanel() == null) return false;
-		BillItem item = getEditor().getBillCardPanel().getHeadItem("oa_status");
-		if (item != null) {
-			String itemValue = PuPubVO.getString_TrimZeroLenAsNull(item.getValueObject());
-			if ("已发送".equals(itemValue)) return true;
-		}
-		return false;
+//		if (!"收回OA".equals(this.getBtnName())) return false;
+//		if (getEditor() == null || getEditor().getBillCardPanel() == null) return false;
+//		BillItem item = getEditor().getBillCardPanel().getHeadItem("oa_status");
+//		if (item != null) {
+//			String itemValue = PuPubVO.getString_TrimZeroLenAsNull(item.getValueObject());
+//			if ("已发送".equals(itemValue)) return true;
+//		}
+//		return false;
+		return true;
 	}
 }

@@ -762,13 +762,14 @@ public class SendAction extends NCAction {
 	@Override
 	protected boolean isActionEnable() {
 //		this.getModel().getAppUiState() == AppUiState.NOT_EDIT;
-		if (getEditor() == null || getEditor().getBillCardPanel() == null) return false;
-		BillItem item = getEditor().getBillCardPanel().getHeadItem("oa_status");
-		if (item != null) {
-			String itemValue = PuPubVO.getString_TrimZeroLenAsNull(item.getValueObject());
-			if (itemValue == null) return true;
-		}
-		return false;
+//		if (getEditor() == null || getEditor().getBillCardPanel() == null) return false;
+//		BillItem item = getEditor().getBillCardPanel().getHeadItem("oa_status");
+//		if (item != null) {
+//			String itemValue = PuPubVO.getString_TrimZeroLenAsNull(item.getValueObject());
+//			if (itemValue == null) return true;
+//		}
+//		return false;
+		return true;
 	}
 	
 }
