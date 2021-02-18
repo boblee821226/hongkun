@@ -2938,8 +2938,12 @@ public class Hg_hzshujuMaintainImpl implements IHG_hzshujuMaintain {
 				+ first_org
 				+ "' as pk_org, '"
 				+ begindate.substring(0, 10)
-				+ " 00:00:00' dbilldate,count(*) checkoutperson from hk_srgk_hg_zhangdan h left join ");
-		sb.append("hk_srgk_hg_zhangdan_b b on h.pk_hk_dzpt_hg_zhangdan=b.pk_hk_dzpt_hg_zhangdan where nvl(h.dr,0)=0 and nvl(b.dr,0)=0  ");
+				+ " 00:00:00' dbilldate," +
+				" count(0) checkoutperson " +
+				" from hk_srgk_hg_zhangdan h " +
+				" left join ");
+		sb.append("hk_srgk_hg_zhangdan_b b on h.pk_hk_dzpt_hg_zhangdan=b.pk_hk_dzpt_hg_zhangdan" +
+				" where h.dr=0 and b.dr=0  ");
 		sb.append(" and b.sq_name in ('男门票','女门票','浴资','男无柜手牌','女无柜手牌','亲子手牌')" +
 				  " and h.pk_org in (" + pk_org
 				+ ") ");
@@ -2960,6 +2964,56 @@ public class Hg_hzshujuMaintainImpl implements IHG_hzshujuMaintain {
 			}
 		}
 
+		/**
+		 * 手工数据，可以进行 调整进店人数。
+		 * HK 2021年2月18日22:43:11
+		 * select sg.pk_org,
+			substr(sg.dbilldate,1,10) || ' 00:00:00' as dbilldate,
+			to_number(sg.vdef01) checkoutperson 
+			from hk_srgk_hg_sgshuju sg
+			where sg.dr = 0
+			and sg.ibillstatus = 1
+			and to_date(sg.dbilldate,'yyyy-mm-dd hh24:mi:ss') >= to_date('2021-02-17 00:00:00','yyyy-mm-dd hh24:mi:ss')
+			and to_date(sg.dbilldate,'yyyy-mm-dd hh24:mi:ss') <= to_date('2021-02-17 23:59:59','yyyy-mm-dd hh24:mi:ss') 
+			and nvl(sg.vdef10, '~') in ('N','~')
+			and sg.vdef01 <> '~'
+		 */
+		{
+			StringBuffer sg_SQL = new StringBuffer("select ")
+				.append(" sg.pk_org, ")
+				.append(" substr(sg.dbilldate,1,10) || ' 00:00:00' as dbilldate, ")
+				.append(" to_number(sg.vdef01) checkoutperson ")
+				.append(" from hk_srgk_hg_sgshuju sg ")
+				.append(" where sg.dr = 0 ")
+				.append(" and sg.ibillstatus = 1 ")
+				.append(" and sg.pk_org = '").append(first_org).append("' ")
+				.append(" and substr(sg.dbilldate,1,10) between '")
+							.append(begindate)
+							.append("' and '")
+							.append(enddate)
+							.append("' ")
+				.append(" and nvl(sg.vdef10, '~') in ('N','~') ")
+				.append(" and nvl(sg.vdef01, '~') <> '~' ")
+			;
+			List<BanCiVO> sg_list = (List<BanCiVO>) getBD().executeQuery(
+					sg_SQL.toString(), new BeanListProcessor(BanCiVO.class));
+			if (sg_list != null && !sg_list.isEmpty()) {
+				for (int i = 0; i < sg_list.size(); i++) {
+					BanCiVO vo = sg_list.get(i);
+					String org = vo.getPk_org();
+					String dbilldate = vo.getDbilldate().toString();
+					Integer checkoutperson = vo.getCheckoutperson();
+					String key = org + dbilldate;
+					if (map.containsKey(key)) {
+						map.put(key, map.get(key) + checkoutperson);
+					} else {
+						map.put(key, checkoutperson);
+					}
+				}
+			}
+		}
+		/***END***/
+		
 		return map;
 	}
 
