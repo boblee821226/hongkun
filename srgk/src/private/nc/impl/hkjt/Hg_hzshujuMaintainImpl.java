@@ -178,7 +178,7 @@ public class Hg_hzshujuMaintainImpl implements IHG_hzshujuMaintain {
 				+ begindate + "', 0, 10), 'yyyy-mm-dd hh24:mi:ss') ");
 		sb.append("and to_date(substr(zhangdan.dbilldate, 0, 10), 'yyyy-mm-dd hh24:mi:ss') <=to_date(substr('"
 				+ enddate + "', 0, 10), 'yyyy-mm-dd hh24:mi:ss') ");
-		sb.append(" and nvl(zhangdan.dr, 0) = 0 and nvl(zhangdanb.dr, 0) = 0 and zhangdanb.sqfl_name not in ('会员卡','套餐方案') ");
+		sb.append(" and nvl(zhangdan.dr, 0) = 0 and nvl(zhangdanb.dr, 0) = 0 and nvl(zhangdanb.sqfl_name,'~') not in ('会员卡','套餐方案','次卡套餐打折') ");
 		if (deptsql != null && deptsql.length() > 0) {
 			sb.append("and zhangdanb.bm_id in (" + deptsql + ")");
 		}
@@ -263,7 +263,7 @@ public class Hg_hzshujuMaintainImpl implements IHG_hzshujuMaintain {
 		sb.append(" from hk_srgk_hg_zhangdan zhangdan ");
 		sb.append(" left join hk_srgk_hg_zhangdan_b zhangdanb ");
 		sb.append(" on zhangdan.pk_hk_dzpt_hg_zhangdan = zhangdanb.pk_hk_dzpt_hg_zhangdan ");
-		sb.append(" where zhangdanb.sqfl_name not in ('会员卡','套餐方案','次卡套餐打折') and zhangdan.pk_org in ("
+		sb.append(" where nvl(zhangdanb.sqfl_name,'~') not in ('会员卡','套餐方案','次卡套餐打折') and zhangdan.pk_org in ("
 				+ orgsql
 				+ ") and  to_date(substr(zhangdan.dbilldate, 0, 10),'yyyy-mm-dd hh24:mi:ss')>=to_date(substr('"
 				+ begindate + "', 0, 10),'yyyy-mm-dd hh24:mi:ss')");
@@ -2736,7 +2736,7 @@ public class Hg_hzshujuMaintainImpl implements IHG_hzshujuMaintain {
 				+ begindate.substring(0, 10)
 				+ " 00:00:00' dbilldate,b.sqfl_name, sum(nvl(b.xianjin,0)) xianjin,sum(nvl(b.pos,0)) pos,sum(nvl(b.zhipiao,0)) zhipiao,sum(nvl(b.huiyuanka,0)-nvl(b.youhui_kabili,0)) hyaskje,sum(nvl(b.chongka_hyk_sr,0)) hyksr,sum(nvl(b.chongka_ck_sr,0)) cksr from hk_srgk_hg_zhangdan h left join hk_srgk_hg_zhangdan_b b ");
 		sql.append(" on h.pk_hk_dzpt_hg_zhangdan=b.pk_hk_dzpt_hg_zhangdan ");
-		sql.append("where nvl(h.dr,0)=0 and nvl(b.dr,0)=0 and  b.sqfl_name in ('会员卡','套餐方案','次卡套餐打折') ");
+		sql.append("where nvl(h.dr,0)=0 and nvl(b.dr,0)=0 and  nvl(b.sqfl_name,'~') in ('会员卡','套餐方案','次卡套餐打折') ");
 		sql.append(" and h.pk_org in (" + pk_org + ")");
 		sql.append(" and to_date(h.dbilldate,'yyyy-mm-dd hh24:mi:ss')>=to_date('"
 				+ begindate + "','yyyy-mm-dd hh24:mi:ss') ");
