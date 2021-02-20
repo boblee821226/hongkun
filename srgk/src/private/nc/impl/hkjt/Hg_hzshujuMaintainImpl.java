@@ -556,6 +556,14 @@ public class Hg_hzshujuMaintainImpl implements IHG_hzshujuMaintain {
 						bvo_jdrs.setJine(PuPubVO.getUFDouble_NullAsZero(jdrs));
 					}
 					list_bnew.add(bvo_jdrs);
+					
+					/**
+					 * 拆分次数
+					 * HK 2021年2月20日18:04:17
+					 */
+					getChaiFenPerson(first_org, begindate, enddate, list_bnew);
+					/***END***/
+					
 					// 重新设置行号
 					resetVrowNo(list_bnew);
 					srdibiaoBillVO.setChildrenVO(list_bnew
@@ -614,6 +622,14 @@ public class Hg_hzshujuMaintainImpl implements IHG_hzshujuMaintain {
 						bvo_jdrs.setJine(PuPubVO.getUFDouble_NullAsZero(jdrs));
 					}
 					lfetbvos.add(bvo_jdrs);
+					
+					/**
+					 * 拆分次数
+					 * HK 2021年2月20日18:04:17
+					 */
+					getChaiFenPerson(first_org, begindate, enddate, lfetbvos);
+					/***END***/
+					
 					// 重新设置行号
 					resetVrowNo(lfetbvos);
 					srdibiaoBillVO.setChildrenVO(lfetbvos
@@ -625,6 +641,48 @@ public class Hg_hzshujuMaintainImpl implements IHG_hzshujuMaintain {
 		billvos = list_new.toArray(new SrdibiaoBillVO[] {});
 
 		return billvos;
+	}
+	
+	/**
+	 * 统计拆分到各景点的人次
+	 * select zb.sq_name,count(0) from hk_srgk_hg_zhangdan z
+		inner join hk_srgk_hg_zhangdan_b zb on z.pk_hk_dzpt_hg_zhangdan = zb.pk_hk_dzpt_hg_zhangdan
+		where z.dr = 0 and zb.dr = 0
+		and z.pk_org = '0001N510000000001SY7'
+		and substr(z.dbilldate,1,10) = '2021-02-08'
+		and nvl(zb.vbdef10,'~') = '~'
+		and nvl(zb.shouru,0) <> 0.0
+		and zb.sqfl_name like '%拆分%'
+		group by zb.sq_name
+	 * @throws DAOException 
+	 */
+	private void getChaiFenPerson(String pk_org, String begindate,
+			String enddate, List<SrdibiaoBVO> list_bnew) throws DAOException {
+		
+		StringBuffer querySQL = 
+		new StringBuffer("select ")
+				.append(" zb.sq_name ")
+				.append(",count(0) ")
+				.append(" from hk_srgk_hg_zhangdan z ")
+				.append(" inner join hk_srgk_hg_zhangdan_b zb on z.pk_hk_dzpt_hg_zhangdan = zb.pk_hk_dzpt_hg_zhangdan ")
+				.append(" where z.dr = 0 and zb.dr = 0 ")
+				.append(" and z.pk_org = '").append(pk_org).append("' ")
+				.append(" and substr(z.dbilldate,1,10) between '")
+					.append(begindate).append("' and '").append(enddate).append("' ")
+				.append(" and nvl(zb.vbdef10,'~') = '~' ")
+				.append(" and nvl(zb.shouru,0) <> 0.0 ")
+				.append(" and zb.sqfl_name like '%拆分%' ")
+				.append(" group by zb.sq_name ")
+		;
+		List<Object[]> list = (ArrayList<Object[]>)this.getBD().executeQuery(querySQL.toString(), new ArrayListProcessor());
+		for (Object[] item : list) {
+			String sqName = PuPubVO.getString_TrimZeroLenAsNull(item[0]);
+			UFDouble count = PuPubVO.getUFDouble_ValueAsValue(item[1]);
+			SrdibiaoBVO bVO = new SrdibiaoBVO();
+			bVO.setJzfs_name(sqName);
+			bVO.setJine(count);
+			list_bnew.add(bVO);
+		}
 	}
 
 	/**
