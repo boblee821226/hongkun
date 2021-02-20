@@ -165,6 +165,7 @@ public class N264XService {
 			bxdwStr = srcHVO.getTzf();
 			fycdgsStr = srcHVO.getSzgs();
 			fycdbmStr = srcHVO.getSzbm();
+			spje = PuPubVO.getUFDouble_NullAsZero(srcHVO.getTzje1());
 		}
 		
 		if (
