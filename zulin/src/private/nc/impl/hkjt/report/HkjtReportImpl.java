@@ -5,6 +5,7 @@ import hd.vo.pub.tools.ReportDataUtil;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 import nc.bs.dao.BaseDAO;
 import nc.bs.framework.common.NCLocator;
@@ -28,6 +29,7 @@ import nc.vo.fa.alter.AlterVO;
 import nc.vo.ia.mia.entity.IABillVO;
 import nc.vo.ia.mia.entity.IAHeadVO;
 import nc.vo.ia.mia.entity.IAItemVO;
+import nc.vo.ic.m4d.entity.MaterialOutVO;
 import nc.vo.pp.m29.account.entity.AccountVO;
 import nc.vo.pu.m25.entity.InvoiceHeaderVO;
 import nc.vo.pu.m25.entity.InvoiceItemVO;
@@ -1024,6 +1026,12 @@ public class HkjtReportImpl implements HkjtReportITF {
 	public Object delXbsqBackJsd(AggAllocateApplyVO billVO, Object other)
 			throws BusinessException {
 		return new BusinessDAO().delXbsqBackJsd(billVO, other);
+	}
+
+	@Override
+	public Object ckZhuanGu(MaterialOutVO ckVO, Map<String, Object> param)
+			throws BusinessException {
+		return new ZhuanGuDAO().doZhuanGu(ckVO, param);
 	}
 	
 }
