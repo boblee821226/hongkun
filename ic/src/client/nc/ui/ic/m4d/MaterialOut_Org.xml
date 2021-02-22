@@ -649,7 +649,7 @@
 	</bean> 
 	
 	<!--HK 转固-->
-	<bean id="zhuanGuAction" class="nc.ui.ic.m4i.action.ZhuanGuAction">
+	<bean id="zhuanGuAction" class="nc.ui.ic.m4d.action.ZhuanGuAction">
 		<property name="model" ref="icBizModel" />
 		<property name="editor" ref="card" />
 		<property name="listView" ref="list" />

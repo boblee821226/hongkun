@@ -1481,11 +1481,11 @@ public class MaterialOut_Org extends
 		return bean;
 	}
 
-	public nc.ui.ic.m4i.action.ZhuanGuAction getZhuanGuAction() {
+	public nc.ui.ic.m4d.action.ZhuanGuAction getZhuanGuAction() {
 		if (context.get("zhuanGuAction") != null)
-			return (nc.ui.ic.m4i.action.ZhuanGuAction) context
+			return (nc.ui.ic.m4d.action.ZhuanGuAction) context
 					.get("zhuanGuAction");
-		nc.ui.ic.m4i.action.ZhuanGuAction bean = new nc.ui.ic.m4i.action.ZhuanGuAction();
+		nc.ui.ic.m4d.action.ZhuanGuAction bean = new nc.ui.ic.m4d.action.ZhuanGuAction();
 		context.put("zhuanGuAction", bean);
 		bean.setModel(getIcBizModel());
 		bean.setEditor((nc.ui.ic.pub.view.ICBizBillForm) findBeanInUIF2BeanFactory("card"));
